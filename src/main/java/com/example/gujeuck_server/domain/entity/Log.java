@@ -6,31 +6,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogEntity {
+public class Log {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purpose_id", nullable = false)
-    private PurposeEntity purpose;
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "custom_id")
-    private CustomLogEntity customLog;
+    private Purpose purpose;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "leader_id", nullable = false)
-    private UserEntity leader;
+    private User leader;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private UserEntity companion;
+    private User companion;
 
     @Column(name = "male_count", nullable = false)
     private int maleCount;
@@ -39,6 +37,13 @@ public class LogEntity {
     private int femaleCount;
 
     @Column(name = "visit_date", nullable = false)
-    private java.time.LocalDate visitDate;
+    private LocalDate visitDate;
+
+    @PrePersist
+    public void prePersist() {
+        if(visitDate == null) {
+            visitDate = LocalDate.now();
+        }
+    }
 }
 

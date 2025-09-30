@@ -11,14 +11,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PurposeEntity {
+public class Admin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 30)
-    private String purpose;
-
-    @Column(name = "purpose_image")
-    private String purposeImage;
+    @Column(nullable = false, length = 100)
+    private String password;
 }
