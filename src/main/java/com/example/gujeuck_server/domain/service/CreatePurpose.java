@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.service;
 
+import com.example.gujeuck_server.domain.dto.PurposeRequest;
 import com.example.gujeuck_server.domain.entity.Purpose;
 import com.example.gujeuck_server.domain.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +11,12 @@ import org.springframework.stereotype.Service;
 public class CreatePurpose {
     private final PurposeRepository purposeRepository;
 
-    public void createPurpose(Purpose purpose) {
-        Purpose newPurpose = new Purpose();
+    public void createPurpose(PurposeRequest purposeRequest) {
+        Purpose purpose = new Purpose();
 
-        newPurpose.setPurpose(purpose.getPurpose());
-        newPurpose.setPurposeImage(purpose.getPurposeImage());
+        purpose.setPurpose(purposeRequest.getPurpose());
+        purpose.setPurposeImage(purposeRequest.getPurposeImage());
 
-        purposeRepository.save(newPurpose);
+        purposeRepository.save(purpose);
     }
 }
