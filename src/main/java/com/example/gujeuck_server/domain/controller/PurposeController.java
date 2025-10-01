@@ -10,7 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin")
-public class AdminController {
+@RequestMapping("/admin/purpose")
+public class PurposeController {
+    private final CreatePurpose createPurpose;
 
+    @PostMapping("/create")
+    public void createPurpose(@RequestBody PurposeRequest purposeDto) {
+        createPurpose.createPurpose(purposeDto);
+    }
 }
