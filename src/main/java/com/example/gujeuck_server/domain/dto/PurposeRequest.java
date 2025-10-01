@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PurposeDto {
+public class PurposeRequest {
     private String purpose;
     private String purposeImage;
 }
