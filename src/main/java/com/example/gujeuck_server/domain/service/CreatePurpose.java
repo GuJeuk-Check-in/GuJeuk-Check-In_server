@@ -12,10 +12,10 @@ public class CreatePurpose {
     private final PurposeRepository purposeRepository;
 
     public void createPurpose(PurposeRequest purposeDto) {
-        Purpose purpose = new Purpose();
-
-        purpose.setPurpose(purposeDto.getPurpose());
-        purpose.setPurposeImage(purposeDto.getPurposeImage());
+        Purpose purpose = Purpose.builder()
+                .purpose(purposeDto.getPurpose())
+                .purposeImage(purposeDto.getPurposeImage())
+                .build();
 
         purposeRepository.save(purpose);
     }
