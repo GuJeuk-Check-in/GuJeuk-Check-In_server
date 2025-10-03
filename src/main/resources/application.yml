@@ -7,46 +7,46 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_NAME}
-    password: ${DB_PASSWORD}
+    url: 'jdbc:mysql://localhost:3306/GuJeuckServer?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8'
+    username: root
+    password: oijwef098234
 
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-
-  jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    open-in-view: false
-    show-sql: true
-    hibernate:
-      jdbc:
-        time_zone: Asia/Seoul
-      ddl-auto: update
-jwt:
-  header: Authorization
-  prefix: Bearer
-  accessExpiration: 3600
-  refreshExpiration: 604800
-  secretKey: ${JWT_SECRET_KEY}
-
-  logging:
-    level:
-      root: DEBUG
-
-cloud:
-  aws:
-    s3:
-      bucket: ${BUCKET_NAME}
-      url-prefix: ${Turkey_IMAGE_FOLDER}
-    region:
-      static: ${AWS_REGION}
-    stack:
-      auto: false
-    credentials:
-      accessKey: ${AWS_ACCESS_KEY_ID}
-      secretKey: ${AWS_SECRET_ACCESS_KEY}
+#  servlet:
+#    multipart:
+#      max-file-size: 10MB
+#      max-request-size: 10MB
+#
+#  jpa:
+#    database-platform: org.hibernate.dialect.MySQL8Dialect
+#    open-in-view: false
+#    show-sql: true
+#    hibernate:
+#      jdbc:
+#        time_zone: Asia/Seoul
+#      ddl-auto: update
+#jwt:
+#  header: Authorization
+#  prefix: Bearer
+#  accessExpiration: 3600
+#  refreshExpiration: 604800
+#  secretKey: ${JWT_SECRET_KEY}
+#
+#  logging:
+#    level:
+#      root: DEBUG
+#
+#cloud:
+#  aws:
+#    s3:
+#      bucket: ${BUCKET_NAME}
+#      url-prefix: ${Turkey_IMAGE_FOLDER}
+#    region:
+#      static: ${AWS_REGION}
+#    stack:
+#      auto: false
+#    credentials:
+#      accessKey: ${AWS_ACCESS_KEY_ID}
+#      secretKey: ${AWS_SECRET_ACCESS_KEY}
 
 
 redis:
