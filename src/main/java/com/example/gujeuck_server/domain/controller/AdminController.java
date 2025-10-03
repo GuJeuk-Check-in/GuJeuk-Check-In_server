@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.controller;
 
-import com.example.gujeuck_server.domain.service.ReadPurpose;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
