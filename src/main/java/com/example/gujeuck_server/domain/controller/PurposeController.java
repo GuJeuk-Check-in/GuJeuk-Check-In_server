@@ -33,4 +33,6 @@ public class PurposeController {
     public Purpose readPurposeById(@PathVariable Long id) {
         return readOnePurpose.readById(id);
     }
+
+
 }
