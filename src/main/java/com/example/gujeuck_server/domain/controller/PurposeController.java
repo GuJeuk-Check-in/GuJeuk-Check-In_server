@@ -3,7 +3,8 @@ package com.example.gujeuck_server.domain.controller;
 import com.example.gujeuck_server.domain.dto.PurposeRequest;
 import com.example.gujeuck_server.domain.entity.Purpose;
 import com.example.gujeuck_server.domain.service.CreatePurpose;
-import com.example.gujeuck_server.domain.service.ReadPurpose;
+import com.example.gujeuck_server.domain.service.ReadAllPurpose;
+import com.example.gujeuck_server.domain.service.ReadOnePurpose;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/admin/purpose")
 public class PurposeController {
-    private final ReadPurpose readPurpose;
+    private final ReadAllPurpose readAllPurpose;
+    private final ReadOnePurpose readOnePurpose;
     private final CreatePurpose createPurpose;
 
     @PostMapping("/create")
@@ -23,11 +25,11 @@ public class PurposeController {
 
     @GetMapping("/all")
     public List<Purpose> readAllPurpose() {
-        return readPurpose.readAll();
+        return readAllPurpose.readAll();
     }
 
     @GetMapping("/{id}")
     public Purpose readPurposeById(@PathVariable Long id) {
-        return readPurpose.readById(id);
+        return readOnePurpose.readById(id);
     }
 }

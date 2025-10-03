@@ -5,18 +5,10 @@ import com.example.gujeuck_server.domain.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
-public class ReadPurpose {
+public class ReadOnePurpose {
     private final PurposeRepository purposeRepository;
-
-    public List<Purpose> readAll() {
-        List<Purpose> purposes = purposeRepository.findAll();
-
-        return purposes;
-    }
 
     public Purpose readById(Long id) {
         Purpose purpose = purposeRepository.findById(id)
