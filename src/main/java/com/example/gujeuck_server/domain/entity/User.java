@@ -25,8 +25,11 @@ public class User {
     @Column(nullable = false, length = 11)
     private String phone;
 
+    @Column(nullable = false)
+    private String gender;
+
     @Column(nullable = false, length = 6, name = "birth_ymd")
-    private int birthYMD;
+    private String birthYMD;
 
     @Column(nullable = false, length = 30)
     private String residence;
