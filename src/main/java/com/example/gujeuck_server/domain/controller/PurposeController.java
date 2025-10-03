@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.controller;
 
 import com.example.gujeuck_server.domain.dto.PurposeRequest;
+import com.example.gujeuck_server.domain.dto.PurposeResponse;
 import com.example.gujeuck_server.domain.entity.Purpose;
 import com.example.gujeuck_server.domain.service.CreatePurpose;
 import com.example.gujeuck_server.domain.service.ReadAllPurpose;
@@ -24,7 +25,7 @@ public class PurposeController {
     }
 
     @GetMapping("/all")
-    public List<Purpose> readAllPurpose() {
+    public List<PurposeResponse> readAllPurpose() {
         return readAllPurpose.readAll();
     }
 
