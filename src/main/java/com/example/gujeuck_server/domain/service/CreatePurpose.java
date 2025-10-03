@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 public class CreatePurpose {
     private final PurposeRepository purposeRepository;
 
-    public void createPurpose(PurposeRequest purposeRequest) {
-        Purpose purpose = new Purpose();
-
-        purpose.setPurpose(purposeRequest.getPurpose());
-        purpose.setPurposeImage(purposeRequest.getPurposeImage());
+    public void createPurpose(PurposeRequest purposeDto) {
+        Purpose purpose = Purpose.builder()
+                .purpose(purposeDto.getPurpose())
+                .purposeImage(purposeDto.getPurposeImage())
+                .build();
 
         purposeRepository.save(purpose);
     }
