@@ -12,3 +12,4 @@ public class PurposeResponse {
     private String purpose;
     private String purposeImage;
 }
+ 
