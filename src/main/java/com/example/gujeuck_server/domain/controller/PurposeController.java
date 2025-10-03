@@ -30,7 +30,7 @@ public class PurposeController {
     }
 
     @GetMapping("/{id}")
-    public Purpose readPurposeById(@PathVariable Long id) {
+    public PurposeResponse readPurposeById(@PathVariable Long id) {
         return readOnePurpose.readById(id);
     }
 
