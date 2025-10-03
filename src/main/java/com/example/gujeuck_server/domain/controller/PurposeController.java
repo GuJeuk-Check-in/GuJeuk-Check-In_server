@@ -2,10 +2,9 @@ package com.example.gujeuck_server.domain.controller;
 
 import com.example.gujeuck_server.domain.dto.PurposeRequest;
 import com.example.gujeuck_server.domain.dto.PurposeResponse;
-import com.example.gujeuck_server.domain.entity.Purpose;
-import com.example.gujeuck_server.domain.service.CreatePurpose;
-import com.example.gujeuck_server.domain.service.ReadAllPurpose;
-import com.example.gujeuck_server.domain.service.ReadOnePurpose;
+import com.example.gujeuck_server.domain.service.CreatePurposeService;
+import com.example.gujeuck_server.domain.service.ReadAllPurposeService;
+import com.example.gujeuck_server.domain.service.ReadOnePurposeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +14,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/admin/purpose")
 public class PurposeController {
-    private final ReadAllPurpose readAllPurpose;
-    private final ReadOnePurpose readOnePurpose;
-    private final CreatePurpose createPurpose;
+    private final ReadAllPurposeService readAllPurpose;
+    private final ReadOnePurposeService readOnePurpose;
+    private final CreatePurposeService createPurpose;
 
     @PostMapping("/create")
     public void createPurpose(@RequestBody PurposeRequest purposeRequest) {

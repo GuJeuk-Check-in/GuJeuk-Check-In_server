@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CreatePurpose {
+public class CreatePurposeService {
     private final PurposeRepository purposeRepository;
 
     public void createPurpose(PurposeRequest purposeDto) {
