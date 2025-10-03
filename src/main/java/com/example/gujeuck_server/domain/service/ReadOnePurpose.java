@@ -13,7 +13,10 @@ public class ReadOnePurpose {
     private final PurposeRepository purposeRepository;
 
     public PurposeResponse readById(Long id) {
-        return purposeRepository.readById(id).orElseThrow(
+        Purpose purpose = purposeRepository.findById(id).orElseThrow(
                 () -> NotFoundPurposeException.EXCEPTION);
+
+        return new PurposeResponse(purpose.getId(), purpose.getPurpose(), purpose.getPurposeImage());
+
     }
 }

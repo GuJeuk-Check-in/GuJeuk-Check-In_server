@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PurposeResponse {
+    private Long id;
     private String purpose;
     private String purposeImage;
 }
