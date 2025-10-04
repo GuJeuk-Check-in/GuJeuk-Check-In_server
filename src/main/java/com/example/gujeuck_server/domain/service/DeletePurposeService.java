@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.service;
 
+import com.example.gujeuck_server.domain.entity.Purpose;
 import com.example.gujeuck_server.domain.exception.NotFoundPurposeException;
 import com.example.gujeuck_server.domain.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +14,10 @@ public class DeletePurposeService {
 
     @Transactional
     public void deletePurpose(Long id) {
-        purposeRepository.findById(id).orElseThrow(
+        Purpose purpose = purposeRepository.findById(id).orElseThrow(
                 () -> NotFoundPurposeException.EXCEPTION
         );
-        purposeRepository.deleteById(id);
+
+        purposeRepository.delete(purpose);
     }
 }
