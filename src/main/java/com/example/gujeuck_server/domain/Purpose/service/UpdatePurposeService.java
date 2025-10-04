@@ -1,9 +1,9 @@
-package com.example.gujeuck_server.domain.service;
+package com.example.gujeuck_server.domain.Purpose.service;
 
-import com.example.gujeuck_server.domain.dto.PurposeRequest;
-import com.example.gujeuck_server.domain.entity.Purpose;
-import com.example.gujeuck_server.domain.exception.NotFoundPurposeException;
-import com.example.gujeuck_server.domain.repository.PurposeRepository;
+import com.example.gujeuck_server.domain.Purpose.dto.PurposeRequest;
+import com.example.gujeuck_server.domain.Purpose.entity.Purpose;
+import com.example.gujeuck_server.domain.Purpose.exception.NotFoundPurposeException;
+import com.example.gujeuck_server.domain.Purpose.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

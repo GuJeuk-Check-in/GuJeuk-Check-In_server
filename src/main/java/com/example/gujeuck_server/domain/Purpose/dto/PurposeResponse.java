@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.dto;
+package com.example.gujeuck_server.domain.Purpose.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.entity;
+package com.example.gujeuck_server.domain.Purpose.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
