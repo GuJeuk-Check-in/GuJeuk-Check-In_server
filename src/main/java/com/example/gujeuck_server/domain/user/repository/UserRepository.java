@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.repository;
+package com.example.gujeuck_server.domain.user.repository;
 
-import com.example.gujeuck_server.domain.entity.User;
+import com.example.gujeuck_server.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {

@@ -1,8 +1,8 @@
-package com.example.gujeuck_server.domain.controller;
+package com.example.gujeuck_server.domain.purpose.controller;
 
-import com.example.gujeuck_server.domain.dto.PurposeRequest;
-import com.example.gujeuck_server.domain.dto.PurposeResponse;
-import com.example.gujeuck_server.domain.service.*;
+import com.example.gujeuck_server.domain.purpose.dto.PurposeRequest;
+import com.example.gujeuck_server.domain.purpose.dto.PurposeResponse;
+import com.example.gujeuck_server.domain.purpose.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

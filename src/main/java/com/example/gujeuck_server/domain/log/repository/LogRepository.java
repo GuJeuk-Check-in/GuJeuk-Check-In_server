@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.repository;
+package com.example.gujeuck_server.domain.log.repository;
 
-import com.example.gujeuck_server.domain.entity.Log;
+import com.example.gujeuck_server.domain.log.entity.Log;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LogRepository extends JpaRepository<Log, Long> {
