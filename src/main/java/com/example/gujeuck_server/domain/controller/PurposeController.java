@@ -2,7 +2,11 @@ package com.example.gujeuck_server.domain.controller;
 
 import com.example.gujeuck_server.domain.dto.PurposeRequest;
 import com.example.gujeuck_server.domain.dto.PurposeResponse;
-import com.example.gujeuck_server.domain.service.*;
+import com.example.gujeuck_server.domain.service.CreatePurposeService;
+import com.example.gujeuck_server.domain.service.ReadAllPurposeService;
+import com.example.gujeuck_server.domain.service.ReadOnePurposeService;
+import com.example.gujeuck_server.domain.service.UpdatePurposeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +23,7 @@ public class PurposeController {
     private final DeletePurposeService deletePurpose;
 
     @PostMapping("/create")
-    public void createPurpose(@RequestBody PurposeRequest purposeRequest) {
+    public void createPurpose(@RequestBody @Valid PurposeRequest purposeRequest) {
         createPurpose.createPurpose(purposeRequest);
     }
 
@@ -34,7 +38,7 @@ public class PurposeController {
     }
 
     @PatchMapping("/{id}")
-    public void updatePurpose(@PathVariable Long id, @RequestBody PurposeRequest purposeRequest) {
+    public void updatePurpose(@PathVariable Long id, @RequestBody @Valid PurposeRequest purposeRequest) {
         updatePurpose.updatePurpose(id, purposeRequest);
     }
 
