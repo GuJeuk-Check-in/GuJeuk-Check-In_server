@@ -1,14 +1,12 @@
 package com.example.gujeuck_server.domain.User.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
@@ -25,7 +23,7 @@ public class User {
     @Column(nullable = false, length = 11)
     private String phone;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "gender")
     private String gender;
 
     @Column(nullable = false, length = 6, name = "birth_ymd")
