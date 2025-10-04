@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(rollbackFor = NotFoundPurposeException.class)
 @RequiredArgsConstructor
 public class DeletePurposeService {
     private final PurposeRepository purposeRepository;
 
+    @Transactional
     public void deletePurpose(Long id) {
         purposeRepository.findById(id).orElseThrow(
                 () -> NotFoundPurposeException.EXCEPTION
