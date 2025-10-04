@@ -20,6 +20,7 @@ public class PurposeController {
     private final ReadOnePurposeService readOnePurpose;
     private final CreatePurposeService createPurpose;
     private final UpdatePurposeService updatePurpose;
+    private final DeletePurposeService deletePurpose;
 
     @PostMapping("/create")
     public void createPurpose(@RequestBody @Valid PurposeRequest purposeRequest) {
@@ -39,5 +40,10 @@ public class PurposeController {
     @PatchMapping("/{id}")
     public void updatePurpose(@PathVariable Long id, @RequestBody @Valid PurposeRequest purposeRequest) {
         updatePurpose.updatePurpose(id, purposeRequest);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletePurpose(@PathVariable Long id) {
+        deletePurpose.deletePurpose(id);
     }
 }
