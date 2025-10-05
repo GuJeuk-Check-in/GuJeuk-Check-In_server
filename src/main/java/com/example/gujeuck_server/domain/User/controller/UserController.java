@@ -12,12 +12,6 @@ import java.util.List;
 @RequestMapping("/admin/user")
 public class UserController {
     private final ReadAllUserListService readAllUserListService;
-    private final TestCreateUserListService testCreateUserListService;
-
-    @PostMapping("/create")
-    public void testCreatePurpose(@RequestBody UserRequest userRequest) {
-        testCreateUserListService.createUserList(userRequest);
-    }
 
     @GetMapping("/all")
     public List<UserResponse> getAllUserList() {

@@ -14,7 +14,7 @@ public class ReadAllUserListService {
 
     public List<UserResponse> readAllUserList() {
         return userRepository.findAll().stream()
-                .map(userList -> new UserResponse(userList.getId(), userList.getUserId(), userList.getName(), userList.getGender(), userList.getPhone(), userList.getBirthYMD(), userList.getResidence(), userList.isPrivacyAgreed()))
+                .map(UserResponse::from)
                 .toList();
     }
 }
