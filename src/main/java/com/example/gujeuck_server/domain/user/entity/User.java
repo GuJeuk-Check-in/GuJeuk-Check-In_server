@@ -6,6 +6,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,7 +24,7 @@ public class User {
     @Column(nullable = false, length = 11)
     private String phone;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "gender")
     @Enumerated(EnumType.STRING)
     private Gender gender;
 

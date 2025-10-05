@@ -1,10 +1,12 @@
 package com.example.gujeuck_server.domain.user.controller;
 
+import com.example.gujeuck_server.domain.user.dto.UserResponse;
 import com.example.gujeuck_server.domain.user.dto.request.LoginRequest;
 import com.example.gujeuck_server.domain.user.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.user.dto.request.SignupRequest;
 import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.user.service.LoginService;
+import com.example.gujeuck_server.domain.user.service.ReadAllUserListService;
 import com.example.gujeuck_server.domain.user.service.ReissueService;
 import com.example.gujeuck_server.domain.user.service.SignupService;
 import jakarta.validation.Valid;
@@ -12,13 +14,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/user")
 @RequiredArgsConstructor
+@RequestMapping("/admin/user")
 public class UserController {
+    private final ReadAllUserListService readAllUserListService;
     private final SignupService signupService;
     private final LoginService loginService;
     private final ReissueService reissueService;
+
+    @GetMapping("/all")
+    public List<UserResponse> getAllUserList() {
+        return readAllUserListService.readAllUserList();
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/sign-up")
