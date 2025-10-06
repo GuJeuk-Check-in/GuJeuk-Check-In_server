@@ -1,11 +1,8 @@
-package com.example.gujeuck_server.domain.purpose.controller;
+package com.example.gujeuck_server.domain.Purpose.controller;
 
-import com.example.gujeuck_server.domain.dto.PurposeRequest;
-import com.example.gujeuck_server.domain.dto.PurposeResponse;
-import com.example.gujeuck_server.domain.service.CreatePurposeService;
-import com.example.gujeuck_server.domain.service.ReadAllPurposeService;
-import com.example.gujeuck_server.domain.service.ReadOnePurposeService;
-import com.example.gujeuck_server.domain.service.UpdatePurposeService;
+import com.example.gujeuck_server.domain.Purpose.dto.PurposeRequest;
+import com.example.gujeuck_server.domain.Purpose.dto.PurposeResponse;
+import com.example.gujeuck_server.domain.Purpose.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

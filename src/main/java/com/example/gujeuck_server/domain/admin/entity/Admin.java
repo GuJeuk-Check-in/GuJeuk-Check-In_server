@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.entity;
+package com.example.gujeuck_server.domain.Admin.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

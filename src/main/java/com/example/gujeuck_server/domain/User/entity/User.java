@@ -1,11 +1,11 @@
 package com.example.gujeuck_server.domain.User.entity;
 
+import com.example.gujeuck_server.domain.User.entity.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,8 +23,9 @@ public class User {
     @Column(nullable = false, length = 11)
     private String phone;
 
-    @Column(nullable = false, name = "gender")
-    private String gender;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Column(nullable = false, length = 6, name = "birth_ymd")
     private String birthYMD;

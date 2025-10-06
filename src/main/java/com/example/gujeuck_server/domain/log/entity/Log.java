@@ -1,9 +1,12 @@
-package com.example.gujeuck_server.domain.log.entity;
+package com.example.gujeuck_server.domain.Log.entity;
 
-import com.example.gujeuck_server.domain.purpose.entity.Purpose;
-import com.example.gujeuck_server.domain.user.entity.User;
+import com.example.gujeuck_server.domain.Purpose.entity.Purpose;
+import com.example.gujeuck_server.domain.User.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 

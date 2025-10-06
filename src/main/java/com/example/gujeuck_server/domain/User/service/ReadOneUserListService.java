@@ -5,7 +5,6 @@ import com.example.gujeuck_server.domain.User.entity.User;
 import com.example.gujeuck_server.domain.User.exception.UserNotFoundException;
 import com.example.gujeuck_server.domain.User.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service

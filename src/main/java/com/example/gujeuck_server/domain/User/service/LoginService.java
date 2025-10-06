@@ -1,10 +1,10 @@
-package com.example.gujeuck_server.domain.user.service;
+package com.example.gujeuck_server.domain.User.service;
 
-import com.example.gujeuck_server.domain.user.dto.request.LoginRequest;
-import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
-import com.example.gujeuck_server.domain.user.entity.User;
-import com.example.gujeuck_server.domain.user.repository.UserRepository;
-import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
+import com.example.gujeuck_server.domain.User.dto.request.LoginRequest;
+import com.example.gujeuck_server.domain.User.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.User.entity.User;
+import com.example.gujeuck_server.domain.User.repository.UserRepository;
+import com.example.gujeuck_server.domain.User.exception.UserNotFoundException;
 import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
