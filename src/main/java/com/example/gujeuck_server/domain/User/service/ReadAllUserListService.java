@@ -4,6 +4,7 @@ import com.example.gujeuck_server.domain.User.dto.UserResponse;
 import com.example.gujeuck_server.domain.User.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,9 +13,10 @@ import java.util.List;
 public class ReadAllUserListService {
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<UserResponse> readAllUserList() {
         return userRepository.findAll().stream()
-                .map(userList -> new UserResponse(userList.getId(), userList.getUserId(), userList.getName(), userList.getGender(), userList.getPhone(), userList.getBirthYMD(), userList.getResidence(), userList.isPrivacyAgreed()))
+                .map(UserResponse::from)
                 .toList();
     }
 }
