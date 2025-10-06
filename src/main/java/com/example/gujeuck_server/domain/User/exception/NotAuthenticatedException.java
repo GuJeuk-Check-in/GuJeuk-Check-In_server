@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.user.exception;
+package com.example.gujeuck_server.domain.User.exception;
 
 public class NotAuthenticatedException extends RuntimeException {
     public NotAuthenticatedException(String message) {

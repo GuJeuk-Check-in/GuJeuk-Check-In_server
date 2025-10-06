@@ -1,8 +1,8 @@
-package com.example.gujeuck_server.domain.purpose.service;
+package com.example.gujeuck_server.domain.Purpose.service;
 
-import com.example.gujeuck_server.domain.purpose.dto.PurposeRequest;
-import com.example.gujeuck_server.domain.purpose.entity.Purpose;
-import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
+import com.example.gujeuck_server.domain.Purpose.dto.PurposeRequest;
+import com.example.gujeuck_server.domain.Purpose.entity.Purpose;
+import com.example.gujeuck_server.domain.Purpose.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

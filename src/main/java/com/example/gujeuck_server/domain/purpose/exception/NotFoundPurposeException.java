@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.purpose.exception;
+package com.example.gujeuck_server.domain.Purpose.exception;
 
 import com.example.gujeuck_server.global.error.exception.ErrorCode;
 import com.example.gujeuck_server.global.error.exception.GujeukException;

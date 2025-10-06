@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.purpose.controller;
+package com.example.gujeuck_server.domain.Purpose.controller;
 
 import com.example.gujeuck_server.domain.purpose.dto.PurposeRequest;
 import com.example.gujeuck_server.domain.purpose.dto.PurposeResponse;
