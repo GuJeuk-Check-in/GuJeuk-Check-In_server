@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 package com.example.gujeuck_server.domain.user.exception;
 
 import com.example.gujeuck_server.global.error.exception.ErrorCode;
@@ -10,3 +11,5 @@ public class PasswordMismatchException extends GujeukException {
         super(ErrorCode.PASSWORD_MISMATCH);
     }
 }
+=======
+>>>>>>> Stashed changes

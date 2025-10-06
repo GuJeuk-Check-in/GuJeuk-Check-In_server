@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 package com.example.gujeuck_server.domain.user.dto.response;
 
 import lombok.Builder;
@@ -20,3 +21,5 @@ public class TokenResponse {
         this.refreshExpiredAt = refreshExpiredAt;
     }
 }
+=======
+>>>>>>> Stashed changes

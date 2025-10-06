@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 package com.example.gujeuck_server.domain.user.exception;
 
 import com.example.gujeuck_server.global.error.exception.ErrorCode;
@@ -10,3 +11,5 @@ public class ExpiredTokenException extends GujeukException {
         super(ErrorCode.EXPIRED_TOKEN);
     }
 }
+=======
+>>>>>>> Stashed changes

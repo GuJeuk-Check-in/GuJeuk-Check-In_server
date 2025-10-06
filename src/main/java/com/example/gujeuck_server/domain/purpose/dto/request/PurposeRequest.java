@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream:src/main/java/com/example/gujeuck_server/domain/purpose/dto/request/PurposeRequest.java
 package com.example.gujeuck_server.domain.purpose.dto.request;
+=======
+package com.example.gujeuck_server.domain.purpose.dto;
+>>>>>>> Stashed changes:src/main/java/com/example/gujeuck_server/domain/purpose/dto/PurposeRequest.java
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

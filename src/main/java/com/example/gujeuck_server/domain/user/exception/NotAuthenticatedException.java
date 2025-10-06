@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 package com.example.gujeuck_server.domain.user.exception;
 
 public class NotAuthenticatedException extends RuntimeException {
@@ -5,3 +6,5 @@ public class NotAuthenticatedException extends RuntimeException {
         super(message);
     }
 }
+=======
+>>>>>>> Stashed changes
