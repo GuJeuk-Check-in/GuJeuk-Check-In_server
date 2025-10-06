@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SignupService {
     private final UserRepository userRepository;
+    private final CalculateAgeService calculateAgeService;
 
     @Transactional
     public void signup(SignupRequest request) {
@@ -21,6 +22,8 @@ public class SignupService {
             throw ExistUserIdException.EXCEPTION;
         }
 
+        int age = calculateAgeService.calculateKoreanAge(request.getBirthYMD());
+
         userRepository.save(User.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
@@ -28,6 +31,7 @@ public class SignupService {
                 .birthYMD(request.getBirthYMD())
                 .residence(request.getResidence())
                 .privacyAgreed(request.isPrivacyAgreed())
+                .age(age)
                 .userId(userId)
                 .build());
     }
