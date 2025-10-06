@@ -1,11 +1,7 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
 import com.example.gujeuck_server.domain.purpose.entity.Purpose;
-<<<<<<< Updated upstream
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
-=======
-import com.example.gujeuck_server.domain.purpose.exception.NotFoundPurposeException;
->>>>>>> Stashed changes
 import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

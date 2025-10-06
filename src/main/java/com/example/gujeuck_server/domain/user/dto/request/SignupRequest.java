@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package com.example.gujeuck_server.domain.user.dto.request;
 
 import com.example.gujeuck_server.domain.user.entity.enums.Gender;
@@ -26,5 +25,3 @@ public class SignupRequest {
     @NotBlank
     private boolean privacyAgreed;
 }
-=======
->>>>>>> Stashed changes

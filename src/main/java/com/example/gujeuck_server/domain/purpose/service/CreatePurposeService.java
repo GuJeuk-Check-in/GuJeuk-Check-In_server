@@ -1,10 +1,6 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-<<<<<<< Updated upstream
 import com.example.gujeuck_server.domain.purpose.dto.request.PurposeRequest;
-=======
-import com.example.gujeuck_server.domain.purpose.dto.PurposeRequest;
->>>>>>> Stashed changes
 import com.example.gujeuck_server.domain.purpose.entity.Purpose;
 import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,5 @@
 package com.example.gujeuck_server.domain.purpose.entity;
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
 import jakarta.persistence.*;
 import lombok.*;
 

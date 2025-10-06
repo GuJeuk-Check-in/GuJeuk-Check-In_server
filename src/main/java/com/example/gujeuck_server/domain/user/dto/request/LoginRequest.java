@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package com.example.gujeuck_server.domain.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
@@ -9,5 +8,3 @@ public class LoginRequest {
     @NotBlank
     private String userId;
 }
-=======
->>>>>>> Stashed changes

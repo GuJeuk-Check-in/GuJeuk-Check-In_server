@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package com.example.gujeuck_server.domain.user.exception;
 
 import com.example.gujeuck_server.global.error.exception.ErrorCode;
@@ -11,5 +10,3 @@ public class RefreshTokenNotFoundException extends GujeukException {
         super(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
     }
 }
-=======
->>>>>>> Stashed changes

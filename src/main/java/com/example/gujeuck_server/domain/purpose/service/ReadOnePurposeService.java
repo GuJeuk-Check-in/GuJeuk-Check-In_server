@@ -1,14 +1,8 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-<<<<<<< Updated upstream
 import com.example.gujeuck_server.domain.purpose.dto.response.PurposeResponse;
 import com.example.gujeuck_server.domain.purpose.entity.Purpose;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
-=======
-import com.example.gujeuck_server.domain.purpose.dto.PurposeResponse;
-import com.example.gujeuck_server.domain.purpose.entity.Purpose;
-import com.example.gujeuck_server.domain.purpose.exception.NotFoundPurposeException;
->>>>>>> Stashed changes
 import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
