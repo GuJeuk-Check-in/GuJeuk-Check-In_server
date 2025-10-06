@@ -1,13 +1,13 @@
 package com.example.gujeuck_server.global.security.jwt;
 
-import com.example.gujeuck_server.domain.User.entity.RefreshToken;
-import com.example.gujeuck_server.domain.User.repository.RefreshTokenRepository;
-import com.example.gujeuck_server.domain.User.exception.ExpiredTokenException;
-import com.example.gujeuck_server.domain.User.exception.InvalidTokenException;
-import com.example.gujeuck_server.domain.User.dto.response.TokenResponse;
-import com.example.gujeuck_server.domain.User.entity.User;
-import com.example.gujeuck_server.domain.User.repository.UserRepository;
-import com.example.gujeuck_server.domain.User.exception.UserNotFoundException;
+import com.example.gujeuck_server.domain.user.entity.RefreshToken;
+import com.example.gujeuck_server.domain.user.repository.RefreshTokenRepository;
+import com.example.gujeuck_server.domain.user.exception.ExpiredTokenException;
+import com.example.gujeuck_server.domain.user.exception.InvalidTokenException;
+import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.user.entity.User;
+import com.example.gujeuck_server.domain.user.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
 import com.example.gujeuck_server.global.security.auth.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

@@ -1,5 +1,4 @@
-package com.example.gujeuck_server.domain.Purpose.entity;
-
+package com.example.gujeuck_server.domain.purpose.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Purpose {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

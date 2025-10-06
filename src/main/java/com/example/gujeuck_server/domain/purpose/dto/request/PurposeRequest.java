@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.Purpose.dto;
+package com.example.gujeuck_server.domain.purpose.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

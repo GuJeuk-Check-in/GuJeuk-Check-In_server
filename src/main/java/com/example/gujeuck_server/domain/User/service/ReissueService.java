@@ -1,10 +1,10 @@
-package com.example.gujeuck_server.domain.User.service;
+package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.User.entity.RefreshToken;
-import com.example.gujeuck_server.domain.User.repository.RefreshTokenRepository;
-import com.example.gujeuck_server.domain.User.exception.RefreshTokenNotFoundException;
-import com.example.gujeuck_server.domain.User.dto.request.RefreshTokenRequest;
-import com.example.gujeuck_server.domain.User.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.user.entity.RefreshToken;
+import com.example.gujeuck_server.domain.user.repository.RefreshTokenRepository;
+import com.example.gujeuck_server.domain.user.exception.RefreshTokenNotFoundException;
+import com.example.gujeuck_server.domain.user.dto.request.RefreshTokenRequest;
+import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
 import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

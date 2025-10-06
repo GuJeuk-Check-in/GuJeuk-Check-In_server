@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.User.dto.request;
+package com.example.gujeuck_server.domain.user.dto.request;
 
-import com.example.gujeuck_server.domain.User.entity.enums.Gender;
+import com.example.gujeuck_server.domain.user.entity.enums.Gender;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 

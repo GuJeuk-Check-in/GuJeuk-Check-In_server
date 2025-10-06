@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.User.dto.request;
+package com.example.gujeuck_server.domain.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

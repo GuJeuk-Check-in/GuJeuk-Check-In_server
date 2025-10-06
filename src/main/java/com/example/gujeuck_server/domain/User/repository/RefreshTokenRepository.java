@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.User.repository;
+package com.example.gujeuck_server.domain.user.repository;
 
-import com.example.gujeuck_server.domain.User.entity.RefreshToken;
+import com.example.gujeuck_server.domain.user.entity.RefreshToken;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

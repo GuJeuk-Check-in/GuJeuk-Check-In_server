@@ -1,7 +1,7 @@
-package com.example.gujeuck_server.domain.Purpose.controller;
+package com.example.gujeuck_server.domain.purpose.controller;
 
-import com.example.gujeuck_server.domain.purpose.dto.PurposeRequest;
-import com.example.gujeuck_server.domain.purpose.dto.PurposeResponse;
+import com.example.gujeuck_server.domain.purpose.dto.request.PurposeRequest;
+import com.example.gujeuck_server.domain.purpose.dto.response.PurposeResponse;
 import com.example.gujeuck_server.domain.purpose.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

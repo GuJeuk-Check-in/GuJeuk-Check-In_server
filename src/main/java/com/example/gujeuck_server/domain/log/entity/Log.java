@@ -1,7 +1,7 @@
-package com.example.gujeuck_server.domain.Log.entity;
+package com.example.gujeuck_server.domain.log.entity;
 
-import com.example.gujeuck_server.domain.Purpose.entity.Purpose;
-import com.example.gujeuck_server.domain.User.entity.User;
+import com.example.gujeuck_server.domain.purpose.entity.Purpose;
+import com.example.gujeuck_server.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

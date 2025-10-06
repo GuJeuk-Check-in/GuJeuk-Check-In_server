@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.user.dto.response;
+package com.example.gujeuck_server.domain.user.dto;
 
 import com.example.gujeuck_server.domain.user.entity.User;
 import com.example.gujeuck_server.domain.user.entity.enums.Gender;
@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserResponse {
     private Long id;
-    private String userId;
     private String name;
     private Gender gender;
     private String phone;
@@ -24,7 +23,6 @@ public class UserResponse {
     public static UserResponse from(User user) {
         return new UserResponse(
                 user.getId(),
-                user.getUserId(),
                 user.getName(),
                 user.getGender(),
                 user.getPhone(),

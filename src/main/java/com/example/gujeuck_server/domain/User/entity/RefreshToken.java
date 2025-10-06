@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.User.entity;
+package com.example.gujeuck_server.domain.user.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,9 +1,9 @@
-package com.example.gujeuck_server.domain.User.service;
+package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.User.entity.User;
-import com.example.gujeuck_server.domain.User.exception.ExistUserIdException;
-import com.example.gujeuck_server.domain.User.repository.UserRepository;
-import com.example.gujeuck_server.domain.User.dto.request.SignupRequest;
+import com.example.gujeuck_server.domain.user.entity.User;
+import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
+import com.example.gujeuck_server.domain.user.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.dto.request.SignupRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

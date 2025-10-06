@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.Purpose.dto;
+package com.example.gujeuck_server.domain.purpose.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,4 +12,3 @@ public class PurposeResponse {
     private String purpose;
     private String purposeImage;
 }
- 

@@ -1,9 +1,9 @@
-package com.example.gujeuck_server.domain.User.service;
+package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.User.dto.UserResponse;
-import com.example.gujeuck_server.domain.User.entity.User;
-import com.example.gujeuck_server.domain.User.exception.UserNotFoundException;
-import com.example.gujeuck_server.domain.User.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.dto.UserResponse;
+import com.example.gujeuck_server.domain.user.entity.User;
+import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
+import com.example.gujeuck_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +17,14 @@ public class ReadOneUserListService {
                 () -> UserNotFoundException.EXCEPTION
         );
 
-        return new UserResponse(user.getId(), user.getUserId(), user.getName(), user.getPhone(), user.getGender(), user.getBirthYMD(), user.getResidence(), user.isPrivacyAgreed());
+        return UserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .phone(user.getPhone())
+                .birthYMD(user.getBirthYMD())
+                .gender(user.getGender())
+                .privacyAgreed(user.isPrivacyAgreed())
+                .residence(user.getResidence())
+                .build();
     }
 }

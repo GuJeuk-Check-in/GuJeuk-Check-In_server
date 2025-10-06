@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.User.dto.response;
+package com.example.gujeuck_server.domain.user.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

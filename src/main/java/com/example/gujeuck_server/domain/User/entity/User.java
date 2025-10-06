@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.User.entity;
+package com.example.gujeuck_server.domain.user.entity;
 
-import com.example.gujeuck_server.domain.User.entity.enums.Gender;
+import com.example.gujeuck_server.domain.user.entity.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 

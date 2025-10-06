@@ -1,9 +1,9 @@
-package com.example.gujeuck_server.domain.Purpose.service;
+package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.Purpose.dto.PurposeResponse;
-import com.example.gujeuck_server.domain.Purpose.entity.Purpose;
-import com.example.gujeuck_server.domain.Purpose.exception.NotFoundPurposeException;
-import com.example.gujeuck_server.domain.Purpose.repository.PurposeRepository;
+import com.example.gujeuck_server.domain.purpose.dto.response.PurposeResponse;
+import com.example.gujeuck_server.domain.purpose.entity.Purpose;
+import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
+import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ public class ReadOnePurposeService {
 
     public PurposeResponse readById(Long id) {
         Purpose purpose = purposeRepository.findById(id).orElseThrow(
-                () -> NotFoundPurposeException.EXCEPTION);
+                () -> PurposeNotFoundException.EXCEPTION);
 
         return new PurposeResponse(purpose.getId(), purpose.getPurpose(), purpose.getPurposeImage());
 
