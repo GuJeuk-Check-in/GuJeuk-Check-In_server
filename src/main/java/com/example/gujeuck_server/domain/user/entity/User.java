@@ -20,14 +20,14 @@ public class User {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(nullable = false, length = 11)
+    @Column(nullable = false, length = 20)
     private String phone;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(nullable = false, length = 6, name = "birth_ymd") //2008-05-04 이런 형태로 받아야 함
+    @Column(nullable = false, length = 20, name = "birth_ymd") //2008-05-04 이런 형태로 받아야 함
     private String birthYMD;
 
     @Column(nullable = false)
@@ -38,4 +38,9 @@ public class User {
 
     @Column(nullable = false, name = "privacy_agreed")
     private boolean privacyAgreed;
+
+    public static String generateUserId(String name, String birthYMD) {
+        String monthDay = birthYMD.substring(5).replace("-", "");
+        return name + monthDay;
+    }
 }
