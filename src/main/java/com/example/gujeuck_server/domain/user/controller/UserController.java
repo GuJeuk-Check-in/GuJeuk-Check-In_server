@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.user.controller;
 
-import com.example.gujeuck_server.domain.user.dto.UserResponse;
+import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
 import com.example.gujeuck_server.domain.user.dto.request.LoginRequest;
 import com.example.gujeuck_server.domain.user.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.user.dto.request.SignupRequest;

@@ -1,12 +1,14 @@
-package com.example.gujeuck_server.domain.user.dto;
+package com.example.gujeuck_server.domain.user.dto.response;
 
 import com.example.gujeuck_server.domain.user.entity.User;
 import com.example.gujeuck_server.domain.user.entity.enums.Gender;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponse {
