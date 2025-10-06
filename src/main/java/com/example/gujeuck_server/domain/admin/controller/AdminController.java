@@ -8,5 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminController {
+    //테스트
 
 }
