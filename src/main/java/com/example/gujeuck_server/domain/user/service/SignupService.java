@@ -16,7 +16,7 @@ public class SignupService {
 
     @Transactional
     public void signup(SignupRequest request) {
-        String userId = request.getName() + request.getBirthYMD();
+        String userId = User.generateUserId(request.getName(), request.getBirthYMD());
 
         if (userRepository.existsByUserId(userId)) {
             throw ExistUserIdException.EXCEPTION;
