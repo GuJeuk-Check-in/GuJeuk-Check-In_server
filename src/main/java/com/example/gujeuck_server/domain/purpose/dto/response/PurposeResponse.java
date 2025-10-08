@@ -10,4 +10,8 @@ import lombok.NoArgsConstructor;
 public class PurposeResponse {
     private Long id;
     private String purpose;
+<<<<<<< HEAD
+=======
+    private String purposeImage;
+>>>>>>> origin/feat/admin-CreateUseList
 }

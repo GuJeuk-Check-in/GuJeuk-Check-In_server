@@ -16,7 +16,11 @@ public class ReadOnePurposeService {
         Purpose purpose = purposeRepository.findById(id).orElseThrow(
                 () -> PurposeNotFoundException.EXCEPTION);
 
+<<<<<<< HEAD
         return new PurposeResponse(purpose.getId(), purpose.getPurpose());
+=======
+        return new PurposeResponse(purpose.getId(), purpose.getPurpose(), purpose.getPurposeImage());
+>>>>>>> origin/feat/admin-CreateUseList
 
     }
 }

@@ -12,4 +12,10 @@ public class PurposeRequest {
     @Size(min = 1, max = 30)
     @NotBlank
     private String purpose;
+<<<<<<< HEAD
+=======
+
+    @NotBlank
+    private String purposeImage;
+>>>>>>> origin/feat/admin-CreateUseList
 }
