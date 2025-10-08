@@ -18,8 +18,13 @@ public class Log {
     private Long id;
 
 
+    @Column(nullable = false, length = 30)
     private String name;
+
+    @Column(nullable = false, length = 10)
     private String age;
+
+    @Column(nullable = false, length = 11)
     private String phone;
 
     @Column(name = "male_count", nullable = false)

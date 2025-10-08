@@ -13,26 +13,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/admin/purpose")
 public class PurposeController {
-    private final ReadAllPurposeService readAllPurpose;
-    private final ReadOnePurposeService readOnePurpose;
     private final CreatePurposeService createPurpose;
     private final UpdatePurposeService updatePurpose;
     private final DeletePurposeService deletePurpose;
 
-
     @PostMapping("/create")
     public void createPurpose(@RequestBody @Valid PurposeRequest purposeRequest) {
         createPurpose.createPurpose(purposeRequest);
-    }
-
-    @GetMapping("/all")
-    public List<PurposeResponse> readAllPurpose() {
-        return readAllPurpose.readAll();
-    }
-
-    @GetMapping("/{id}")
-    public PurposeResponse readOnePurpose(@PathVariable Long id) {
-        return readOnePurpose.readById(id);
     }
 
     @PatchMapping("/{id}")
