@@ -14,7 +14,7 @@ public class ReadAllPurposeService {
 
     public List<PurposeResponse> readAll() {
         return purposeRepository.findAll().stream()
-                .map(purpose -> new PurposeResponse(purpose.getId(), purpose.getPurpose(), purpose.getPurposeImage()))
+                .map(purpose -> new PurposeResponse(purpose.getId(), purpose.getPurpose()))
                 .toList();
     }
 }

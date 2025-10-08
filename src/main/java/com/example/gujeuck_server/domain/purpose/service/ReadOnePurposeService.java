@@ -16,7 +16,7 @@ public class ReadOnePurposeService {
         Purpose purpose = purposeRepository.findById(id).orElseThrow(
                 () -> PurposeNotFoundException.EXCEPTION);
 
-        return new PurposeResponse(purpose.getId(), purpose.getPurpose(), purpose.getPurposeImage());
+        return new PurposeResponse(purpose.getId(), purpose.getPurpose());
 
     }
 }

@@ -14,7 +14,6 @@ public class CreatePurposeService {
     public void createPurpose(PurposeRequest purposeDto) {
         Purpose purpose = Purpose.builder()
                 .purpose(purposeDto.getPurpose())
-                .purposeImage(purposeDto.getPurposeImage())
                 .build();
 
         purposeRepository.save(purpose);
