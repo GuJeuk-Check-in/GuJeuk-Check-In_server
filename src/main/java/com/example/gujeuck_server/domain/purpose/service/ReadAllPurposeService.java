@@ -14,11 +14,7 @@ public class ReadAllPurposeService {
 
     public List<PurposeResponse> readAll() {
         return purposeRepository.findAll().stream()
-<<<<<<< HEAD
                 .map(purpose -> new PurposeResponse(purpose.getId(), purpose.getPurpose()))
-=======
-                .map(purpose -> new PurposeResponse(purpose.getId(), purpose.getPurpose(), purpose.getPurposeImage()))
->>>>>>> origin/feat/admin-CreateUseList
                 .toList();
     }
 }

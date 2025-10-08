@@ -1,9 +1,5 @@
 package com.example.gujeuck_server.domain.user.controller;
 
-<<<<<<< HEAD
-import com.example.gujeuck_server.domain.user.dto.UserResponse;
-=======
->>>>>>> origin/feat/admin-CreateUseList
 import com.example.gujeuck_server.domain.user.dto.request.LoginRequest;
 import com.example.gujeuck_server.domain.user.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.user.dto.request.SignupRequest;

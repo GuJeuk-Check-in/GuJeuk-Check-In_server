@@ -18,10 +18,6 @@ public class UpdatePurposeService {
         Purpose purpose = purposeRepository.findById(id)
                 .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
 
-<<<<<<< HEAD
         purpose.updatePurpose(purposeRequest.getPurpose());
-=======
-        purpose.updatePurpose(purposeRequest.getPurpose(),  purposeRequest.getPurposeImage());
->>>>>>> origin/feat/admin-CreateUseList
     }
 }

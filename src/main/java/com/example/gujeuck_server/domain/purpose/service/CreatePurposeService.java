@@ -14,10 +14,6 @@ public class CreatePurposeService {
     public void createPurpose(PurposeRequest purposeDto) {
         Purpose purpose = Purpose.builder()
                 .purpose(purposeDto.getPurpose())
-<<<<<<< HEAD
-=======
-                .purposeImage(purposeDto.getPurposeImage())
->>>>>>> origin/feat/admin-CreateUseList
                 .build();
 
         purposeRepository.save(purpose);
