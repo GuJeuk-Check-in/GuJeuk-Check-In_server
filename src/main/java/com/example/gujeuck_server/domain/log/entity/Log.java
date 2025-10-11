@@ -1,18 +1,15 @@
 package com.example.gujeuck_server.domain.log.entity;
 
 import com.example.gujeuck_server.domain.purpose.entity.Purpose;
-import com.example.gujeuck_server.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Log {
@@ -20,17 +17,15 @@ public class Log {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purpose_id", nullable = false)
-    private Purpose purpose;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "leader_id", nullable = false)
-    private User leader;
+    @Column(nullable = false, length = 30)
+    private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User companion;
+    @Column(nullable = false, length = 10)
+    private String age;
+
+    @Column(nullable = false, length = 11)
+    private String phone;
 
     @Column(name = "male_count", nullable = false)
     private int maleCount;
@@ -38,8 +33,14 @@ public class Log {
     @Column(name = "female_count", nullable = false)
     private int femaleCount;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "purpose_id", nullable = false)
+    private Purpose purpose;
+
     @Column(name = "visit_date", nullable = false)
     private LocalDate visitDate;
+
+    private boolean privacyAgreed;
 
     @PrePersist
     public void prePersist() {

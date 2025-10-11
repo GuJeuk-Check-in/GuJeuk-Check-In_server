@@ -12,11 +12,9 @@ public class CreatePurposeService {
     private final PurposeRepository purposeRepository;
 
     public void createPurpose(PurposeRequest purposeDto) {
-        Purpose purpose = Purpose.builder()
-                .purpose(purposeDto.getPurpose())
-                .purposeImage(purposeDto.getPurposeImage())
-                .build();
 
-        purposeRepository.save(purpose);
+        purposeRepository.save(Purpose.builder()
+                .purpose(purposeDto.getPurpose())
+                .build());
     }
 }
