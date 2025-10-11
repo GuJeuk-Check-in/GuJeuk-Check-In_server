@@ -28,6 +28,7 @@ public class CreateUseListService {
                 .femaleCount(useListRequest.getFemaleCount())
                 .purpose(purpose)
                 .visitDate(useListRequest.getVisitDate())
+                .privacyAgreed(useListRequest.isPrivacyAgreed())
                 .build());
     }
 }
