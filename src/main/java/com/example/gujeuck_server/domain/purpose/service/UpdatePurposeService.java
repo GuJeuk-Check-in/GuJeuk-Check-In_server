@@ -18,6 +18,6 @@ public class UpdatePurposeService {
         Purpose purpose = purposeRepository.findById(id)
                 .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
 
-        purpose.updatePurpose(purposeRequest.getPurpose(),  purposeRequest.getPurposeImage());
+        purpose.updatePurpose(purposeRequest.getPurpose());
     }
 }
