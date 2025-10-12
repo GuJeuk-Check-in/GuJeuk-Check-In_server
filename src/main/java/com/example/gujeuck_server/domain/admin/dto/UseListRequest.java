@@ -1,7 +1,8 @@
 package com.example.gujeuck_server.domain.admin.dto;
 import jakarta.validation.constraints.*;
-import lombok.Getter; import lombok.NoArgsConstructor;
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
