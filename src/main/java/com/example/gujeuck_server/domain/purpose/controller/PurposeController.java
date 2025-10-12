@@ -16,6 +16,8 @@ public class PurposeController {
     private final CreatePurposeService createPurpose;
     private final UpdatePurposeService updatePurpose;
     private final DeletePurposeService deletePurpose;
+    private final ReadAllPurposeService readAllPurpose;
+    private final ReadOnePurposeService readOnePurpose;
 
     @PostMapping("/create")
     public void createPurpose(@RequestBody @Valid PurposeRequest purposeRequest) {
@@ -30,5 +32,15 @@ public class PurposeController {
     @DeleteMapping("/{id}")
     public void deletePurpose(@PathVariable Long id) {
         deletePurpose.deletePurpose(id);
+    }
+
+    @GetMapping("/{id")
+    public PurposeResponse getPurpose(@PathVariable Long id) {
+        return readOnePurpose.readById(id);
+    }
+
+    @GetMapping("/all")
+    public List<PurposeResponse> getAllPurpose() {
+        return readAllPurpose.readAll();
     }
 }
