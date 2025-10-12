@@ -34,7 +34,7 @@ public class PurposeController {
         deletePurpose.deletePurpose(id);
     }
 
-    @GetMapping("/{id")
+    @GetMapping("/{id}")
     public PurposeResponse getPurpose(@PathVariable Long id) {
         return readOnePurpose.readById(id);
     }
