@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.admin.controller;
 
 import com.example.gujeuck_server.domain.admin.dto.UseListRequest;
+import com.example.gujeuck_server.domain.admin.dto.UseListResponse;
 import com.example.gujeuck_server.domain.admin.service.*;
 import com.example.gujeuck_server.domain.user.dto.UserResponse;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ public class AdminController {
     private final ReadAllUserListService readAllUserListService;
     private final DeleteUseListService deleteUseListService;
     private final UpdateUseListService updateUseListService;
+    private final ReadAllUseListService readAllUseListService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
@@ -42,5 +44,10 @@ public class AdminController {
     @PatchMapping("/list/{id}")
     public void updateUseList(@PathVariable Long id, @RequestBody @Valid UseListRequest useListRequest) {
         updateUseListService.updateLog(id, useListRequest);
+    }
+
+    @GetMapping("/list/all")
+    public List<UseListResponse> getAllUseList() {
+        return readAllUseListService.readAllUseList();
     }
 }
