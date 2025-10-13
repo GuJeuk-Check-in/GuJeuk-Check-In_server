@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.admin.service;
 
-import com.example.gujeuck_server.domain.admin.dto.UseListRequest;
+import com.example.gujeuck_server.domain.admin.dto.request.UseListRequest;
 import com.example.gujeuck_server.domain.admin.exception.LogNotFountException;
 import com.example.gujeuck_server.domain.log.entity.Log;
 import com.example.gujeuck_server.domain.log.repository.LogRepository;

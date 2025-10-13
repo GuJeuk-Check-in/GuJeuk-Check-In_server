@@ -1,14 +1,11 @@
 package com.example.gujeuck_server.domain.admin.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
-@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Admin {
@@ -18,4 +15,8 @@ public class Admin {
 
     @Column(nullable = false, length = 100)
     private String password;
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
 }
