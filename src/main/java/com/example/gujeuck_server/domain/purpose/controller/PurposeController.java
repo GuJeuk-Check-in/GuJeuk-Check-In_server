@@ -16,8 +16,13 @@ public class PurposeController {
     private final CreatePurposeService createPurpose;
     private final UpdatePurposeService updatePurpose;
     private final DeletePurposeService deletePurpose;
+<<<<<<< HEAD
     private final ReadAllPurposeService readAllPurpose;
     private final ReadOnePurposeService readOnePurpose;
+=======
+    private final ReadOnePurposeService readOnePurpose;
+    private final ReadAllPurposeService readAllPurpose;
+>>>>>>> origin/feat/admin-UpdateUseList
 
     @PostMapping("/create")
     public void createPurpose(@RequestBody @Valid PurposeRequest purposeRequest) {
@@ -34,13 +39,24 @@ public class PurposeController {
         deletePurpose.deletePurpose(id);
     }
 
+<<<<<<< HEAD
     @GetMapping("/{id}")
     public PurposeResponse getPurpose(@PathVariable Long id) {
         return readOnePurpose.readById(id);
     }
 
+=======
+>>>>>>> origin/feat/admin-UpdateUseList
     @GetMapping("/all")
     public List<PurposeResponse> getAllPurpose() {
         return readAllPurpose.readAll();
     }
+<<<<<<< HEAD
+=======
+
+    @GetMapping("/{id}")
+    public PurposeResponse getPurposeById(@PathVariable Long id) {
+        return readOnePurpose.readById(id);
+    }
+>>>>>>> origin/feat/admin-UpdateUseList
 }
