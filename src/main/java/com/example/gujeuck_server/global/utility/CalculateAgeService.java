@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.user.service;
+package com.example.gujeuck_server.global.utility;
 
 import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import lombok.RequiredArgsConstructor;
