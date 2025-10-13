@@ -22,11 +22,10 @@ public class PurposeController {
     private final UpdatePurposeService updatePurpose;
     private final DeletePurposeService deletePurpose;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createPurpose(@RequestPart(name = "request") PurposeRequest request,
-                              @RequestPart(name = "image") MultipartFile image) {
-        createPurpose.createPurpose(request, image);
+    public void createPurpose(@RequestBody @Valid PurposeRequest request) {
+        createPurpose.createPurpose(request);
     }
 
     @GetMapping("/all")

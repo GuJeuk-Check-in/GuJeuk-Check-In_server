@@ -16,13 +16,10 @@ public class CreatePurposeService {
     private final S3Service s3Service;
 
     @Transactional
-    public void createPurpose(PurposeRequest purposeDto, MultipartFile image) {
-
-        String imageUrl = s3Service.upload(image);
+    public void createPurpose(PurposeRequest purposeDto) {
 
         Purpose purpose = Purpose.builder()
                 .purpose(purposeDto.getPurpose())
-                .purposeImage(imageUrl)
                 .build();
 
         purposeRepository.save(purpose);
