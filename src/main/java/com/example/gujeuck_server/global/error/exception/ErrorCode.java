@@ -3,6 +3,7 @@ package com.example.gujeuck_server.global.error.exception;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
 @Getter
 @AllArgsConstructor
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
@@ -23,6 +24,7 @@ public enum ErrorCode {
     PASSWORD_MISMATCH(401, "비밀 번호가 일치 하지 않습니다."),
     INVALID_USER(401, "유효 하지 않은 사용자입니다."),
     USER_EXIST(401, "유저가 이미 존재합니다."),
+    COMPANION_NOT_FOUND(404, "존재하지 않는 동행인 ID입니다."),
 
     //s3
     IMAGE_NOT_FOUND(404, "이미지를 찾을 수 없음"),
