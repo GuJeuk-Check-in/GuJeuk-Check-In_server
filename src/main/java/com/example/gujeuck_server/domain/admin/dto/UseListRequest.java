@@ -29,4 +29,5 @@ public class UseListRequest {
     private LocalDate visitDate;
 
     @AssertTrue(message = "개인정보 수집 및 이용 동의를 체크해주세요.")
-    private boolean privacyAgreed; }
+    private boolean privacyAgreed;
+}
