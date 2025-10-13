@@ -44,22 +44,28 @@ public class LoginService {
                 .build());
 
         if (request.getCompanionIds() != null && !request.getCompanionIds().isEmpty()) {
+
+            List<String> invalidCompanionIds = new ArrayList<>();
+
             for (String companionId : request.getCompanionIds()) {
+                userRepository.findByUserId(companionId)
+                        .ifPresentOrElse(companion -> logs.add(Log.builder()
+                                        .name(companion.getName())
+                                        .age(companion.getAge())
+                                        .phone(companion.getPhone())
+                                        .privacyAgreed(companion.isPrivacyAgreed())
+                                        .purpose(request.getPurpose())
+                                        .visitDate(formattedDate)
+                                        .build()),
+                                () -> invalidCompanionIds.add(companionId)
+                        );
+            }
 
-                User companion = userRepository.findByUserId(companionId)
-                        .orElseThrow(() -> CompanionIdNotFoundException.of(companionId));
-
-                logs.add(Log.builder()
-                        .name(companion.getName())
-                        .age(companion.getAge())
-                        .phone(companion.getPhone())
-                        .privacyAgreed(companion.isPrivacyAgreed())
-                        .purpose(request.getPurpose())
-                        .visitDate(formattedDate)
-                        .build());
+            if (!invalidCompanionIds.isEmpty()) {
+                throw new CompanionIdNotFoundException(invalidCompanionIds);
             }
         }
-
-        logRepository.saveAll(logs);
+        
+            logRepository.saveAll(logs);
     }
 }
