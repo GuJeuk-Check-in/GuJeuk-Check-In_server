@@ -1,8 +1,11 @@
 package com.example.gujeuck_server.domain.admin.controller;
 
-import com.example.gujeuck_server.domain.admin.dto.UseListRequest;
+import com.example.gujeuck_server.domain.admin.dto.request.AdminRequest;
+import com.example.gujeuck_server.domain.admin.dto.request.ChangePasswordRequest;
+import com.example.gujeuck_server.domain.admin.dto.request.UseListRequest;
 import com.example.gujeuck_server.domain.admin.service.*;
 import com.example.gujeuck_server.domain.user.dto.UserResponse;
+import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,9 @@ public class AdminController {
     private final ReadAllUserListService readAllUserListService;
     private final DeleteUseListService deleteUseListService;
     private final UpdateUseListService updateUseListService;
+    private final AdminLoginService adminLoginService;
+    private final CreateAdminService createAdminService;
+    private final ChangePasswordService changePasswordService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
@@ -42,5 +48,20 @@ public class AdminController {
     @PatchMapping("/list/{id}")
     public void updateUseList(@PathVariable Long id, @RequestBody @Valid UseListRequest useListRequest) {
         updateUseListService.updateLog(id, useListRequest);
+    }
+
+    @PostMapping("/login")
+    public TokenResponse login(@RequestBody @Valid AdminRequest request) {
+        return adminLoginService.login(request);
+    }
+
+    @PostMapping("/create")
+    public void createAdmin(@RequestBody @Valid AdminRequest request) {
+        createAdminService.createAdmin(request);
+    }
+
+    @PatchMapping("/change")
+    public void changeAdmin(@RequestBody @Valid ChangePasswordRequest request) {
+        changePasswordService.changePassword(request);
     }
 }
