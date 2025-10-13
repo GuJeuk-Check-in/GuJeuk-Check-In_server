@@ -44,3 +44,4 @@ public class AdminController {
         updateUseListService.updateLog(id, useListRequest);
     }
 }
+ 
