@@ -1,6 +1,8 @@
 package com.example.gujeuck_server.domain.user.service;
 
+import com.example.gujeuck_server.domain.log.repository.LogRepository;
 import com.example.gujeuck_server.domain.user.entity.User;
+import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
 import com.example.gujeuck_server.domain.user.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.dto.request.SignupRequest;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SignupService {
     private final UserRepository userRepository;
     private final CalculateAgeService calculateAgeService;
+    private final LogRepository logRepository;
 
     @Transactional
     public void signup(SignupRequest request) {
@@ -22,7 +25,7 @@ public class SignupService {
             throw ExistUserIdException.EXCEPTION;
         }
 
-        int age = calculateAgeService.calculateKoreanAge(request.getBirthYMD());
+        Age age = calculateAgeService.getAge(request.getBirthYMD());
 
         userRepository.save(User.builder()
                 .name(request.getName())

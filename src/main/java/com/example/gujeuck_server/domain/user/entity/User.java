@@ -1,5 +1,7 @@
 package com.example.gujeuck_server.domain.user.entity;
 
+import com.example.gujeuck_server.domain.purpose.entity.Purpose;
+import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import com.example.gujeuck_server.domain.user.entity.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,8 +32,9 @@ public class User {
     @Column(nullable = false, length = 20, name = "birth_ymd") //2008-05-04 이런 형태로 받아야 함
     private String birthYMD;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private int age;
+    private Age age;
 
     @Column(nullable = false, length = 30)
     private String residence;
