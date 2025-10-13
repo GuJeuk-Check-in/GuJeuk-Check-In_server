@@ -16,7 +16,7 @@ public class ReadAllUseListService {
     @Transactional(readOnly = true)
     public List<UseListResponse> readAllUseList() {
         return logRepository.findAll().stream()
-                .map(log -> new UseListResponse(log.getId(), log.getName(), log.getAge(), log.getPhone(), log.getMaleCount(), log.getMaleCount(), log.getPurpose().getId(), log.getVisitDate(), log.isPrivacyAgreed()))
+                .map(UseListResponse::from)
                 .toList();
     }
 }

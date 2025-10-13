@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.admin.dto;
 
+import com.example.gujeuck_server.domain.log.entity.Log;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,4 +40,18 @@ public class UseListResponse {
 
     @AssertTrue(message = "개인정보 수집 및 이용 동의를 체크해주세요.")
     private boolean privacyAgreed;
+
+    public static UseListResponse from(Log l) {
+        return new UseListResponse(
+                l.getId(),
+                l.getName(),
+                l.getAge(),
+                l.getPhone(),
+                l.getMaleCount(),
+                l.getFemaleCount(),      // ← 버그 수정
+                l.getPurpose().getId(),
+                l.getVisitDate(),
+                l.isPrivacyAgreed()
+        );
+    }
 }
