@@ -21,8 +21,7 @@ public class Purpose {
     @Column(name = "purpose_image")
     private String purposeImage;
 
-    public void updatePurpose(String purpose, String purposeImage) {
+    public void updatePurpose(String purpose) {
         this.purpose = purpose;
-        this.purposeImage = purposeImage;
     }
 }

@@ -5,13 +5,16 @@ import com.example.gujeuck_server.domain.purpose.dto.response.PurposeResponse;
 import com.example.gujeuck_server.domain.purpose.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/purpose")
+@RequestMapping("/purpose")
 public class PurposeController {
     private final ReadAllPurposeService readAllPurpose;
     private final ReadOnePurposeService readOnePurpose;
@@ -19,9 +22,11 @@ public class PurposeController {
     private final UpdatePurposeService updatePurpose;
     private final DeletePurposeService deletePurpose;
 
-    @PostMapping("/create")
-    public void createPurpose(@RequestBody @Valid PurposeRequest purposeRequest) {
-        createPurpose.createPurpose(purposeRequest);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createPurpose(@RequestPart(name = "request") PurposeRequest request,
+                              @RequestPart(name = "image") MultipartFile image) {
+        createPurpose.createPurpose(request, image);
     }
 
     @GetMapping("/all")
