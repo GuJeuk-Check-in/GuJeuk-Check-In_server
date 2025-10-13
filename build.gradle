@@ -26,16 +26,17 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
     compileOnly 'org.springframework.boot:spring-boot-starter-validation'
+
+    //security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -44,7 +45,7 @@ dependencies {
     //s3
     implementation "software.amazon.awssdk:s3:2.20.40"
 
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'commons-fileupload:commons-fileupload:1.5'
 }
 
 tasks.named('test') {
