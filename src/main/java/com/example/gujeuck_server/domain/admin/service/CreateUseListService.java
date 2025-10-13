@@ -17,7 +17,8 @@ public class CreateUseListService {
     private final PurposeRepository purposeRepository;
 
     public void creatUseList(UseListRequest useListRequest) {
-        Purpose purpose = purposeRepository.findById(useListRequest.getPurposeId())
+
+        Purpose purpose = purposeRepository.findByPurpose(useListRequest.getPurpose())
                 .orElseThrow(() -> NotFoundPurposeException.EXCEPTION);
 
         logRepository.save(Log.builder()
@@ -26,7 +27,7 @@ public class CreateUseListService {
                 .phone(useListRequest.getPhone())
                 .maleCount(useListRequest.getMaleCount())
                 .femaleCount(useListRequest.getFemaleCount())
-                .purpose(purpose)
+                .purpose(purpose.getPurpose())
                 .visitDate(useListRequest.getVisitDate())
                 .privacyAgreed(useListRequest.isPrivacyAgreed())
                 .build());

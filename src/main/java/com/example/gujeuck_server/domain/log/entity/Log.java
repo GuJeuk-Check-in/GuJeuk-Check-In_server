@@ -1,13 +1,11 @@
 package com.example.gujeuck_server.domain.log.entity;
 
-import com.example.gujeuck_server.domain.user.entity.User;
 import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
-@Builder
 @Setter
 @Builder
 @NoArgsConstructor
@@ -40,5 +38,16 @@ public class Log {
 
     @Column(name = "visit_date")
     private String visitDate;
+
+    public void updateLog(String name, Age age, String phone, int maleCount, int femaleCount, String purpose, String visitDate, boolean privacyAgreed) {
+        this.name = name;
+        this.age = age;
+        this.phone = phone;
+        this.maleCount = maleCount;
+        this.femaleCount = femaleCount;
+        this.purpose = purpose;
+        this.visitDate = visitDate;
+        this.privacyAgreed = privacyAgreed;
+    }
 }
 

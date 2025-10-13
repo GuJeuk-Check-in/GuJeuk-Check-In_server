@@ -22,15 +22,18 @@ public class UpdateUseListService {
         Log log = logRepository.findById(id).orElseThrow(
                 () -> LogNotFountException.EXCEPTION
         );
-        Purpose purpose = purposeRepository.findById(useListRequest.getPurposeId())
+
+        Purpose purpose = purposeRepository.findByPurpose(useListRequest.getPurpose())
                 .orElseThrow(() -> NotFoundPurposeException.EXCEPTION);
+
+
         log.updateLog(
                 useListRequest.getName(),
                 useListRequest.getAge(),
                 useListRequest.getPhone(),
                 useListRequest.getMaleCount(),
                 useListRequest.getFemaleCount(),
-                purpose,
+                purpose.getPurpose(),
                 useListRequest.getVisitDate(),
                 useListRequest.isPrivacyAgreed()
         );
