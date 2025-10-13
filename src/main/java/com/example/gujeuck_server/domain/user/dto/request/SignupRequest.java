@@ -26,4 +26,7 @@ public class SignupRequest {
 
     @NotNull
     private boolean privacyAgreed;
+
+    @NotBlank
+    private String purpose;
 }
