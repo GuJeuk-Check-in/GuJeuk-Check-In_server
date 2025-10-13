@@ -15,6 +15,9 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_FOUND(404, "일치 하는 RefreshToken이 존재 하지 않습니다."),
     INVALID_ROLE(401,"유효 하지 않은 역할입니다."),
 
+    //log
+    LOG_NOT_FOUND(404, "존재하지 않는 이용목록입니다."),
+
     // purpose
     PURPOSE_NOT_FOUND(404, "존재하지 않는 방문목적입니다."),
 

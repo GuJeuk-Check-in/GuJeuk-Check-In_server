@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class PurposeResponse {
     private Long id;
     private String purpose;
-    private String purposeImage;
 }

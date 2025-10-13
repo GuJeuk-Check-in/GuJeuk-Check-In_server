@@ -14,26 +14,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/purpose")
 public class PurposeController {
-    private final ReadAllPurposeService readAllPurpose;
-    private final ReadOnePurposeService readOnePurpose;
     private final CreatePurposeService createPurpose;
     private final UpdatePurposeService updatePurpose;
     private final DeletePurposeService deletePurpose;
+    private final ReadOnePurposeService readOnePurpose;
+    private final ReadAllPurposeService readAllPurpose;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void createPurpose(@RequestBody @Valid PurposeRequest request) {
         createPurpose.createPurpose(request);
-    }
-
-    @GetMapping("/all")
-    public List<PurposeResponse> readAllPurpose() {
-        return readAllPurpose.readAll();
-    }
-
-    @GetMapping("/{id}")
-    public PurposeResponse readPurposeById(@PathVariable Long id) {
-        return readOnePurpose.readById(id);
     }
 
     @PatchMapping("/{id}")
@@ -44,5 +34,10 @@ public class PurposeController {
     @DeleteMapping("/{id}")
     public void deletePurpose(@PathVariable Long id) {
         deletePurpose.deletePurpose(id);
+    }
+
+    @GetMapping("/{id}")
+    public PurposeResponse getPurpose(@PathVariable Long id) {
+        return readOnePurpose.readById(id);
     }
 }

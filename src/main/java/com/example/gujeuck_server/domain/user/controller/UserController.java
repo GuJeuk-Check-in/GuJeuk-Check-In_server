@@ -1,12 +1,10 @@
 package com.example.gujeuck_server.domain.user.controller;
 
-import com.example.gujeuck_server.domain.user.dto.UserResponse;
 import com.example.gujeuck_server.domain.user.dto.request.LoginRequest;
 import com.example.gujeuck_server.domain.user.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.user.dto.request.SignupRequest;
 import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.user.service.LoginService;
-import com.example.gujeuck_server.domain.user.service.ReadOneUserListService;
 import com.example.gujeuck_server.domain.user.service.ReissueService;
 import com.example.gujeuck_server.domain.user.service.SignupService;
 import jakarta.validation.Valid;
@@ -21,7 +19,6 @@ public class UserController {
     private final SignupService signupService;
     private final LoginService loginService;
     private final ReissueService reissueService;
-    private final ReadOneUserListService readOneUserListService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/sign-up")
@@ -39,11 +36,5 @@ public class UserController {
     @PatchMapping("/re-issue")
     public TokenResponse reissue(@RequestBody @Valid RefreshTokenRequest request) {
         return reissueService.reissue(request);
-    }
-
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/{id}")
-    public UserResponse getOneUser(@PathVariable Long id) {
-        return readOneUserListService.readOneUserList(id);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.user.service;
+package com.example.gujeuck_server.domain.admin.service;
 
 import com.example.gujeuck_server.domain.user.dto.UserResponse;
 import com.example.gujeuck_server.domain.user.repository.UserRepository;

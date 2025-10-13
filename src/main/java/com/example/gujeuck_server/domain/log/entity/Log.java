@@ -9,6 +9,7 @@ import lombok.*;
 @Getter
 @Builder
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Log {
@@ -19,19 +20,17 @@ public class Log {
     @Column(nullable = false)
     private String purpose;
 
-    private String name;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Age age;
 
-    private String phone;
-
     private boolean privacyAgreed;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User companion;
+    @Column(nullable = false, length = 30)
+    private String name;
+  
+    @Column(nullable = false, length = 11)
+    private String phone;
 
     @Column(name = "male_count")
     private int maleCount;

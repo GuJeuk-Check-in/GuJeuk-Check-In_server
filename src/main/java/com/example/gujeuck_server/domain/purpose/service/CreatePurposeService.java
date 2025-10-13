@@ -18,10 +18,8 @@ public class CreatePurposeService {
     @Transactional
     public void createPurpose(PurposeRequest purposeDto) {
 
-        Purpose purpose = Purpose.builder()
+        purposeRepository.save(Purpose.builder()
                 .purpose(purposeDto.getPurpose())
-                .build();
-
-        purposeRepository.save(purpose);
+                .build());
     }
 }
