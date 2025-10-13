@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.user.entity;
 
-import com.example.gujeuck_server.domain.purpose.entity.Purpose;
 import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import com.example.gujeuck_server.domain.user.entity.enums.Gender;
 import jakarta.persistence.*;
