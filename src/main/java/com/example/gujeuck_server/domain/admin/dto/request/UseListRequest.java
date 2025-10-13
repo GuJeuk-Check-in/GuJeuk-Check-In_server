@@ -1,10 +1,9 @@
-package com.example.gujeuck_server.domain.admin.dto;
+package com.example.gujeuck_server.domain.admin.dto.request;
 import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.LocalDate;
+
 @Getter
 @NoArgsConstructor
 public class UseListRequest {
