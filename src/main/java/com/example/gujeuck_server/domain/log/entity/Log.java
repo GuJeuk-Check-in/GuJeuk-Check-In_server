@@ -42,6 +42,17 @@ public class Log {
 
     private boolean privacyAgreed;
 
+    public void updateLog(String name, String age, String phone, int maleCount, int femaleCount,  Purpose purpose, LocalDate visitDate, boolean privacyAgreed) {
+        this.name = name;
+        this.age = age;
+        this.phone = phone;
+        this.maleCount = maleCount;
+        this.femaleCount = femaleCount;
+        this.purpose = purpose;
+        this.visitDate = visitDate;
+        this.privacyAgreed = privacyAgreed;
+    }
+
     @PrePersist
     public void prePersist() {
         if(visitDate == null) {
