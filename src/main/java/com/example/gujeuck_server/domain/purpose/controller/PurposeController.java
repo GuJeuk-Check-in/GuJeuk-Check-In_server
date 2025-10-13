@@ -17,8 +17,13 @@ public class PurposeController {
     private final UpdatePurposeService updatePurpose;
     private final DeletePurposeService deletePurpose;
 <<<<<<< HEAD
+<<<<<<< HEAD
     private final ReadAllPurposeService readAllPurpose;
     private final ReadOnePurposeService readOnePurpose;
+=======
+    private final ReadOnePurposeService readOnePurpose;
+    private final ReadAllPurposeService readAllPurpose;
+>>>>>>> origin/feat/admin-UpdateUseList
 =======
     private final ReadOnePurposeService readOnePurpose;
     private final ReadAllPurposeService readAllPurpose;
@@ -40,6 +45,7 @@ public class PurposeController {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     @GetMapping("/{id}")
     public PurposeResponse getPurpose(@PathVariable Long id) {
         return readOnePurpose.readById(id);
@@ -47,16 +53,24 @@ public class PurposeController {
 
 =======
 >>>>>>> origin/feat/admin-UpdateUseList
+=======
+>>>>>>> origin/feat/admin-UpdateUseList
     @GetMapping("/all")
     public List<PurposeResponse> getAllPurpose() {
         return readAllPurpose.readAll();
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> origin/feat/admin-UpdateUseList
 
     @GetMapping("/{id}")
     public PurposeResponse getPurposeById(@PathVariable Long id) {
         return readOnePurpose.readById(id);
     }
+<<<<<<< HEAD
+>>>>>>> origin/feat/admin-UpdateUseList
+=======
 >>>>>>> origin/feat/admin-UpdateUseList
 }
