@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.log.entity;
 
 import com.example.gujeuck_server.domain.purpose.entity.Purpose;
 import com.example.gujeuck_server.domain.user.entity.User;
+import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,13 +19,14 @@ public class Log {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purpose_id", nullable = false)
-    private Purpose purpose;
+    @Column(nullable = false)
+    private String purpose;
 
     private String name;
 
-    private int age;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Age age;
 
     private String phone;
 
@@ -34,20 +36,13 @@ public class Log {
     @JoinColumn(name = "user_id")
     private User companion;
 
-    @Column(name = "male_count", nullable = false)
+    @Column(name = "male_count")
     private int maleCount;
 
-    @Column(name = "female_count", nullable = false)
+    @Column(name = "female_count")
     private int femaleCount;
 
-    @Column(name = "visit_date", nullable = false)
-    private LocalDate visitDate;
-
-    @PrePersist
-    public void prePersist() {
-        if(visitDate == null) {
-            visitDate = LocalDate.now();
-        }
-    }
+    @Column(name = "visit_date")
+    private String visitDate;
 }
 
