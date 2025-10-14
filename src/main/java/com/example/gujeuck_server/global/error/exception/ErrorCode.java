@@ -18,6 +18,9 @@ public enum ErrorCode {
     //log
     LOG_NOT_FOUND(404, "존재하지 않는 이용목록입니다."),
 
+    //excel
+    EXCEL_GENERATION_FAILED(507, "엑셀 파일 생성 중 오류가 발생했습니다."),
+
     // purpose
     PURPOSE_NOT_FOUND(404, "존재하지 않는 방문목적입니다."),
 
