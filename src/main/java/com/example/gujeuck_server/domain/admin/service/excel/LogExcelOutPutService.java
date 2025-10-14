@@ -22,9 +22,8 @@ public class LogExcelOutPutService {
     private final LogRepository logRepository;
     private final AdminFacade adminFacade;
 
-    private static final String FILE_NAME_PATTERN = "log_%d_%02d.xlsx";
-    private static final String EXCEL_SHEET_NAME = "구즉 청소년 문화의집 월간 방문 기록";
-    private static final MediaType EXCEL_MEDIA_TYPE = MediaType.APPLICATION_OCTET_STREAM;
+    private static final String EXCEL_MEDIA_TYPE_NAME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    private static final MediaType EXCEL_MEDIA_TYPE = MediaType.parseMediaType(EXCEL_MEDIA_TYPE_NAME);
 
     public ResponseEntity<byte[]> outputExcel() {
         adminFacade.currentUser();
@@ -33,9 +32,7 @@ public class LogExcelOutPutService {
             List<LogResponse> logs = logRepository.findAllByCurrentMonth();
 
             byte[] excelFile = ExcelGenerator.generateLogExcel(logs);
-
             String encodedFilename = encodeFileName(generateExcelFileName());
-
             HttpHeaders headers = buildExcelHeaders(encodedFilename);
 
             return ResponseEntity.ok()
@@ -49,7 +46,7 @@ public class LogExcelOutPutService {
 
     private String generateExcelFileName() {
         LocalDate now = LocalDate.now();
-        return String.format(FILE_NAME_PATTERN, now.getYear(), now.getMonthValue());
+        return String.format("%d년 %d월 이용 신청 현황.xlsx", now.getYear(), now.getMonthValue());
     }
 
     private String encodeFileName(String filename) {
