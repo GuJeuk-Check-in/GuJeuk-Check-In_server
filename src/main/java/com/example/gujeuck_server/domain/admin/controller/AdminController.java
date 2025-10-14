@@ -54,6 +54,6 @@ public class AdminController {
     public Slice<UseListResponse> getAllUseList(
             @PageableDefault(size = 10, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
-        return readAllUseListService.readAllUseList(pageable.getPageNumber(),  pageable.getPageSize());
+        return readAllUseListService.readAllUseList(pageable);
     }
 }

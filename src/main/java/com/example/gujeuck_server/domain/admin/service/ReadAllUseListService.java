@@ -16,10 +16,10 @@ public class ReadAllUseListService {
     private final LogRepository logRepository;
 
     @Transactional(readOnly = true)
-    public Slice<UseListResponse> readAllUseList(int page, int size) {
+    public Slice<UseListResponse> readAllUseList(Pageable p) {
          Pageable pageable = PageRequest.of(
-                page,
-                size,
+                p.getPageNumber(),
+                p.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "visitDate")
                         .and(Sort.by(Sort.Direction.DESC, "id"))
                 );
