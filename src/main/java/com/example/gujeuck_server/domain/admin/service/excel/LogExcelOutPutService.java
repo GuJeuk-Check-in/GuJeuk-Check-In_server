@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.admin.service.excel;
 
 import com.example.gujeuck_server.domain.admin.exception.ExcelGenerationException;
+import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.dto.response.LogResponse;
 import com.example.gujeuck_server.domain.log.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LogExcelOutPutService {
     private final LogRepository logRepository;
+    private final AdminFacade adminFacade;
 
     private static final String FILE_NAME_PATTERN = "log_%d_%02d.xlsx";
     private static final String EXCEL_SHEET_NAME = "구즉 청소년 문화의집 월간 방문 기록";
     private static final MediaType EXCEL_MEDIA_TYPE = MediaType.APPLICATION_OCTET_STREAM;
 
     public ResponseEntity<byte[]> outputExcel() {
+        adminFacade.currentUser();
+
         try {
             List<LogResponse> logs = logRepository.findAllByCurrentMonth();
 
