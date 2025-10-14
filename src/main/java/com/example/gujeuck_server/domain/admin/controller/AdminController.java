@@ -8,10 +8,13 @@ import com.example.gujeuck_server.domain.admin.service.list.*;
 import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
 import com.example.gujeuck_server.domain.admin.service.etc.ChangePasswordService;
 import com.example.gujeuck_server.domain.admin.service.etc.CreateAdminService;
+import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
 import com.example.gujeuck_server.domain.user.dto.UserResponse;
+import com.example.gujeuck_server.domain.user.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +33,7 @@ public class AdminController {
     private final CreateAdminService createAdminService;
     private final ChangePasswordService changePasswordService;
     private final LogExcelOutPutService logExcelOutPutService;
+    private final ReissueService reissueService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
@@ -74,5 +78,11 @@ public class AdminController {
     @GetMapping("/excel")
     public ResponseEntity<byte[]> exportCurrentMonthExcel() {
         return logExcelOutPutService.outputExcel();
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/re-issue")
+    public TokenResponse reissue(@RequestBody @Valid RefreshTokenRequest request) {
+        return reissueService.reissue(request);
     }
 }

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final SignupService signupService;
     private final LoginService loginService;
-    private final ReissueService reissueService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/sign-up")
@@ -30,11 +29,5 @@ public class UserController {
     @PostMapping("/login")
     public void login(@RequestBody @Valid LoginRequest request) {
         loginService.login(request);
-    }
-
-    @ResponseStatus(HttpStatus.OK)
-    @PatchMapping("/re-issue")
-    public TokenResponse reissue(@RequestBody @Valid RefreshTokenRequest request) {
-        return reissueService.reissue(request);
     }
 }
