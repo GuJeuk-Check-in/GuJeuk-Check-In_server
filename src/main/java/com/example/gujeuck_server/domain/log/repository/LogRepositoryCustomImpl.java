@@ -21,10 +21,6 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
     @Override
     public List<LogResponse> findAllByCurrentMonth() {
 
-        LocalDate now = LocalDate.now();
-        int currentYear = now.getYear();
-        String currentMonth = String.format("%02d월", now.getMonthValue()); // "10월"
-
         return jpaQueryFactory
                 .select(Projections.constructor(
                         LogResponse.class,
