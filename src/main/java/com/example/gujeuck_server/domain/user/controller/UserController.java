@@ -5,7 +5,7 @@ import com.example.gujeuck_server.domain.user.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.user.dto.request.SignupRequest;
 import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.user.service.LoginService;
-import com.example.gujeuck_server.domain.admin.service.ReissueService;
+import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
 import com.example.gujeuck_server.domain.user.service.SignupService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

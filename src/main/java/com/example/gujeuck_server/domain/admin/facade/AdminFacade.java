@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.service.facade;
+package com.example.gujeuck_server.domain.admin.facade;
 
 import com.example.gujeuck_server.domain.admin.entity.Admin;
 import com.example.gujeuck_server.domain.admin.exception.AdminNotFoundException;

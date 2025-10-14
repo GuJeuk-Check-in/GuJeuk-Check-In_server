@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.admin.service.facade.AdminFacade;
+import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.purpose.dto.response.PurposeResponse;
 import com.example.gujeuck_server.domain.purpose.entity.Purpose;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
