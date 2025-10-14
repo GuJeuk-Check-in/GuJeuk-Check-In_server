@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.admin.controller;
 
-import com.example.gujeuck_server.domain.admin.dto.UseListResponse;
+import com.example.gujeuck_server.domain.admin.dto.response.UseListResponse;
 import com.example.gujeuck_server.domain.admin.dto.request.AdminRequest;
 import com.example.gujeuck_server.domain.admin.dto.request.ChangePasswordRequest;
 import com.example.gujeuck_server.domain.admin.dto.request.UseListRequest;
@@ -11,9 +11,9 @@ import com.example.gujeuck_server.domain.admin.service.excel.LogExcelOutPutServi
 import com.example.gujeuck_server.domain.admin.service.list.*;
 import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
 import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
-import com.example.gujeuck_server.domain.user.dto.UserResponse;
-import com.example.gujeuck_server.domain.user.dto.request.RefreshTokenRequest;
-import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
+import com.example.gujeuck_server.domain.admin.dto.request.RefreshTokenRequest;
+import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

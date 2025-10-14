@@ -1,7 +1,8 @@
-package com.example.gujeuck_server.domain.user.dto;
+package com.example.gujeuck_server.domain.user.dto.response;
 
 import com.example.gujeuck_server.domain.user.entity.User;
 import com.example.gujeuck_server.domain.user.entity.enums.Gender;
+import com.example.gujeuck_server.domain.user.entity.enums.Residence;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class UserResponse {
     private Gender gender;
     private String phone;
     private String birthYMD;
-    private String residence;
+    private Residence residence;
     private boolean privacyAgreed;
 
     public static UserResponse from(User user) {
