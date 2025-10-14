@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.admin.service;
 
 import com.example.gujeuck_server.domain.admin.dto.request.UseListRequest;
 import com.example.gujeuck_server.domain.admin.exception.LogNotFountException;
+import com.example.gujeuck_server.domain.admin.service.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.entity.Log;
 import com.example.gujeuck_server.domain.log.repository.LogRepository;
 import com.example.gujeuck_server.domain.purpose.entity.Purpose;
@@ -16,12 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateUseListService {
     private final LogRepository logRepository;
     private final PurposeRepository purposeRepository;
+    private final AdminFacade adminFacade;
 
     @Transactional
     public void updateLog(Long id, UseListRequest useListRequest) {
+        adminFacade.currentUser();
+
         Log log = logRepository.findById(id).orElseThrow(
-                () -> LogNotFountException.EXCEPTION
-        );
+                () -> LogNotFountException.EXCEPTION);
 
         Purpose purpose = purposeRepository.findByPurpose(useListRequest.getPurpose())
                 .orElseThrow(() -> NotFoundPurposeException.EXCEPTION);

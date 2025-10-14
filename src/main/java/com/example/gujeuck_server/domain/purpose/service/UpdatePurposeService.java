@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
+import com.example.gujeuck_server.domain.admin.service.facade.AdminFacade;
 import com.example.gujeuck_server.domain.purpose.dto.request.PurposeRequest;
 import com.example.gujeuck_server.domain.purpose.entity.Purpose;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
@@ -15,9 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class UpdatePurposeService {
     private final PurposeRepository purposeRepository;
     private final S3Service s3Service;
+    private final AdminFacade adminFacade;
 
     @Transactional
     public void updatePurpose(Long id, PurposeRequest purposeRequest) {
+        adminFacade.currentUser();
+
         Purpose purpose = purposeRepository.findById(id)
                 .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
 
