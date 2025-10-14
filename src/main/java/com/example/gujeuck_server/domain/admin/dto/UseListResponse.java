@@ -1,0 +1,57 @@
+package com.example.gujeuck_server.domain.admin.dto;
+
+import com.example.gujeuck_server.domain.log.entity.Log;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class UseListResponse {
+    private Long id;
+
+    @NotBlank(message = "이름은 필수 입력 항목입니다.")
+    @Size(max = 30, message = "이름은 30자 이하로 입력해주세요.")
+    private String name;
+
+    @NotBlank(message = "나이를 선택해주세요.")
+    private String age;
+
+    @NotBlank(message = "전화번호를 입력해주세요.")
+    @Size(max = 30, message = "전화번호은 11자리 이상으로 입력할 수 없습니다.")
+    private String phone;
+
+    private int maleCount;
+
+    private int femaleCount;
+
+    @NotNull(message = "방문 목적을 선택해주세요.")
+    private Long purposeId;
+
+    @NotNull(message = "방문 날짜를 선택해주세요.")
+    private LocalDate visitDate;
+
+    @AssertTrue(message = "개인정보 수집 및 이용 동의를 체크해주세요.")
+    private boolean privacyAgreed;
+
+    public static UseListResponse from(Log l) {
+        return new UseListResponse(
+                l.getId(),
+                l.getName(),
+                l.getAge(),
+                l.getPhone(),
+                l.getMaleCount(),
+                l.getFemaleCount(),      // ← 버그 수정
+                l.getPurpose().getId(),
+                l.getVisitDate(),
+                l.isPrivacyAgreed()
+        );
+    }
+}

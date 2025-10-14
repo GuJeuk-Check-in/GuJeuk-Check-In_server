@@ -1,19 +1,17 @@
 package com.example.gujeuck_server.domain.admin.controller;
 
-import com.example.gujeuck_server.domain.admin.dto.request.AdminRequest;
-import com.example.gujeuck_server.domain.admin.dto.request.ChangePasswordRequest;
-import com.example.gujeuck_server.domain.admin.dto.request.UseListRequest;
-import com.example.gujeuck_server.domain.admin.service.excel.LogExcelOutPutService;
-import com.example.gujeuck_server.domain.admin.service.list.*;
-import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
-import com.example.gujeuck_server.domain.admin.service.etc.ChangePasswordService;
-import com.example.gujeuck_server.domain.admin.service.etc.CreateAdminService;
-import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
+import com.example.gujeuck_server.domain.admin.dto.UseListRequest;
+import com.example.gujeuck_server.domain.admin.dto.UseListResponse;
+import com.example.gujeuck_server.domain.admin.service.*;
 import com.example.gujeuck_server.domain.user.dto.UserResponse;
 import com.example.gujeuck_server.domain.user.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +23,7 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
     private final CreateUseListService createUseListService;
-    private final ReadOneUserListService readOneUserListService;
-    private final ReadAllUserListService readAllUserListService;
-    private final DeleteUseListService deleteUseListService;
-    private final UpdateUseListService updateUseListService;
+    private final ReadAllUseListService readAllUseListService;
     private final AdminLoginService adminLoginService;
     private final CreateAdminService createAdminService;
     private final ChangePasswordService changePasswordService;
@@ -59,6 +54,12 @@ public class AdminController {
     public void updateUseList(@PathVariable Long id, @RequestBody @Valid UseListRequest useListRequest) {
         updateUseListService.updateLog(id, useListRequest);
     }
+
+    @GetMapping("/list/all")
+    public Slice<UseListResponse> getAllUseList(
+            @PageableDefault(size = 10, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        return readAllUseListService.readAllUseList(pageable);
 
     @PostMapping("/login")
     public TokenResponse login(@RequestBody @Valid AdminRequest request) {
