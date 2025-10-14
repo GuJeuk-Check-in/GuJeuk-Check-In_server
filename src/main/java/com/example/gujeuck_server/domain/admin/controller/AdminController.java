@@ -3,6 +3,7 @@ package com.example.gujeuck_server.domain.admin.controller;
 import com.example.gujeuck_server.domain.admin.dto.request.AdminRequest;
 import com.example.gujeuck_server.domain.admin.dto.request.ChangePasswordRequest;
 import com.example.gujeuck_server.domain.admin.dto.request.UseListRequest;
+import com.example.gujeuck_server.domain.admin.service.excel.LogExcelOutPutService;
 import com.example.gujeuck_server.domain.admin.service.list.*;
 import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
 import com.example.gujeuck_server.domain.admin.service.etc.ChangePasswordService;
@@ -11,6 +12,7 @@ import com.example.gujeuck_server.domain.user.dto.UserResponse;
 import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +29,7 @@ public class AdminController {
     private final AdminLoginService adminLoginService;
     private final CreateAdminService createAdminService;
     private final ChangePasswordService changePasswordService;
+    private final LogExcelOutPutService logExcelOutPutService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
@@ -66,5 +69,10 @@ public class AdminController {
     @PatchMapping("/change")
     public void changeAdmin(@RequestBody @Valid ChangePasswordRequest request) {
         changePasswordService.changePassword(request);
+    }
+
+    @GetMapping("/excel")
+    public ResponseEntity<byte[]> exportCurrentMonthExcel() {
+        return logExcelOutPutService.outputExcel();
     }
 }
