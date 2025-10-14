@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.admin.service.excel;
 
 import com.example.gujeuck_server.domain.log.dto.response.LogResponse;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayOutputStream;
@@ -20,22 +21,31 @@ public class ExcelGenerator {
 
             Sheet sheet = workbook.createSheet(sheetTitle);
 
+            CellStyle titleStyle = createTitleStyle(workbook);
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle bodyStyle = createBodyStyle(workbook);
 
-            createHeader(sheet, headerStyle);
-            createBody(sheet, logs, bodyStyle);
-
-            for (int i = 0; i < HEADERS.length; i++) {
-                sheet.autoSizeColumn(i);
-            }
+            createTitleRow(sheet, titleStyle);
+            createHeaderRow(sheet, headerStyle);
+            createBodyRows(sheet, logs, bodyStyle);
+            autoAdjustColumns(sheet);
 
             workbook.write(out);
             return out.toByteArray();
         }
     }
 
-    // 🔹 헤더 스타일
+    private static CellStyle createTitleStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 14);
+        style.setFont(font);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
+    }
+
     private static CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -46,10 +56,7 @@ public class ExcelGenerator {
         style.setVerticalAlignment(VerticalAlignment.CENTER);
         style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
+        setBorders(style, BorderStyle.MEDIUM);
         return style;
     }
 
@@ -57,15 +64,32 @@ public class ExcelGenerator {
         CellStyle style = workbook.createCellStyle();
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
+        style.setWrapText(true);
+        setBorders(style, BorderStyle.THIN);
         return style;
     }
 
-    private static void createHeader(Sheet sheet, CellStyle style) {
-        Row headerRow = sheet.createRow(0);
+    private static void setBorders(CellStyle style, BorderStyle borderStyle) {
+        style.setBorderTop(borderStyle);
+        style.setBorderBottom(borderStyle);
+        style.setBorderLeft(borderStyle);
+        style.setBorderRight(borderStyle);
+    }
+
+    private static void createTitleRow(Sheet sheet, CellStyle style) {
+        Row titleRow = sheet.createRow(0);
+        titleRow.setHeightInPoints(25);
+        Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue(sheetTitle);
+        titleCell.setCellStyle(style);
+
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, HEADERS.length - 1));
+    }
+
+    private static void createHeaderRow(Sheet sheet, CellStyle style) {
+        Row headerRow = sheet.createRow(1);
+        headerRow.setHeightInPoints(20);
+
         for (int i = 0; i < HEADERS.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(HEADERS[i]);
@@ -73,18 +97,20 @@ public class ExcelGenerator {
         }
     }
 
-    private static void createBody(Sheet sheet, List<LogResponse> logs, CellStyle style) {
-        int rowIdx = 1;
+
+    private static void createBodyRows(Sheet sheet, List<LogResponse> logs, CellStyle style) {
+        int rowIdx = 2;
         int no = 1;
 
         for (LogResponse log : logs) {
             Row row = sheet.createRow(rowIdx++);
-            int col = 0;
+            row.setHeightInPoints(18);
 
+            int col = 0;
             createCell(row, col++, no++, style);
             createCell(row, col++, log.getVisitDate(), style);
             createCell(row, col++, log.getName(), style);
-            createCell(row, col++, log.getAge().getLabel(), style); // Age Enum → label 변환
+            createCell(row, col++, log.getAge().getLabel(), style);
             createCell(row, col++, log.getMaleCount(), style);
             createCell(row, col++, log.getFemaleCount(), style);
             createCell(row, col++, log.getPhone(), style);
@@ -101,5 +127,14 @@ public class ExcelGenerator {
             cell.setCellValue(value != null ? value.toString() : "");
         }
         cell.setCellStyle(style);
+    }
+
+
+    private static void autoAdjustColumns(Sheet sheet) {
+        for (int i = 0; i < HEADERS.length; i++) {
+            sheet.autoSizeColumn(i);
+            int width = sheet.getColumnWidth(i);
+            sheet.setColumnWidth(i, width + 512);
+        }
     }
 }
