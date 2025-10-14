@@ -30,7 +30,7 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                         LogResponse.class,
                         qLog.visitDate,
                         qLog.name,
-                        qLog.age.stringValue(),
+                        qLog.age,
                         qLog.maleCount,
                         qLog.femaleCount,
                         qLog.phone,
