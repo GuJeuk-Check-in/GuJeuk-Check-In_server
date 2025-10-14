@@ -38,6 +38,8 @@ public class SignupService {
 
         String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
 
+        int currentYear = LocalDate.now().getYear();
+
         Purpose purpose = purposeRepository.findByPurpose(request.getPurpose())
                         .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
 
@@ -59,6 +61,7 @@ public class SignupService {
                 .purpose(purpose.getPurpose())
                 .privacyAgreed(request.isPrivacyAgreed())
                 .visitDate(formattedDate)
+                .year(currentYear)
                 .build());
     }
 }

@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.admin.service;
+package com.example.gujeuck_server.domain.admin.service.list;
 
-import com.example.gujeuck_server.domain.admin.service.facade.AdminFacade;
+import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.user.dto.UserResponse;
 import com.example.gujeuck_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

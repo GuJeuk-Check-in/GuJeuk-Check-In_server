@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.service;
+package com.example.gujeuck_server.domain.admin.service.token;
 
 import com.example.gujeuck_server.domain.user.entity.RefreshToken;
 import com.example.gujeuck_server.domain.user.repository.RefreshTokenRepository;
