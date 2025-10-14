@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.user.service;
+package com.example.gujeuck_server.domain.admin.service.token;
 
 import com.example.gujeuck_server.domain.user.entity.RefreshToken;
 import com.example.gujeuck_server.domain.user.repository.RefreshTokenRepository;
@@ -22,6 +22,6 @@ public class ReissueService {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getToken())
                 .orElseThrow(() -> RefreshTokenNotFoundException.EXCEPTION);
 
-        return jwtTokenProvider.receiveToken(refreshToken.getUserId());
+        return jwtTokenProvider.receiveToken(refreshToken.getPassword());
     }
 }

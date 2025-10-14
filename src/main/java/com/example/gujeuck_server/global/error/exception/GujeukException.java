@@ -7,4 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class GujeukException extends RuntimeException {
     private final ErrorCode errorCode;
+
+    public GujeukException(ErrorCode errorCode, String customMessage) {
+        super(customMessage);
+        this.errorCode = errorCode;
+    }
 }

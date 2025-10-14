@@ -17,7 +17,7 @@ import org.springframework.data.redis.core.index.Indexed;
 public class RefreshToken {
 
     @Id
-    private String userId;
+    private String password;
 
     @Indexed
     private String token;

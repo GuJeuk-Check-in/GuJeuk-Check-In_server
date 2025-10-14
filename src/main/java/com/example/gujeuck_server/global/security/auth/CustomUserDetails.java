@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.global.security.auth;
 
-import com.example.gujeuck_server.domain.user.entity.User;
+import com.example.gujeuck_server.domain.admin.entity.Admin;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,20 +9,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-public record CustomUserDetails(User user) implements UserDetails {
+public record CustomUserDetails(Admin admin) implements UserDetails {
     @Override
     public String getUsername() {
-        return user.getUserId();
+        return admin.getPassword();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {    //사용자의 권한 목록을 반환
-        return new ArrayList<>(Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getName())));
+        return new ArrayList<>(Collections.singleton(new SimpleGrantedAuthority("ROLE_" + admin.getPassword())));
     }
 
     @Override
     public String getPassword() {
-        return user.getUserId();
+        return admin.getPassword();
     }
 
     @Override

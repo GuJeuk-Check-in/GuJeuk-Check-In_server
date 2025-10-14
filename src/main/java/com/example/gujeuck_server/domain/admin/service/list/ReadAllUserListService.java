@@ -1,5 +1,6 @@
-package com.example.gujeuck_server.domain.admin.service;
+package com.example.gujeuck_server.domain.admin.service.list;
 
+import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.user.dto.UserResponse;
 import com.example.gujeuck_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +13,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReadAllUserListService {
     private final UserRepository userRepository;
+    private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
     public List<UserResponse> readAllUserList() {
+        adminFacade.currentUser();
+
         return userRepository.findAll().stream()
                 .map(UserResponse::from)
                 .toList();

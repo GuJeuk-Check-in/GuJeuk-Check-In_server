@@ -1,0 +1,12 @@
+package com.example.gujeuck_server.domain.admin.exception;
+
+import com.example.gujeuck_server.global.error.exception.ErrorCode;
+import com.example.gujeuck_server.global.error.exception.GujeukException;
+
+public class SameOldPasswordException extends GujeukException {
+    public static final SameOldPasswordException EXCEPTION = new SameOldPasswordException();
+
+    private SameOldPasswordException() {
+        super(ErrorCode.SAME_OLD_PASSWORD);
+    }
+}

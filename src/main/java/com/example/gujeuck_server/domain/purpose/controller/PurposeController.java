@@ -5,13 +5,14 @@ import com.example.gujeuck_server.domain.purpose.dto.response.PurposeResponse;
 import com.example.gujeuck_server.domain.purpose.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/purpose")
+@RequestMapping("/purpose")
 public class PurposeController {
     private final CreatePurposeService createPurpose;
     private final UpdatePurposeService updatePurpose;
@@ -19,9 +20,10 @@ public class PurposeController {
     private final ReadOnePurposeService readOnePurpose;
     private final ReadAllPurposeService readAllPurpose;
 
-    @PostMapping("/create")
-    public void createPurpose(@RequestBody @Valid PurposeRequest purposeRequest) {
-        createPurpose.createPurpose(purposeRequest);
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createPurpose(@RequestBody @Valid PurposeRequest request) {
+        createPurpose.createPurpose(request);
     }
 
     @PatchMapping("/{id}")
@@ -37,5 +39,10 @@ public class PurposeController {
     @GetMapping("/{id}")
     public PurposeResponse getPurpose(@PathVariable Long id) {
         return readOnePurpose.readById(id);
+    }
+
+    @GetMapping("/all")
+    public List<PurposeResponse> getAllPurpose() {
+        return readAllPurpose.readAll();
     }
 }

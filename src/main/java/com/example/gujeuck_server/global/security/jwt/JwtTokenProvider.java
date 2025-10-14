@@ -1,13 +1,14 @@
 package com.example.gujeuck_server.global.security.jwt;
 
+import com.example.gujeuck_server.domain.admin.entity.Admin;
+import com.example.gujeuck_server.domain.admin.exception.AdminNotFoundException;
+import com.example.gujeuck_server.domain.admin.repository.AdminRepository;
 import com.example.gujeuck_server.domain.user.entity.RefreshToken;
 import com.example.gujeuck_server.domain.user.repository.RefreshTokenRepository;
 import com.example.gujeuck_server.domain.user.exception.ExpiredTokenException;
 import com.example.gujeuck_server.domain.user.exception.InvalidTokenException;
 import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
-import com.example.gujeuck_server.domain.user.entity.User;
 import com.example.gujeuck_server.domain.user.repository.UserRepository;
-import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
 import com.example.gujeuck_server.global.security.auth.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -29,15 +30,16 @@ import java.util.Date;
 public class JwtTokenProvider {
     private final JwtProperties jwtProperties;
     private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final RefreshTokenRepository refreshTokenRepository;
 
     //access token 생성
-    public String createAccessToken(String userId) {
+    public String createAccessToken(String password) {
         Date now = new Date(); //코드를 실행한 시점의 현재 날짜와 시간이 저장(일시적)
 
         return Jwts.builder()
-                .setSubject(userId) //토큰의 소유자
+                .setSubject(password) //토큰의 소유자
                 .claim("type", "access") //액세스 토큰임을 나타냄
                 .setIssuedAt(now) //토큰 발행 시간 정보
                 .setExpiration(new Date(now.getTime() + jwtProperties.getAccessExpiration() * 1000)) //토큰의 만료 시간 설정
@@ -48,7 +50,7 @@ public class JwtTokenProvider {
 
     //refresh token 생성
     @Transactional
-    public String createRefreshToken(String userId) {
+    public String createRefreshToken(String password) {
         Date now = new Date();
 
         String refreshToken = Jwts.builder()
@@ -61,7 +63,7 @@ public class JwtTokenProvider {
 
         refreshTokenRepository.save(
                 RefreshToken.builder()
-                        .userId(userId)
+                        .password(password)
                         .token(refreshToken)
                         .timeToLive((jwtProperties.getRefreshExpiration()))
                         .build()
@@ -93,17 +95,17 @@ public class JwtTokenProvider {
         }
     }
 
-    public TokenResponse receiveToken(String userId) {
+    public TokenResponse receiveToken(String password) {
 
         Date  now = new Date();
 
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> UserNotFoundException.EXCEPTION);
+        Admin admin = adminRepository.findByPassword(password)
+                .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
 
         return TokenResponse
                 .builder()
-                .accessToken(createAccessToken(userId))
-                .refreshToken(createRefreshToken(userId))
+                .accessToken(createAccessToken(password))
+                .refreshToken(createRefreshToken(password))
                 .accessExpiredAt(new Date(now.getTime() + jwtProperties.getAccessExpiration()))
                 .refreshExpiredAt(new Date(now.getTime() + jwtProperties.getRefreshExpiration()))
                 .build();
