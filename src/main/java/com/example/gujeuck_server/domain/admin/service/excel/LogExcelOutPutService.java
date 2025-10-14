@@ -24,6 +24,7 @@ public class LogExcelOutPutService {
 
     private static final String EXCEL_MEDIA_TYPE_NAME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final MediaType EXCEL_MEDIA_TYPE = MediaType.parseMediaType(EXCEL_MEDIA_TYPE_NAME);
+    private static final String FILE_NAME = "%d년 %d월 이용 신청 현황.xlsx";
 
     public ResponseEntity<byte[]> outputExcel() {
         adminFacade.currentUser();
@@ -46,7 +47,7 @@ public class LogExcelOutPutService {
 
     private String generateExcelFileName() {
         LocalDate now = LocalDate.now();
-        return String.format("%d년 %d월 이용 신청 현황.xlsx", now.getYear(), now.getMonthValue());
+        return String.format(FILE_NAME, now.getYear(), now.getMonthValue());
     }
 
     private String encodeFileName(String filename) {
