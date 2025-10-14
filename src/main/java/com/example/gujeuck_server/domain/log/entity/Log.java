@@ -27,7 +27,7 @@ public class Log {
     @Column(nullable = false, length = 30)
     private String name;
   
-    @Column(nullable = false, length = 11)
+    @Column(nullable = false, length = 20)
     private String phone;
 
     @Column(name = "male_count")
