@@ -1,8 +1,16 @@
 package com.example.gujeuck_server.domain.admin.controller;
 
-import com.example.gujeuck_server.domain.admin.dto.UseListRequest;
 import com.example.gujeuck_server.domain.admin.dto.UseListResponse;
+import com.example.gujeuck_server.domain.admin.dto.request.AdminRequest;
+import com.example.gujeuck_server.domain.admin.dto.request.ChangePasswordRequest;
+import com.example.gujeuck_server.domain.admin.dto.request.UseListRequest;
 import com.example.gujeuck_server.domain.admin.service.*;
+import com.example.gujeuck_server.domain.admin.service.etc.ChangePasswordService;
+import com.example.gujeuck_server.domain.admin.service.etc.CreateAdminService;
+import com.example.gujeuck_server.domain.admin.service.excel.LogExcelOutPutService;
+import com.example.gujeuck_server.domain.admin.service.list.*;
+import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
+import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
 import com.example.gujeuck_server.domain.user.dto.UserResponse;
 import com.example.gujeuck_server.domain.user.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.user.dto.response.TokenResponse;
@@ -29,6 +37,10 @@ public class AdminController {
     private final ChangePasswordService changePasswordService;
     private final LogExcelOutPutService logExcelOutPutService;
     private final ReissueService reissueService;
+    private final ReadAllUserListService readAllUserListService;
+    private final ReadOneUserListService readOneUserListService;
+    private final DeleteUseListService deleteUseListService;
+    private final UpdateUseListService updateUseListService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
@@ -60,6 +72,7 @@ public class AdminController {
             @PageableDefault(size = 10, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         return readAllUseListService.readAllUseList(pageable);
+    }
 
     @PostMapping("/login")
     public TokenResponse login(@RequestBody @Valid AdminRequest request) {
