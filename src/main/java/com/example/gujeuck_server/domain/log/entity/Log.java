@@ -39,6 +39,9 @@ public class Log {
     @Column(name = "visit_date")
     private String visitDate;
 
+    @Column(nullable = false)
+    private int year;
+
     public void updateLog(String name, Age age, String phone, int maleCount, int femaleCount, String purpose, String visitDate, boolean privacyAgreed) {
         this.name = name;
         this.age = age;

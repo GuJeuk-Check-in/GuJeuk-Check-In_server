@@ -32,6 +32,8 @@ public class LoginService {
 
         String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
 
+        int currentYear = LocalDate.now().getYear();
+
         List<Log> logs = new ArrayList<>();
 
         logs.add(Log.builder()
@@ -41,6 +43,7 @@ public class LoginService {
                 .privacyAgreed(user.isPrivacyAgreed())
                 .purpose(request.getPurpose())
                 .visitDate(formattedDate)
+                .year(currentYear)
                 .build());
 
         if (request.getCompanionIds() != null && !request.getCompanionIds().isEmpty()) {
@@ -56,6 +59,7 @@ public class LoginService {
                                         .privacyAgreed(companion.isPrivacyAgreed())
                                         .purpose(request.getPurpose())
                                         .visitDate(formattedDate)
+                                        .year(currentYear)
                                         .build()),
                                 () -> invalidCompanionIds.add(companionId)
                         );

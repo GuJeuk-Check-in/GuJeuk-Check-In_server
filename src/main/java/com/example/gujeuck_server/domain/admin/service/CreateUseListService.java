@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class CreateUseListService {
@@ -24,6 +26,8 @@ public class CreateUseListService {
 
         adminFacade.currentUser();
 
+        int currentYear = LocalDate.now().getYear();
+
         Purpose purpose = purposeRepository.findByPurpose(useListRequest.getPurpose())
                 .orElseThrow(() -> NotFoundPurposeException.EXCEPTION);
 
@@ -35,6 +39,7 @@ public class CreateUseListService {
                 .femaleCount(useListRequest.getFemaleCount())
                 .purpose(purpose.getPurpose())
                 .visitDate(useListRequest.getVisitDate())
+                .year(currentYear)
                 .privacyAgreed(useListRequest.isPrivacyAgreed())
                 .build());
     }
