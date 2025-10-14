@@ -6,6 +6,10 @@ import com.example.gujeuck_server.domain.admin.service.*;
 import com.example.gujeuck_server.domain.user.dto.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,7 +51,9 @@ public class AdminController {
     }
 
     @GetMapping("/list/all")
-    public List<UseListResponse> getAllUseList() {
-        return readAllUseListService.readAllUseList();
+    public Slice<UseListResponse> getAllUseList(
+            @PageableDefault(size = 10, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        return readAllUseListService.readAllUseList(pageable.getPageNumber(),  pageable.getPageSize());
     }
 }

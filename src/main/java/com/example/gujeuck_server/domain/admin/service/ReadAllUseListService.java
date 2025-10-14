@@ -3,10 +3,12 @@ package com.example.gujeuck_server.domain.admin.service;
 import com.example.gujeuck_server.domain.admin.dto.UseListResponse;
 import com.example.gujeuck_server.domain.log.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -14,9 +16,15 @@ public class ReadAllUseListService {
     private final LogRepository logRepository;
 
     @Transactional(readOnly = true)
-    public List<UseListResponse> readAllUseList() {
-        return logRepository.findAll().stream()
-                .map(UseListResponse::from)
-                .toList();
+    public Slice<UseListResponse> readAllUseList(int page, int size) {
+         Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "visitDate")
+                        .and(Sort.by(Sort.Direction.DESC, "id"))
+                );
+
+        return logRepository.findAllByOrderByVisitDateDescIdDesc(pageable)
+                .map(UseListResponse::from);
     }
 }
