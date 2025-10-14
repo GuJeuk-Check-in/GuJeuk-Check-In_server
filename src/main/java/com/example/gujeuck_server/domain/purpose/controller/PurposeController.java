@@ -40,4 +40,9 @@ public class PurposeController {
     public PurposeResponse getPurpose(@PathVariable Long id) {
         return readOnePurpose.readById(id);
     }
+
+    @GetMapping("/all")
+    public List<PurposeResponse> getAllPurpose() {
+        return readAllPurpose.readAll();
+    }
 }
