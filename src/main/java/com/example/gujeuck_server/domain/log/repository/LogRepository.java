@@ -6,5 +6,5 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LogRepository extends JpaRepository<Log, Long> {
-    Slice<Log> findAllByOrderByVisitDateDescIdDesc(Pageable pageable);
+    Slice<Log> findAllBy(Pageable pageable);
 }

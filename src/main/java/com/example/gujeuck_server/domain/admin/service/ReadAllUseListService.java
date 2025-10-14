@@ -24,7 +24,7 @@ public class ReadAllUseListService {
                         .and(Sort.by(Sort.Direction.DESC, "id"))
                 );
 
-        return logRepository.findAllByOrderByVisitDateDescIdDesc(pageable)
+        return logRepository.findAllBy(pageable)
                 .map(UseListResponse::from);
     }
 }
