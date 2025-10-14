@@ -25,6 +25,7 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                 .select(Projections.constructor(
                         LogResponse.class,
                         qLog.visitDate,
+                        qLog.visitTime,
                         qLog.name,
                         qLog.age,
                         qLog.maleCount,

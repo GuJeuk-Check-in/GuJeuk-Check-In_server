@@ -17,6 +17,8 @@ public class LogResponse {
 
     private String visitDate;
 
+    private String visitTime;
+
     private String purpose;
 
     private Age age;
@@ -25,6 +27,7 @@ public class LogResponse {
 
     public LogResponse(
             String visitDate,
+            String visitTime,
             String name,
             Age age,
             Integer maleCount,
@@ -34,6 +37,7 @@ public class LogResponse {
             Boolean privacyAgreed
     ) {
         this.visitDate = visitDate;
+        this.visitTime = visitTime;
         this.name = name;
         this.age = age;
         this.maleCount = maleCount;

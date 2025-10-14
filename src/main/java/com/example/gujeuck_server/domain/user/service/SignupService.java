@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,8 @@ public class SignupService {
         Age age = calculateAgeService.getAge(request.getBirthYMD());
 
         String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
+
+        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
 
         int currentYear = LocalDate.now().getYear();
 
@@ -62,6 +66,7 @@ public class SignupService {
                 .privacyAgreed(request.isPrivacyAgreed())
                 .visitDate(formattedDate)
                 .year(currentYear)
+                .visitTime(visitTime)
                 .build());
     }
 }
