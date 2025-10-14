@@ -37,6 +37,8 @@ public class QLog extends EntityPathBase<Log> {
 
     public final StringPath visitDate = createString("visitDate");
 
+    public final StringPath visitTime = createString("visitTime");
+
     public final NumberPath<Integer> year = createNumber("year", Integer.class);
 
     public QLog(String variable) {
