@@ -45,4 +45,5 @@ public class User {
         String monthDay = birthYMD.substring(5).replace("-", "");
         return name + monthDay;
     }
+
 }

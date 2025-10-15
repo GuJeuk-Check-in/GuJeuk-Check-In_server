@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,8 @@ public class SignupService {
     private final LogRepository logRepository;
     private final PurposeRepository purposeRepository;
 
+    private static final String TIME = "HH:mm";
+
     @Transactional
     public void signup(SignupRequest request) {
         String userId = User.generateUserId(request.getName(), request.getBirthYMD());
@@ -34,11 +38,13 @@ public class SignupService {
             throw ExistUserIdException.EXCEPTION;
         }
 
-        Age age = calculateAgeService.getAge(request.getBirthYMD());
+        Age age = calculateAgeService.getAge(request.getBirthYMD()); // 나이 변환기
 
-        String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
+        String formattedDate = DateFormatter.LocalDateForm(LocalDate.now()); // 객체 생성 시간에 맞게 날짜 설정
 
-        int currentYear = LocalDate.now().getYear();
+        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME)); // 객체 생성 시간에 맞게 시간 설정
+
+        int currentYear = LocalDate.now().getYear(); // 현재 연도 반환
 
         Purpose purpose = purposeRepository.findByPurpose(request.getPurpose())
                         .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
@@ -62,6 +68,7 @@ public class SignupService {
                 .privacyAgreed(request.isPrivacyAgreed())
                 .visitDate(formattedDate)
                 .year(currentYear)
+                .visitTime(visitTime)
                 .build());
     }
 }

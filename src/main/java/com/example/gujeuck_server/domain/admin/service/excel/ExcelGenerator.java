@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ExcelGenerator {
     private static final String[] HEADERS = {
-            "NO", "날짜", "성명", "나이", "남자 동행인 수", "여자 동행인 수", "연락처", "방문목적", "개인정보 제공 동의 여부"
+            "NO", "날짜", "방문 시간", "성명", "나이", "남자 동행인 수", "여자 동행인 수", "연락처", "방문목적", "개인정보 제공 동의 여부"
     };
     private static final String sheetTitle = "구즉 청소년 문화의집 월간 방문 기록";
 
@@ -109,6 +109,7 @@ public class ExcelGenerator {
             int col = 0;
             createCell(row, col++, no++, style);
             createCell(row, col++, log.getVisitDate(), style);
+            createCell(row, col++, log.getVisitTime(), style);
             createCell(row, col++, log.getName(), style);
             createCell(row, col++, log.getAge().getLabel(), style);
             createCell(row, col++, log.getMaleCount(), style);

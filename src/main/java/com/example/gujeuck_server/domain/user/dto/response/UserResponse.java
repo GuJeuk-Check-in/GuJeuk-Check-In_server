@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.user.dto;
+package com.example.gujeuck_server.domain.user.dto.response;
 
 import com.example.gujeuck_server.domain.user.entity.User;
 import com.example.gujeuck_server.domain.user.entity.enums.Gender;

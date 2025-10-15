@@ -4,9 +4,11 @@ import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,6 +43,8 @@ public class Log {
 
     @Column(nullable = false)
     private int year;
+
+    private String visitTime;
 
     public void updateLog(String name, Age age, String phone, int maleCount, int femaleCount, String purpose, String visitDate, boolean privacyAgreed) {
         this.name = name;
