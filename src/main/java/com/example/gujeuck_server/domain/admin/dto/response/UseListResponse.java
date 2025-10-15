@@ -54,4 +54,16 @@ public class UseListResponse {
                 .phone(log.getPhone())
                 .build();
     }
+
+    public UseListResponse(Log log) {
+        this.id = log.getId();
+        this.name = log.getName();
+        this.age = log.getAge();
+        this.phone = log.getPhone();
+        this.maleCount = log.getMaleCount();
+        this.femaleCount = log.getFemaleCount();
+        this.purpose = log.getPurpose();
+        this.visitDate = log.getVisitDate();
+        this.privacyAgreed = log.isPrivacyAgreed();
+    }
 }
