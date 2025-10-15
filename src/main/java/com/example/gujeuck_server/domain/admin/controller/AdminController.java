@@ -73,6 +73,11 @@ public class AdminController {
         return readAllUseListService.readAllUseList(pageable);
     }
 
+    @GetMapping("/list/{id}")
+    public UserResponse getOneUseList(@PathVariable Long id) {
+        return readOneUserListService.readOneUserList(id);
+    }
+
     @PostMapping("/login")
     public TokenResponse login(@RequestBody @Valid AdminRequest request) {
         return adminLoginService.login(request);
