@@ -29,7 +29,6 @@ public class ReadAllUseListService {
                 );
 
         return logRepository.findAllBy(pageable)
-                .map(UseListResponse::from)
-                .getContent();
+                .map(UseListResponse::from);
     }
 }
