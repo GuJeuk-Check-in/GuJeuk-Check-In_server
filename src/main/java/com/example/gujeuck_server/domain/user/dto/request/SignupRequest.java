@@ -1,7 +1,6 @@
 package com.example.gujeuck_server.domain.user.dto.request;
 
 import com.example.gujeuck_server.domain.user.entity.enums.Gender;
-import com.example.gujeuck_server.domain.user.entity.enums.Residence;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -22,7 +21,7 @@ public class SignupRequest {
     private String birthYMD;
 
     @NotBlank
-    private Residence residence;
+    private String residence;
 
     @NotNull
     private boolean privacyAgreed;

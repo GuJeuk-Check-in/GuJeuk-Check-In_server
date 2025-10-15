@@ -2,7 +2,6 @@ package com.example.gujeuck_server.domain.user.entity;
 
 import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import com.example.gujeuck_server.domain.user.entity.enums.Gender;
-import com.example.gujeuck_server.domain.user.entity.enums.Residence;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,9 +35,8 @@ public class User {
     @Column(nullable = false)
     private Age age;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private Residence residence;
+    private String residence;
 
     @Column(nullable = false, name = "privacy_agreed")
     private boolean privacyAgreed;
@@ -47,4 +45,5 @@ public class User {
         String monthDay = birthYMD.substring(5).replace("-", "");
         return name + monthDay;
     }
+
 }

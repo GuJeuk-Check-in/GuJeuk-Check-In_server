@@ -33,7 +33,7 @@ public class QUser extends EntityPathBase<User> {
 
     public final BooleanPath privacyAgreed = createBoolean("privacyAgreed");
 
-    public final EnumPath<com.example.gujeuck_server.domain.user.entity.enums.Residence> residence = createEnum("residence", com.example.gujeuck_server.domain.user.entity.enums.Residence.class);
+    public final StringPath residence = createString("residence");
 
     public final StringPath userId = createString("userId");
 
