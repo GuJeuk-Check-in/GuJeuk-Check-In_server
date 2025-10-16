@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.admin.service.list;
 
 
+import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
 import com.example.gujeuck_server.domain.user.entity.enums.Residence;
 import com.example.gujeuck_server.domain.user.repository.UserRepository;
@@ -15,9 +16,23 @@ import java.util.List;
 public class ReadAllUserListByResidenceService {
     private final UserRepository userRepository;
 
-    public List<UserResponse> readAllUserListByResidence(String residence) {
-        Residence matched = Residence.fromKoreanName(residence);
+    private static final String ETC = "기타";
 
+    public List<UserResponse> readAllUserListByResidence(String residence) {
+        String data = residence.trim();
+
+        if (ETC.equals(data)) {
+            List<String> registeredResidences = Arrays.stream(Residence.values())
+                    .map(Residence::getKoreanName)
+                    .toList();
+
+            return userRepository.findByResidenceNotIn(registeredResidences)
+                    .stream()
+                    .map(UserResponse::from)
+                    .toList();
+        }
+
+        Residence matched = Residence.fromKoreanName(data);
         if (matched != null) {
             return userRepository.findByResidence(matched.getKoreanName())
                     .stream()
@@ -25,13 +40,7 @@ public class ReadAllUserListByResidenceService {
                     .toList();
         }
 
-        List<String> registeredResidences = Arrays.stream(Residence.values())
-                .map(Residence::getKoreanName)
-                .toList();
-
-        return userRepository.findByResidenceNotIn(registeredResidences)
-                .stream()
-                .map(UserResponse::from)
-                .toList();
+        throw InvalidResidenceException.EXCEPTION;
     }
+
 }
