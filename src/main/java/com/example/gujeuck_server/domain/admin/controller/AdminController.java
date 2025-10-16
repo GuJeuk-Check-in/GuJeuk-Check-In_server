@@ -60,8 +60,8 @@ public class AdminController {
             Pageable pageable) {
         return readAllUserListService.readAllUserList(pageable);
     }
-    @GetMapping("/user/{residence}")
-    public List<UserResponse> getALlUserByResidenceList(@PathVariable String residence) {
+    @GetMapping("/user")
+    public List<UserResponse> getALlUserByResidenceList(@RequestParam String residence) {
         return readAllUserListByResidenceService.readAllUserListByResidence(residence);
     }
 
