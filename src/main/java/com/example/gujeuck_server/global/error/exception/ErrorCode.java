@@ -18,6 +18,9 @@ public enum ErrorCode {
     //log
     LOG_NOT_FOUND(404, "존재하지 않는 이용목록입니다."),
 
+    //residence
+    INVALID_RESIDENCE(400, "존재하지 않는 거주지 이름입니다."),
+
     //excel
     EXCEL_GENERATION_FAILED(507, "엑셀 파일 생성 중 오류가 발생했습니다."),
 
