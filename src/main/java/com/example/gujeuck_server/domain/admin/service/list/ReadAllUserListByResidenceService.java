@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.admin.service.list;
 
 
 import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
+import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
 import com.example.gujeuck_server.domain.user.entity.enums.Residence;
 import com.example.gujeuck_server.domain.user.repository.UserRepository;
@@ -17,8 +18,11 @@ public class ReadAllUserListByResidenceService {
     private final UserRepository userRepository;
 
     private static final String ETC = "기타";
+    private final AdminFacade adminFacade;
 
     public List<UserResponse> readAllUserListByResidence(String residence) {
+        adminFacade.currentUser();
+
         String data = residence.trim();
 
         if (ETC.equals(data)) {
