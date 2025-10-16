@@ -13,6 +13,8 @@ import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
 import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
 import com.example.gujeuck_server.domain.admin.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.user.entity.User;
+import com.example.gujeuck_server.domain.user.entity.enums.Residence;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +42,7 @@ public class AdminController {
     private final ReadOneUserListService readOneUserListService;
     private final DeleteUseListService deleteUseListService;
     private final UpdateUseListService updateUseListService;
+    private final ReadAllUserListByResidenceService readAllUserListByResidenceService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
@@ -52,8 +55,14 @@ public class AdminController {
     }
 
     @GetMapping("/user/all")
-    public List<UserResponse> getAllUserList() {
-        return readAllUserListService.readAllUserList();
+    public Slice<UserResponse> getAllUserList(
+            @PageableDefault(size = 10, sort = {"id"}, direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        return readAllUserListService.readAllUserList(pageable);
+    }
+    @GetMapping("/user/{residence}")
+    public List<UserResponse> getALlUserByResidenceList(@PathVariable String residence) {
+        return readAllUserListByResidenceService.readAllUserListByResidence(residence);
     }
 
     @DeleteMapping("/list/{id}")

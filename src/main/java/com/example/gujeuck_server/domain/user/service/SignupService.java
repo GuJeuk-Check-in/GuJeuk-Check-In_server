@@ -49,12 +49,14 @@ public class SignupService {
         Purpose purpose = purposeRepository.findByPurpose(request.getPurpose())
                         .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
 
+        String correctResidence = User.resolveResidence(request.getResidence());
+
         userRepository.save(User.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
                 .gender(request.getGender())
                 .birthYMD(request.getBirthYMD())
-                .residence(request.getResidence())
+                .residence(correctResidence)
                 .privacyAgreed(request.isPrivacyAgreed())
                 .age(age)
                 .userId(userId)

@@ -20,7 +20,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class LoginService {
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final LogRepository logRepository;
 
