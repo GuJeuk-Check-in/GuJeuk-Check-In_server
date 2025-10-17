@@ -45,8 +45,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "https://gujeuk.dsmhs.kr",  
-                "https://gujeuk-api.dsmhs.kr"
+                "https://gujeuk.dsmhs.kr"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"));
