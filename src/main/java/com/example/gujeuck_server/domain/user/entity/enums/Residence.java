@@ -24,13 +24,12 @@ public enum Residence {
         this.koreanName = koreanName;
     }
 
-    // ✅ 한글로 된 입력값으로 Enum을 찾는 메서드
     public static Residence fromKoreanName(String koreanName) {
         for (Residence r : values()) {
             if (r.koreanName.equals(koreanName)) {
                 return r;
             }
         }
-        return null; // 없으면 null 리턴
+        return null;
     }
 }
