@@ -26,48 +26,36 @@ public class SecurityConfig {
 
     @Bean
     protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
-
-        HttpSecurity with = httpSecurity
+        return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
-
-                .cors(cors -> cors
-                        .configurationSource(corsConfigurationSource())
-                )
-
-                .headers(headers -> {
-                            headers
-                                    .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin
-                                    );
-                        }
-                )
-
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .sessionManagement(sessionManagement -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-
-                        .requestMatchers( "/user/**", "/admin/**", "/purpose/**")
-                        .permitAll()
+                        .requestMatchers("/user/**", "/admin/**", "/purpose/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-
-                .with(new SecurityFilterConfig(jwtTokenProvider, objectMapper), Customizer.withDefaults());
-
-        return httpSecurity.build();
-
+                .with(new SecurityFilterConfig(jwtTokenProvider, objectMapper), Customizer.withDefaults())
+                .build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("https://gujeuk-api.dsmhs.kr"));
+        configuration.setAllowedOrigins(List.of(
+                "https://gujeuk.dsmhs.kr",  
+                "https://gujeuk-api.dsmhs.kr"
+        ));
+
         configuration.setAllowedMethods(Arrays.asList("OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"));
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
-
 }
