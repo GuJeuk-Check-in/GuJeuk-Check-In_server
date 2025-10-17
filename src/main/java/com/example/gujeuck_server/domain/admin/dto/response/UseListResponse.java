@@ -45,6 +45,7 @@ public class UseListResponse {
     public static UseListResponse from(Log log) {
         return UseListResponse.builder()
                 .id(log.getId())
+                .name(log.getName())
                 .age(log.getAge())
                 .visitDate(log.getVisitDate())
                 .femaleCount(log.getFemaleCount())
