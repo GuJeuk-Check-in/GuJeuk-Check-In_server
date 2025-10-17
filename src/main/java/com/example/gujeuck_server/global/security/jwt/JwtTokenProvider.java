@@ -97,7 +97,7 @@ public class JwtTokenProvider {
 
     public TokenResponse receiveToken(String password) {
 
-        Date  now = new Date();
+        Date now = new Date();
 
         Admin admin = adminRepository.findByPassword(password)
                 .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
@@ -122,6 +122,5 @@ public class JwtTokenProvider {
 
         return null;
     }
-
 
 }
