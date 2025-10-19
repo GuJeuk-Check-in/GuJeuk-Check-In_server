@@ -36,7 +36,7 @@ public enum ErrorCode {
     COMPANION_NOT_FOUND(404, "존재하지 않는 동행인 ID입니다."),
 
     //admin
-    ADMIN_NOT_FOUND(404, "해당 관리자 계정이 존재하지 않습니다."),
+    ADMIN_NOT_FOUND(404, "해당 관리자 계정이 존재하지 않습니다람쥐."),
     INVALID_PASSWORD_CONFIRM(401, "비밀번호 확인이 일치하지 않습니다."),
     SAME_OLD_PASSWORD(400, "기존 비밀번호와 동일한 비밀번호로 변경할 수 없습니다."),
 
