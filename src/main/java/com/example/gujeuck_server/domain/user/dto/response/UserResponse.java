@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.user.dto.response;
 
 import com.example.gujeuck_server.domain.user.entity.User;
+import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import com.example.gujeuck_server.domain.user.entity.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class UserResponse {
     private Long id;
     private String name;
+    private Age age;
     private Gender gender;
     private String phone;
     private String birthYMD;
@@ -24,6 +26,7 @@ public class UserResponse {
         return new UserResponse(
                 user.getId(),
                 user.getName(),
+                user.getAge(),
                 user.getGender(),
                 user.getPhone(),
                 user.getBirthYMD(),

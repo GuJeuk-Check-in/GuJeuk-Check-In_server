@@ -23,6 +23,7 @@ public class ReadOneUserListService {
         return UserResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
+                .age(user.getAge())
                 .phone(user.getPhone())
                 .birthYMD(user.getBirthYMD())
                 .gender(user.getGender())
