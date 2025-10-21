@@ -37,9 +37,6 @@ jwt:
 
 cloud:
   aws:
-    s3:
-      bucket: ${BUCKET_NAME}
-      url-prefix: ${Turkey_IMAGE_FOLDER}
     region:
       static: ${AWS_REGION}
     stack:
