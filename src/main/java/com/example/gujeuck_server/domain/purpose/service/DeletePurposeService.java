@@ -23,8 +23,6 @@ public class DeletePurposeService {
         Purpose purpose = purposeRepository.findById(id).orElseThrow(
                 () -> PurposeNotFoundException.EXCEPTION);
 
-        s3Service.delete(purpose.getPurposeImage());
-
         purposeRepository.delete(purpose);
     }
 }
