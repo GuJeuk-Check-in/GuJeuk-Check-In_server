@@ -17,7 +17,6 @@ public class ReadOnePurposeService {
 
     @Transactional(readOnly = true)
     public PurposeResponse readById(Long id) {
-        adminFacade.currentUser();
 
         Purpose purpose = purposeRepository.findById(id).orElseThrow(
                 () -> PurposeNotFoundException.EXCEPTION);
