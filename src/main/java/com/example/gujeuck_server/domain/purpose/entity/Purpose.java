@@ -18,9 +18,6 @@ public class Purpose {
     @Column(nullable = false, length = 30)
     private String purpose;
 
-    @Column(name = "purpose_image")
-    private String purposeImage;
-
     public void updatePurpose(String purpose) {
         this.purpose = purpose;
     }
