@@ -39,19 +39,14 @@ public class AdminController {
     private final LogExcelOutPutService logExcelOutPutService;
     private final ReissueService reissueService;
     private final ReadAllUserListService readAllUserListService;
-    private final ReadOneUserListService readOneUserListService;
     private final DeleteUseListService deleteUseListService;
     private final UpdateUseListService updateUseListService;
     private final ReadAllUserListByResidenceService readAllUserListByResidenceService;
+    private final ReadOneUseListService readOneUseListService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
         createUseListService.creatUseList(useListRequest);
-    }
-
-    @GetMapping("/user/{id}")
-    public UserResponse getOneUser(@PathVariable Long id) {
-        return readOneUserListService.readOneUserList(id);
     }
 
     @GetMapping("/user/all")
@@ -83,8 +78,8 @@ public class AdminController {
     }
 
     @GetMapping("/list/{id}")
-    public UserResponse getOneUseList(@PathVariable Long id) {
-        return readOneUserListService.readOneUserList(id);
+    public UseListResponse getOneUseList(@PathVariable Long id) {
+        return readOneUseListService.readOneUseList(id);
     }
 
     @PostMapping("/login")
