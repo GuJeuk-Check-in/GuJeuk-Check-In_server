@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class UserResponse {
     private Long id;
     private String name;
+    private long allUserCount;
     private Age age;
     private Gender gender;
     private String phone;
@@ -22,10 +23,11 @@ public class UserResponse {
     private String residence;
     private boolean privacyAgreed;
 
-    public static UserResponse from(User user) {
+    public static UserResponse from(User user, long allUserCount) {
         return new UserResponse(
                 user.getId(),
                 user.getName(),
+                allUserCount,
                 user.getAge(),
                 user.getGender(),
                 user.getPhone(),

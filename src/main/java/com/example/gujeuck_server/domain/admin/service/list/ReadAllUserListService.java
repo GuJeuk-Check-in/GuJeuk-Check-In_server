@@ -28,7 +28,9 @@ public class ReadAllUserListService {
                 Sort.by(Sort.Direction.DESC, "id")
         );
 
+        long total = userRepository.count();
+
         return userRepository.findAllBy(pageable)
-                .map(UserResponse::from);
+                .map(user -> UserResponse.from(user, total));
     }
 }

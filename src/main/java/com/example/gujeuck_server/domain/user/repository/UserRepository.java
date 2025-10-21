@@ -20,4 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByResidenceNotIn (List<String> residences);
 
     Slice<User> findAllBy(Pageable pageable);
+
+    long countByResidence(String residence);
+
+    long countByResidenceNotIn(List<String> residences);
 }

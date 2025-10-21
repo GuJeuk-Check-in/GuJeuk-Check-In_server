@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReadAllUserListByResidenceService {
     private final UserRepository userRepository;
-
     private static final String ETC = "기타";
     private final AdminFacade adminFacade;
 
@@ -30,21 +29,26 @@ public class ReadAllUserListByResidenceService {
                     .map(Residence::getKoreanName)
                     .toList();
 
+            long total = userRepository.countByResidenceNotIn(registeredResidences);
+
             return userRepository.findByResidenceNotIn(registeredResidences)
                     .stream()
-                    .map(UserResponse::from)
+                    .map(user -> UserResponse.from(user, total))
                     .toList();
         }
 
         Residence matched = Residence.fromKoreanName(data);
+
         if (matched != null) {
-            return userRepository.findByResidence(matched.getKoreanName())
+            String kr = matched.getKoreanName();
+            long total = userRepository.countByResidence(kr);
+
+            return userRepository.findByResidence(kr)
                     .stream()
-                    .map(UserResponse::from)
+                    .map(user -> UserResponse.from(user, total))
                     .toList();
         }
 
         throw InvalidResidenceException.EXCEPTION;
     }
-
 }
