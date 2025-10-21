@@ -10,11 +10,10 @@ import com.example.gujeuck_server.domain.admin.service.excel.LogExcelOutPutServi
 import com.example.gujeuck_server.domain.admin.service.list.*;
 import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
 import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
-import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
+import com.example.gujeuck_server.domain.user.dto.response.UserDto;
 import com.example.gujeuck_server.domain.admin.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
-import com.example.gujeuck_server.domain.user.entity.User;
-import com.example.gujeuck_server.domain.user.entity.enums.Residence;
+import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -39,29 +38,24 @@ public class AdminController {
     private final LogExcelOutPutService logExcelOutPutService;
     private final ReissueService reissueService;
     private final ReadAllUserListService readAllUserListService;
-    private final ReadOneUserListService readOneUserListService;
     private final DeleteUseListService deleteUseListService;
     private final UpdateUseListService updateUseListService;
     private final ReadAllUserListByResidenceService readAllUserListByResidenceService;
+    private final ReadOneUseListService readOneUseListService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
         createUseListService.creatUseList(useListRequest);
     }
 
-    @GetMapping("/user/{id}")
-    public UserResponse getOneUser(@PathVariable Long id) {
-        return readOneUserListService.readOneUserList(id);
-    }
-
     @GetMapping("/user/all")
-    public Slice<UserResponse> getAllUserList(
+    public UserResponse getAllUserList(
             @PageableDefault(size = 10, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         return readAllUserListService.readAllUserList(pageable);
     }
     @GetMapping("/user")
-    public List<UserResponse> getALlUserByResidenceList(@RequestParam String residence) {
+    public UserResponse getALlUserByResidenceList(@RequestParam String residence) {
         return readAllUserListByResidenceService.readAllUserListByResidence(residence);
     }
 
@@ -83,8 +77,8 @@ public class AdminController {
     }
 
     @GetMapping("/list/{id}")
-    public UserResponse getOneUseList(@PathVariable Long id) {
-        return readOneUserListService.readOneUserList(id);
+    public UseListResponse getOneUseList(@PathVariable Long id) {
+        return readOneUseListService.readOneUseList(id);
     }
 
     @PostMapping("/login")

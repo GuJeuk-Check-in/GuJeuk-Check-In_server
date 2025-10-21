@@ -21,6 +21,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final EnumPath<com.example.gujeuck_server.domain.user.entity.enums.Age> age = createEnum("age", com.example.gujeuck_server.domain.user.entity.enums.Age.class);
 
+    public final NumberPath<Long> allUserCount = createNumber("allUserCount", Long.class);
+
     public final StringPath birthYMD = createString("birthYMD");
 
     public final EnumPath<com.example.gujeuck_server.domain.user.entity.enums.Gender> gender = createEnum("gender", com.example.gujeuck_server.domain.user.entity.enums.Gender.class);

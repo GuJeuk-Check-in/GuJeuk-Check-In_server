@@ -19,6 +19,8 @@ public class User {
     @Column(unique = true, nullable = false, length = 30, name = "user_id")
     private String userId;
 
+    private long allUserCount;
+
     @Column(nullable = false, length = 30)
     private String name;
 
