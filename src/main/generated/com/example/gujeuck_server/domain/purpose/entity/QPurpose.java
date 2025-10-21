@@ -23,8 +23,6 @@ public class QPurpose extends EntityPathBase<Purpose> {
 
     public final StringPath purpose = createString("purpose");
 
-    public final StringPath purposeImage = createString("purposeImage");
-
     public QPurpose(String variable) {
         super(Purpose.class, forVariable(variable));
     }

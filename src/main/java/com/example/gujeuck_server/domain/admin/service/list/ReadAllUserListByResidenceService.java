@@ -3,6 +3,7 @@ package com.example.gujeuck_server.domain.admin.service.list;
 
 import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.user.dto.response.UserDto;
 import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
 import com.example.gujeuck_server.domain.user.entity.enums.Residence;
 import com.example.gujeuck_server.domain.user.repository.UserRepository;
@@ -19,7 +20,7 @@ public class ReadAllUserListByResidenceService {
     private static final String ETC = "기타";
     private final AdminFacade adminFacade;
 
-    public List<UserResponse> readAllUserListByResidence(String residence) {
+    public UserResponse readAllUserListByResidence(String residence) {
         adminFacade.currentUser();
 
         String data = residence.trim();
@@ -31,10 +32,12 @@ public class ReadAllUserListByResidenceService {
 
             long total = userRepository.countByResidenceNotIn(registeredResidences);
 
-            return userRepository.findByResidenceNotIn(registeredResidences)
+            List<UserDto> users = userRepository.findByResidenceNotIn(registeredResidences)
                     .stream()
-                    .map(user -> UserResponse.from(user, total))
+                    .map(UserDto::from)
                     .toList();
+
+            return new UserResponse(total, users);
         }
 
         Residence matched = Residence.fromKoreanName(data);
@@ -43,10 +46,12 @@ public class ReadAllUserListByResidenceService {
             String kr = matched.getKoreanName();
             long total = userRepository.countByResidence(kr);
 
-            return userRepository.findByResidence(kr)
+            List<UserDto> users = userRepository.findByResidence(kr)
                     .stream()
-                    .map(user -> UserResponse.from(user, total))
+                    .map(UserDto::from)
                     .toList();
+
+            return new UserResponse(total, users);
         }
 
         throw InvalidResidenceException.EXCEPTION;

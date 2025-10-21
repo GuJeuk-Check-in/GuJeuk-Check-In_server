@@ -10,11 +10,10 @@ import com.example.gujeuck_server.domain.admin.service.excel.LogExcelOutPutServi
 import com.example.gujeuck_server.domain.admin.service.list.*;
 import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
 import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
-import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
+import com.example.gujeuck_server.domain.user.dto.response.UserDto;
 import com.example.gujeuck_server.domain.admin.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
-import com.example.gujeuck_server.domain.user.entity.User;
-import com.example.gujeuck_server.domain.user.entity.enums.Residence;
+import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -50,13 +49,13 @@ public class AdminController {
     }
 
     @GetMapping("/user/all")
-    public Slice<UserResponse> getAllUserList(
+    public UserResponse getAllUserList(
             @PageableDefault(size = 10, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         return readAllUserListService.readAllUserList(pageable);
     }
     @GetMapping("/user")
-    public List<UserResponse> getALlUserByResidenceList(@RequestParam String residence) {
+    public UserResponse getALlUserByResidenceList(@RequestParam String residence) {
         return readAllUserListByResidenceService.readAllUserListByResidence(residence);
     }
 
