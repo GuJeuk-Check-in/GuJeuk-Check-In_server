@@ -138,10 +138,18 @@ public class ExcelGenerator {
     private static void autoAdjustColumns(Sheet sheet) {
         for (int i = 0; i < HEADERS.length; i++) {
             sheet.autoSizeColumn(i);
+
             int width = sheet.getColumnWidth(i);
-            sheet.setColumnWidth(i, width + 512);
+            sheet.setColumnWidth(i, width + 1024);
         }
+
+        sheet.setColumnWidth(3, 5000); // 성명
+        sheet.setColumnWidth(4, 3500); // 나이
+        sheet.setColumnWidth(7, 6000); // 연락처
+        sheet.setColumnWidth(8, 6000); // 방문목적
+        sheet.setColumnWidth(9, 5000); // 개인정보 제공 동의 여부
     }
+
 
     private static String formatFullDate(String visitDate) {
         int currentYear = LocalDate.now().getYear();
