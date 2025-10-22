@@ -7,10 +7,13 @@ import com.example.gujeuck_server.domain.log.entity.Log;
 import com.example.gujeuck_server.domain.log.repository.LogRepository;
 import com.example.gujeuck_server.domain.purpose.entity.Purpose;
 import com.example.gujeuck_server.domain.purpose.exception.NotFoundPurposeException;
+import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
 import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +29,13 @@ public class UpdateUseListService {
         Log log = logRepository.findById(id).orElseThrow(
                 () -> LogNotFountException.EXCEPTION);
 
-        Purpose purpose = purposeRepository.findByPurpose(useListRequest.getPurpose())
-                .stream().toList().get(0);
+        List<Purpose> purposeList = purposeRepository.findByPurpose(useListRequest.getPurpose());
 
+        if (purposeList.isEmpty()) {
+            throw PurposeNotFoundException.EXCEPTION;
+        }
+
+        Purpose purpose = purposeList.get(0);
 
         log.updateLog(
                 useListRequest.getName(),

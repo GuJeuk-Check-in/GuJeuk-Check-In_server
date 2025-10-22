@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,8 +47,13 @@ public class SignupService {
 
         int currentYear = LocalDate.now().getYear(); // 현재 연도 반환
 
-        Purpose purpose = purposeRepository.findByPurpose(request.getPurpose())
-                        .stream().toList().get(0);
+        List<Purpose> purposeList = purposeRepository.findByPurpose(request.getPurpose());
+
+        if (purposeList.isEmpty()) {
+            throw PurposeNotFoundException.EXCEPTION;
+        }
+
+        Purpose purpose = purposeList.get(0);
 
         String correctResidence = User.resolveResidence(request.getResidence());
 
