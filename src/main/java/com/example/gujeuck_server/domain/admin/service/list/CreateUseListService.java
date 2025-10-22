@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +23,15 @@ public class CreateUseListService {
     private final PurposeRepository purposeRepository;
     private final AdminFacade adminFacade;
 
+    private static final String TIME = "HH:mm";
+
     @Transactional
     public void creatUseList(UseListRequest useListRequest) {
 
         adminFacade.currentUser();
+
+        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME)); // 객체 생성 시간에 맞게 시간 설정
+
 
         int currentYear = LocalDate.now().getYear();
 
@@ -38,6 +45,7 @@ public class CreateUseListService {
                 .maleCount(useListRequest.getMaleCount())
                 .femaleCount(useListRequest.getFemaleCount())
                 .purpose(purpose.getPurpose())
+                .visitTime(visitTime)
                 .visitDate(useListRequest.getVisitDate())
                 .year(currentYear)
                 .privacyAgreed(useListRequest.isPrivacyAgreed())
