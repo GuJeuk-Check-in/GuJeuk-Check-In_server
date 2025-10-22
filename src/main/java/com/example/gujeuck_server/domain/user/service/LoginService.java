@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,8 @@ public class LoginService {
     private final UserRepository userRepository;
     private final LogRepository logRepository;
 
+    private static final String TIME = "HH:mm";
+
     @Transactional
     public void login(LoginRequest request) {
 
@@ -30,6 +34,8 @@ public class LoginService {
                 .orElseThrow(()-> UserNotFoundException.EXCEPTION);
 
         String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
+
+        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
 
         int currentYear = LocalDate.now().getYear();
 
@@ -42,6 +48,7 @@ public class LoginService {
                 .privacyAgreed(user.isPrivacyAgreed())
                 .purpose(request.getPurpose())
                 .visitDate(formattedDate)
+                .visitTime(visitTime)
                 .year(currentYear)
                 .build());
 
@@ -58,6 +65,7 @@ public class LoginService {
                                         .privacyAgreed(companion.isPrivacyAgreed())
                                         .purpose(request.getPurpose())
                                         .visitDate(formattedDate)
+                                        .visitTime(visitTime)
                                         .year(currentYear)
                                         .build()),
                                 () -> invalidCompanionIds.add(companionId)
