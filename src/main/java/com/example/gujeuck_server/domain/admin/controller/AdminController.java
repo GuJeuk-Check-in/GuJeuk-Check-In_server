@@ -10,6 +10,7 @@ import com.example.gujeuck_server.domain.admin.service.excel.LogExcelOutPutServi
 import com.example.gujeuck_server.domain.admin.service.list.*;
 import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
 import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
+import com.example.gujeuck_server.domain.user.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.dto.response.UserDto;
 import com.example.gujeuck_server.domain.admin.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
@@ -49,7 +50,7 @@ public class AdminController {
     }
 
     @GetMapping("/user/all")
-    public UserResponse getAllUserList(
+    public SliceWithTotalResponse<UserDto> getAllUserList(
             @PageableDefault(size = 10, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         return readAllUserListService.readAllUserList(pageable);

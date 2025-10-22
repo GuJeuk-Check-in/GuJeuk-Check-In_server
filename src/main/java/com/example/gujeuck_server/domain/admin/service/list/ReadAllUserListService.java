@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.admin.service.list;
 
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.user.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.dto.response.UserDto;
 import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
 import com.example.gujeuck_server.domain.user.entity.User;
@@ -22,7 +23,7 @@ public class ReadAllUserListService {
     private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
-    public UserResponse readAllUserList(Pageable p) {
+    public SliceWithTotalResponse<UserDto> readAllUserList(Pageable p) {
         adminFacade.currentUser();
 
         Pageable pageable = PageRequest.of(
@@ -33,13 +34,9 @@ public class ReadAllUserListService {
 
         long total = userRepository.count();
 
-        Slice<User> slice = userRepository.findAllBy(p); // Slice<User>
-        List<UserDto> users = slice.getContent()
-                .stream()
-                .map(UserDto::from)
-                .toList();
+        Slice<UserDto> slice = userRepository.findAllBy(pageable)
+                .map(UserDto::from);
 
-
-        return new UserResponse(total, users);
+        return new SliceWithTotalResponse<>(total, slice);
     }
 }
