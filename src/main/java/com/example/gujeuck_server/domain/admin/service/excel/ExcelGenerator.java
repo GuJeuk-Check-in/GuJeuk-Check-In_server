@@ -7,6 +7,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 public class ExcelGenerator {
@@ -108,7 +109,10 @@ public class ExcelGenerator {
 
             int col = 0;
             createCell(row, col++, no++, style);
-            createCell(row, col++, log.getVisitDate(), style);
+
+            String visitDateFormatted = formatFullDate(log.getVisitDate());
+            createCell(row, col++, visitDateFormatted, style);
+
             createCell(row, col++, log.getVisitTime(), style);
             createCell(row, col++, log.getName(), style);
             createCell(row, col++, log.getAge().getLabel(), style);
@@ -138,4 +142,18 @@ public class ExcelGenerator {
             sheet.setColumnWidth(i, width + 512);
         }
     }
+
+    private static String formatFullDate(String visitDate) {
+        int currentYear = LocalDate.now().getYear();
+
+        if (visitDate.contains("월")) {
+            return currentYear + "년" + visitDate;
+        } else if (visitDate.contains("-")) {
+            String[] parts = visitDate.split("-");
+            return String.format("%d년%s월%s일", currentYear, parts[0], parts[1]);
+        } else {
+            return currentYear + "년 " + visitDate;
+        }
+    }
+
 }
