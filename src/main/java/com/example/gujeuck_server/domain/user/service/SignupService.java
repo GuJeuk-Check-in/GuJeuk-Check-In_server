@@ -47,7 +47,7 @@ public class SignupService {
         int currentYear = LocalDate.now().getYear(); // 현재 연도 반환
 
         Purpose purpose = purposeRepository.findByPurpose(request.getPurpose())
-                        .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
+                        .stream().toList().get(0);
 
         String correctResidence = User.resolveResidence(request.getResidence());
 

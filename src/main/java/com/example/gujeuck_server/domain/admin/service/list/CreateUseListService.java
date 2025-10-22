@@ -29,7 +29,7 @@ public class CreateUseListService {
         int currentYear = LocalDate.now().getYear();
 
         Purpose purpose = purposeRepository.findByPurpose(useListRequest.getPurpose())
-                .orElseThrow(() -> NotFoundPurposeException.EXCEPTION);
+                        .stream().toList().get(0);
 
         logRepository.save(Log.builder()
                 .name(useListRequest.getName())

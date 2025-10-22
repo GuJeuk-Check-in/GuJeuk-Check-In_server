@@ -27,7 +27,7 @@ public class UpdateUseListService {
                 () -> LogNotFountException.EXCEPTION);
 
         Purpose purpose = purposeRepository.findByPurpose(useListRequest.getPurpose())
-                .orElseThrow(() -> NotFoundPurposeException.EXCEPTION);
+                .stream().toList().get(0);
 
 
         log.updateLog(
