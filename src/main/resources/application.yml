@@ -23,7 +23,7 @@ spring:
     hibernate:
       jdbc:
         time_zone: Asia/Seoul
-      ddl-auto: update
+      ddl-auto: create-drop
 jwt:
   header: Authorization
   prefix: Bearer
