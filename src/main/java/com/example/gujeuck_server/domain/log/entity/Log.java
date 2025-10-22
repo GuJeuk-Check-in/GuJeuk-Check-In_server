@@ -32,13 +32,10 @@ public class Log {
     @Column(nullable = false, length = 20)
     private String phone;
 
-    @Column(name = "male_count")
     private int maleCount;
 
-    @Column(name = "female_count")
     private int femaleCount;
 
-    @Column(name = "visit_date")
     private String visitDate;
 
     @Column(nullable = false)
