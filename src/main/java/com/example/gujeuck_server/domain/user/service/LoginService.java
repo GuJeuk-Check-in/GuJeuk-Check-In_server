@@ -31,12 +31,10 @@ public class LoginService {
     public void login(LoginRequest request) {
 
         User user = userRepository.findByUserId(request.getUserId())
-                .orElseThrow(()-> UserNotFoundException.EXCEPTION);
+                .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
         String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
-
         String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
-
         int currentYear = LocalDate.now().getYear();
 
         List<Log> logs = new ArrayList<>();
@@ -76,7 +74,8 @@ public class LoginService {
                 throw new CompanionIdNotFoundException(invalidCompanionIds);
             }
         }
-        
-            logRepository.saveAll(logs);
+
+        logRepository.saveAll(logs);
     }
+
 }

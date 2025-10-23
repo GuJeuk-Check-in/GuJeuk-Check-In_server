@@ -39,22 +39,18 @@ public class SignupService {
             throw ExistUserIdException.EXCEPTION;
         }
 
-        Age age = calculateAgeService.getAge(request.getBirthYMD()); // 나이 변환기
+        Age age = calculateAgeService.getAge(request.getBirthYMD());
 
-        String formattedDate = DateFormatter.LocalDateForm(LocalDate.now()); // 객체 생성 시간에 맞게 날짜 설정
-
-        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME)); // 객체 생성 시간에 맞게 시간 설정
-
-        int currentYear = LocalDate.now().getYear(); // 현재 연도 반환
+        String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
+        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
+        int currentYear = LocalDate.now().getYear();
 
         List<Purpose> purposeList = purposeRepository.findByPurpose(request.getPurpose());
-
         if (purposeList.isEmpty()) {
             throw PurposeNotFoundException.EXCEPTION;
         }
 
         Purpose purpose = purposeList.get(0);
-
         String correctResidence = User.resolveResidence(request.getResidence());
 
         userRepository.save(User.builder()

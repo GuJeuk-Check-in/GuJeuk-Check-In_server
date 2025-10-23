@@ -9,6 +9,7 @@ import com.example.gujeuck_server.domain.purpose.exception.NotFoundPurposeExcept
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
 import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
 
+import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,18 +33,22 @@ public class CreateUseListService {
 
         adminFacade.currentUser();
 
-        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME)); // 객체 생성 시간에 맞게 시간 설정
-
-
+        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
         int currentYear = LocalDate.now().getYear();
 
         List<Purpose> purposeList = purposeRepository.findByPurpose(useListRequest.getPurpose());
-
         if (purposeList.isEmpty()) {
             throw PurposeNotFoundException.EXCEPTION;
         }
 
         Purpose purpose = purposeList.get(0);
+
+        String formattedDate;
+        if (useListRequest.getVisitDate().matches("\\d{4}년\\d{2}월\\d{2}일")) { //하드 코딩
+            formattedDate = useListRequest.getVisitDate();
+        } else {
+            formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
+        }
 
         logRepository.save(Log.builder()
                 .name(useListRequest.getName())
@@ -53,9 +58,10 @@ public class CreateUseListService {
                 .femaleCount(useListRequest.getFemaleCount())
                 .purpose(purpose.getPurpose())
                 .visitTime(visitTime)
-                .visitDate(useListRequest.getVisitDate())
+                .visitDate(formattedDate)
                 .year(currentYear)
                 .privacyAgreed(useListRequest.isPrivacyAgreed())
                 .build());
     }
+
 }
