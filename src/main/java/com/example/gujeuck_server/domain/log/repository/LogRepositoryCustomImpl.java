@@ -16,7 +16,7 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
 
     LocalDate now = LocalDate.now();
     int currentYear = now.getYear();
-    String currentMonth = String.format("%02d월", now.getMonthValue()); // "10월"
+    String currentYearMonth = String.format("%d년%02d월", currentYear, now.getMonthValue());
 
     @Override
     public List<LogResponse> findAllByCurrentMonth() {
@@ -37,7 +37,7 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                 .from(qLog)
                 .where(
                         qLog.year.eq(currentYear),
-                        qLog.visitDate.startsWith(currentMonth)
+                        qLog.visitDate.startsWith(currentYearMonth)
                 )
                 .orderBy(qLog.visitDate.asc())
                 .fetch();
