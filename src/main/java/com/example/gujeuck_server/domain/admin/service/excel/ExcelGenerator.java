@@ -110,9 +110,7 @@ public class ExcelGenerator {
             int col = 0;
             createCell(row, col++, no++, style);
 
-            String visitDateFormatted = formatFullDate(log.getVisitDate());
-            createCell(row, col++, visitDateFormatted, style);
-
+            createCell(row, col++, log.getVisitDate(), style);
             createCell(row, col++, log.getVisitTime(), style);
             createCell(row, col++, log.getName(), style);
             createCell(row, col++, log.getAge().getLabel(), style);
