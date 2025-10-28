@@ -53,7 +53,7 @@ public class SignupService {
         Purpose purpose = purposeList.get(0);
         String correctResidence = User.resolveResidence(request.getResidence());
 
-        userRepository.save(User.builder()
+        User user = User.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
                 .gender(request.getGender())
@@ -62,7 +62,11 @@ public class SignupService {
                 .privacyAgreed(request.isPrivacyAgreed())
                 .age(age)
                 .userId(userId)
-                .build());
+                .build();
+
+        user.increaseCount();
+
+        userRepository.save(user);
 
         logRepository.save(Log.builder()
                 .name(request.getName())

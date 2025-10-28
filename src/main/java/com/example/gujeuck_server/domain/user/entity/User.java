@@ -44,6 +44,9 @@ public class User {
     @Column(nullable = false)
     private boolean privacyAgreed;
 
+    @Column(nullable = false)
+    private int count;
+
     public static String generateUserId(String name, String birthYMD) {
         String monthDay = birthYMD.substring(5).replace("-", "");
         return name + monthDay;
@@ -54,5 +57,9 @@ public class User {
         Residence matched = Residence.fromKoreanName(input.trim());
 
         return matched != null ? matched.getKoreanName() : input.trim();
+    }
+
+    public void increaseCount() {
+        this.count = count + 1;
     }
 }

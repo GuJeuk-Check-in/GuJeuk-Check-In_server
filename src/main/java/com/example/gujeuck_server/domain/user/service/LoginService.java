@@ -34,6 +34,8 @@ public class LoginService {
         User user = userRepository.findByUserId(request.getUserId())
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
+        user.increaseCount();
+
         String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
         String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
         int currentYear = LocalDate.now().getYear();
