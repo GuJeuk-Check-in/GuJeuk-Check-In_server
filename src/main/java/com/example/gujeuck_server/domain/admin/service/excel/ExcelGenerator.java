@@ -118,6 +118,7 @@ public class ExcelGenerator {
             createCell(row, col++, log.getFemaleCount(), style);
             createCell(row, col++, log.getPhone(), style);
             createCell(row, col++, log.getPurpose(), style);
+            createCell(row, col++, log.getResidence(), style);
             createCell(row, col++, log.isPrivacyAgreed() ? "동의" : "미동의", style);
         }
     }
