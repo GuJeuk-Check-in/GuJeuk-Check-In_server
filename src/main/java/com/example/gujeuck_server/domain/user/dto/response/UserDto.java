@@ -19,6 +19,7 @@ public class UserDto {
     private String birthYMD;
     private String residence;
     private boolean privacyAgreed;
+    private int count;
 
     public static UserDto from(User u) {
         return UserDto.builder()
@@ -30,6 +31,7 @@ public class UserDto {
                 .birthYMD(u.getBirthYMD())
                 .residence(u.getResidence())
                 .privacyAgreed(u.isPrivacyAgreed())
+                .count(u.getCount())
                 .build();
     }
 }
