@@ -23,6 +23,8 @@ public class LogResponse {
 
     private Age age;
 
+    private String residence;
+
     private boolean privacyAgreed;
 
     public LogResponse(
