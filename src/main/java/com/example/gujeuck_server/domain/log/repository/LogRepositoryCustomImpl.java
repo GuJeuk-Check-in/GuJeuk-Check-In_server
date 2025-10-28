@@ -32,6 +32,7 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                         qLog.femaleCount,
                         qLog.phone,
                         qLog.purpose,
+                        qLog.residence,
                         qLog.privacyAgreed
                 ))
                 .from(qLog)

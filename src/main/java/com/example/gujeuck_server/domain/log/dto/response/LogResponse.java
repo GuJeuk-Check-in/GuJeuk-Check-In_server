@@ -36,6 +36,7 @@ public class LogResponse {
             Integer femaleCount,
             String phone,
             String purpose,
+            String residence,
             Boolean privacyAgreed
     ) {
         this.visitDate = visitDate;
@@ -46,6 +47,7 @@ public class LogResponse {
         this.femaleCount = femaleCount;
         this.phone = phone;
         this.purpose = purpose;
+        this.residence = residence;
         this.privacyAgreed = privacyAgreed;
     }
 }
