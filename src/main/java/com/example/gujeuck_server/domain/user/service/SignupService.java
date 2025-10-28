@@ -73,6 +73,7 @@ public class SignupService {
                 .visitDate(formattedDate)
                 .year(currentYear)
                 .visitTime(visitTime)
+                .residence(correctResidence)
                 .build());
     }
 }
