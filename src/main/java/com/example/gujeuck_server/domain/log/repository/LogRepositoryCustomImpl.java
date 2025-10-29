@@ -1,13 +1,16 @@
 package com.example.gujeuck_server.domain.log.repository;
 
 import com.example.gujeuck_server.domain.log.dto.response.LogResponse;
+import com.example.gujeuck_server.domain.log.entity.Log;
 import com.example.gujeuck_server.domain.log.entity.QLog;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class LogRepositoryCustomImpl implements LogRepositoryCustom {
@@ -42,6 +45,23 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                 )
                 .orderBy(qLog.visitDate.asc())
                 .fetch();
+    }
+
+    @Override
+    public Optional<Log> findByUserIdAndVisitTime(String userId, String visitDate, String visitTime) {
+
+        return Optional.ofNullable(
+                jpaQueryFactory
+                        .selectFrom(qLog)
+                        .where(
+                                qLog.user.userId.eq(userId),
+                                qLog.visitDate.eq(visitDate),
+                                qLog.visitTime.eq(visitTime)
+                        )
+                        .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                        .fetchOne()
+        );
+
     }
 
 }
