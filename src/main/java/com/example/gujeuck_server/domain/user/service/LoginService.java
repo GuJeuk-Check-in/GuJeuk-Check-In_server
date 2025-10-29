@@ -48,6 +48,7 @@ public class LoginService {
         List<Log> logs = new ArrayList<>();
 
         logs.add(Log.builder()
+                .user(user)
                 .name(user.getName())
                 .age(user.getAge())
                 .phone(user.getPhone())
