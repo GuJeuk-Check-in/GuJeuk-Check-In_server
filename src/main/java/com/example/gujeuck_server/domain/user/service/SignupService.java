@@ -35,7 +35,7 @@ public class SignupService {
     public void signup(SignupRequest request) {
         String userId = User.generateUserId(request.getName(), request.getBirthYMD());
 
-        if (userRepository.existsByUserId(userId)) {
+        if (userRepository.findByUserId(userId).isPresent()) {
             throw ExistUserIdException.EXCEPTION;
         }
 
