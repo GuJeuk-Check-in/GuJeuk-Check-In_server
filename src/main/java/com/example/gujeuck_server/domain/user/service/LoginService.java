@@ -65,17 +65,21 @@ public class LoginService {
 
             for (String companionId : request.getCompanionIds()) {
                 userRepository.findByUserId(companionId)
-                        .ifPresentOrElse(companion -> logs.add(Log.builder()
-                                        .name(companion.getName())
-                                        .age(companion.getAge())
-                                        .phone(companion.getPhone())
-                                        .privacyAgreed(companion.isPrivacyAgreed())
-                                        .purpose(request.getPurpose())
-                                        .visitDate(formattedDate)
-                                        .visitTime(visitTime)
-                                        .year(currentYear)
-                                        .residence(companion.getResidence())
-                                        .build()),
+                        .ifPresentOrElse(companion -> {
+                            companion.increaseCount();
+
+                                    logs.add(Log.builder()
+                                            .name(companion.getName())
+                                            .age(companion.getAge())
+                                            .phone(companion.getPhone())
+                                            .privacyAgreed(companion.isPrivacyAgreed())
+                                            .purpose(request.getPurpose())
+                                            .visitDate(formattedDate)
+                                            .visitTime(visitTime)
+                                            .year(currentYear)
+                                            .residence(companion.getResidence())
+                                            .build());
+                                },
                                 () -> invalidCompanionIds.add(companionId)
                         );
             }
