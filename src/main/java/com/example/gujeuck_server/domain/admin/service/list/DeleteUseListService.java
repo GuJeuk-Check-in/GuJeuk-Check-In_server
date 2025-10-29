@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.admin.service.list;
 
-import com.example.gujeuck_server.domain.admin.exception.LogNotFountException;
+import com.example.gujeuck_server.domain.log.exception.LogNotFountException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.entity.Log;
 import com.example.gujeuck_server.domain.log.repository.LogRepository;
