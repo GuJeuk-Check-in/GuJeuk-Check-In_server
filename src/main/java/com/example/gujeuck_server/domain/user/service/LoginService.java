@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.user.service;
 
 import com.example.gujeuck_server.domain.log.entity.Log;
+import com.example.gujeuck_server.domain.log.exception.DuplicateLogException;
 import com.example.gujeuck_server.domain.log.repository.LogRepository;
 import com.example.gujeuck_server.domain.user.dto.request.LoginRequest;
 import com.example.gujeuck_server.domain.user.entity.User;
@@ -39,6 +40,10 @@ public class LoginService {
         String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
         String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
         int currentYear = LocalDate.now().getYear();
+
+        if (logRepository.findByUserIdAndVisitTime(user.getUserId(), formattedDate, visitTime).isPresent()) {
+            throw DuplicateLogException.EXCEPTION;
+        }
 
         List<Log> logs = new ArrayList<>();
 
