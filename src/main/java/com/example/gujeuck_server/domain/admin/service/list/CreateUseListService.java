@@ -22,46 +22,75 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CreateUseListService {
+
     private final LogRepository logRepository;
     private final PurposeRepository purposeRepository;
     private final AdminFacade adminFacade;
 
     private static final String TIME = "HH:mm";
+    private static final String KOREAN_DATE_REGEX = "\\d{4}년\\d{2}월\\d{2}일";
 
     @Transactional
     public void creatUseList(UseListRequest useListRequest) {
 
         adminFacade.currentUser();
 
-        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
-        int currentYear = LocalDate.now().getYear();
+        String visitTime = getCurrentTime();
+        int currentYear = getCurrentYear();
 
-        List<Purpose> purposeList = purposeRepository.findByPurpose(useListRequest.getPurpose());
-        if (purposeList.isEmpty()) {
-            throw PurposeNotFoundException.EXCEPTION;
-        }
+        Purpose purpose = findPurpose(useListRequest.getPurpose());
+        String formattedDate = resolveVisitDate(useListRequest.getVisitDate());
 
-        Purpose purpose = purposeList.get(0);
-
-        String formattedDate;
-        if (useListRequest.getVisitDate().matches("\\d{4}년\\d{2}월\\d{2}일")) { //하드 코딩
-            formattedDate = useListRequest.getVisitDate();
-        } else {
-            formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
-        }
-
-        logRepository.save(Log.builder()
-                .name(useListRequest.getName())
-                .age(useListRequest.getAge())
-                .phone(useListRequest.getPhone())
-                .maleCount(useListRequest.getMaleCount())
-                .femaleCount(useListRequest.getFemaleCount())
-                .purpose(purpose.getPurpose())
-                .visitTime(visitTime)
-                .visitDate(formattedDate)
-                .year(currentYear)
-                .privacyAgreed(useListRequest.isPrivacyAgreed())
-                .build());
+        Log log = createUseLog(useListRequest, purpose, formattedDate, visitTime, currentYear);
+        logRepository.save(log);
     }
 
+    private String getCurrentTime() {
+        return LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
+    }
+
+    private int getCurrentYear() {
+        return LocalDate.now().getYear();
+    }
+
+    private Purpose findPurpose(String purposeName) {
+        List<Purpose> list = purposeRepository.findByPurpose(purposeName);
+
+        if (list.isEmpty()) {
+            throw PurposeNotFoundException.EXCEPTION;
+        }
+        return list.get(0);
+    }
+
+    private String resolveVisitDate(String requestDate) {
+        if (isKoreanDateFormat(requestDate)) {
+            return requestDate;
+        }
+        return DateFormatter.LocalDateForm(LocalDate.now());
+    }
+
+    private boolean isKoreanDateFormat(String date) {
+        return date != null && date.matches(KOREAN_DATE_REGEX);
+    }
+
+    private Log createUseLog(
+            UseListRequest request,
+            Purpose purpose,
+            String date,
+            String time,
+            int year
+    ) {
+        return Log.builder()
+                .name(request.getName())
+                .age(request.getAge())
+                .phone(request.getPhone())
+                .maleCount(request.getMaleCount())
+                .femaleCount(request.getFemaleCount())
+                .purpose(purpose.getPurpose())
+                .visitTime(time)
+                .visitDate(date)
+                .year(year)
+                .privacyAgreed(request.isPrivacyAgreed())
+                .build();
+    }
 }
