@@ -1,4 +1,5 @@
 package com.example.gujeuck_server.domain.admin.dto.request;
+
 import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import jakarta.validation.constraints.*;
 import lombok.Getter;

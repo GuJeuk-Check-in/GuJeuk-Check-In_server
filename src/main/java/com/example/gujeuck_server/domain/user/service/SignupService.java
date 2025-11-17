@@ -24,6 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class SignupService {
+
     private final UserRepository userRepository;
     private final CalculateAgeService calculateAgeService;
     private final LogRepository logRepository;
@@ -33,52 +34,98 @@ public class SignupService {
 
     @Transactional
     public void signup(SignupRequest request) {
-        String userId = User.generateUserId(request.getName(), request.getBirthYMD());
 
+        String userId = generateUserId(request);
+        validateDuplicateUserId(userId);
+
+        Age age = calculateAge(request);
+        String formattedDate = getFormattedDate();
+        String visitTime = getVisitTime();
+        int currentYear = getCurrentYear();
+
+        Purpose purpose = findPurpose(request.getPurpose());
+        String resolvedResidence = resolveResidence(request.getResidence());
+
+        User user = createUserEntity(request, age, userId, resolvedResidence);
+        user.increaseCount();
+        userRepository.save(user);
+
+        Log log = createSignupLog(request, age, purpose, formattedDate, visitTime, currentYear, resolvedResidence);
+        logRepository.save(log);
+    }
+
+    private String generateUserId(SignupRequest request) {
+        return User.generateUserId(request.getName(), request.getBirthYMD());
+    }
+
+    private void validateDuplicateUserId(String userId) {
         if (userRepository.findByUserId(userId).isPresent()) {
             throw ExistUserIdException.EXCEPTION;
         }
+    }
 
-        Age age = calculateAgeService.getAge(request.getBirthYMD());
+    private Age calculateAge(SignupRequest request) {
+        return calculateAgeService.getAge(request.getBirthYMD());
+    }
 
-        String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());
-        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
-        int currentYear = LocalDate.now().getYear();
+    private String getFormattedDate() {
+        return DateFormatter.LocalDateForm(LocalDate.now());
+    }
 
-        List<Purpose> purposeList = purposeRepository.findByPurpose(request.getPurpose());
-        if (purposeList.isEmpty()) {
+    private String getVisitTime() {
+        return LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
+    }
+
+    private int getCurrentYear() {
+        return LocalDate.now().getYear();
+    }
+
+    private Purpose findPurpose(String purposeName) {
+        List<Purpose> list = purposeRepository.findByPurpose(purposeName);
+
+        if (list.isEmpty()) {
             throw PurposeNotFoundException.EXCEPTION;
         }
+        return list.get(0);
+    }
 
-        Purpose purpose = purposeList.get(0);
-        String correctResidence = User.resolveResidence(request.getResidence());
+    private String resolveResidence(String residence) {
+        return User.resolveResidence(residence);
+    }
 
-        User user = User.builder()
+    private User createUserEntity(SignupRequest request, Age age, String userId, String residence) {
+        return User.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
                 .gender(request.getGender())
                 .birthYMD(request.getBirthYMD())
-                .residence(correctResidence)
+                .residence(residence)
                 .privacyAgreed(request.isPrivacyAgreed())
                 .age(age)
                 .userId(userId)
                 .build();
+    }
 
-        user.increaseCount();
-
-        userRepository.save(user);
-
-        logRepository.save(Log.builder()
+    private Log createSignupLog(
+            SignupRequest request,
+            Age age,
+            Purpose purpose,
+            String date,
+            String time,
+            int year,
+            String residence
+    ) {
+        return Log.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
                 .age(age)
                 .purpose(purpose.getPurpose())
                 .privacyAgreed(request.isPrivacyAgreed())
-                .visitDate(formattedDate)
-                .year(currentYear)
-                .visitTime(visitTime)
-                .residence(correctResidence)
-                .build());
+                .visitDate(date)
+                .visitTime(time)
+                .year(year)
+                .residence(residence)
+                .build();
     }
 }
 
