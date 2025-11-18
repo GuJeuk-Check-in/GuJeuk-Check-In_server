@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service
@@ -27,6 +30,11 @@ public class LogExcelOutPutService { // 이건 엑셀 다운로드 관련 클래
     private static final String EXCEL_MEDIA_TYPE_NAME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final MediaType EXCEL_MEDIA_TYPE = MediaType.parseMediaType(EXCEL_MEDIA_TYPE_NAME);
     private static final String FILE_NAME = "%d년 %d월 이용 신청 현황.xlsx";
+    private static final DateTimeFormatter YEAR_MONTH =
+            DateTimeFormatter.ofPattern("yyyy-MM");      // 들어오는 값 형식
+
+    private static final DateTimeFormatter VISIT_DATE =
+            DateTimeFormatter.ofPattern("yyyy년MM월");   // DB에 저장된 형식의 prefix
 
     public ResponseEntity<byte[]> outputExcel(String yearMonth) {
 //        adminFacade.currentUser();
@@ -57,16 +65,14 @@ public class LogExcelOutPutService { // 이건 엑셀 다운로드 관련 클래
         }
     }
     private String toVisitDatePrefix(String yearMonth) {
-        if (!yearMonth.matches("\\d{4}-\\d{2}")) {
+        try {
+            YearMonth ym = YearMonth.parse(yearMonth, YEAR_MONTH); // 문자열로 나와있는 연-월을 날짜로 파싱
+
+            return ym.format(VISIT_DATE);
+
+        } catch (DateTimeParseException e) {
             throw InvalidDateException.EXCEPTION;
         }
-
-        String[] parts = yearMonth.split("-");
-        String year = parts[0];   // "2025"
-        String month = parts[1];  // "11" (이미 2자리)
-
-        // DB / 엑셀에 들어가는 형식: 2025년11월03일 → 여기서 월까지만 prefix 로 사용
-        return year + "년" + month + "월";
     }
 
 
