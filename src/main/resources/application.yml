@@ -35,15 +35,15 @@ jwt:
     level:
       root: DEBUG
 
-cloud:
-  aws:
-    region:
-      static: ${AWS_REGION}
-    stack:
-      auto: false
-    credentials:
-      accessKey: ${AWS_ACCESS_KEY_ID}
-      secretKey: ${AWS_SECRET_ACCESS_KEY}
+#cloud:
+#  aws:
+#    region:
+#      static: ${AWS_REGION}
+#    stack:
+#      auto: false
+#    credentials:
+#      accessKey: ${AWS_ACCESS_KEY_ID}
+#      secretKey: ${AWS_SECRET_ACCESS_KEY}
 
 
 redis:
