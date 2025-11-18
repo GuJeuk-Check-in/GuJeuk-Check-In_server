@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.admin.service.excel;
 
 import com.example.gujeuck_server.domain.admin.exception.ExcelGenerationException;
+import com.example.gujeuck_server.domain.admin.exception.InvalidDateException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.dto.response.LogResponse;
 import com.example.gujeuck_server.domain.log.entity.Log;
@@ -57,7 +58,7 @@ public class LogExcelOutPutService { // 이건 엑셀 다운로드 관련 클래
     }
     private String toVisitDatePrefix(String yearMonth) {
         if (!yearMonth.matches("\\d{4}-\\d{2}")) {
-            throw new IllegalArgumentException("형식은 yyyy-MM 이어야 합니다. 예) 2025-11");
+            throw InvalidDateException.EXCEPTION;
         }
 
         String[] parts = yearMonth.split("-");
