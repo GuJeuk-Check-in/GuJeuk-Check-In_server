@@ -72,7 +72,7 @@ public class AdminController {
 
     @GetMapping("/list/all")
     public Slice<UseListResponse> getAllUseList(
-            @PageableDefault(size = 100, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
+            @PageableDefault(size = 15, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         return readAllUseListService.readAllUseList(pageable);
     }
