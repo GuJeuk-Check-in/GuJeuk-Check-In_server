@@ -51,9 +51,7 @@ public class LogExcelOutPutService { // 이건 엑셀 다운로드 관련 클래
 
             byte[] excelFile = ExcelGenerator.generateLogExcel(responses);
 
-            // 파일 이름에 월 넣고 싶으면 이렇게
-            String fileName = "logs-" + yearMonth + ".xlsx";
-            String encodedFilename = encodeFileName(fileName);
+            String encodedFilename = encodeFileName(generateExcelFileName());
             HttpHeaders headers = buildExcelHeaders(encodedFilename);
 
             return ResponseEntity.ok()
