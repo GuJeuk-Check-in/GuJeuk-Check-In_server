@@ -37,7 +37,7 @@ public class LogExcelOutPutService { // 이건 엑셀 다운로드 관련 클래
             DateTimeFormatter.ofPattern("yyyy년MM월");   // DB에 저장된 형식의 prefix
 
     public ResponseEntity<byte[]> outputExcel(String yearMonth) {
-//        adminFacade.currentUser();
+        adminFacade.currentUser();
 
         try {
             String visitDatePrefix = toVisitDatePrefix(yearMonth);
