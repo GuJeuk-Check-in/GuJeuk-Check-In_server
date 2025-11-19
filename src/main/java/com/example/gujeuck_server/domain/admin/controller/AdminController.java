@@ -97,9 +97,9 @@ public class AdminController {
         changePasswordService.changePassword(request);
     }
 
-    @GetMapping("/excel")
-    public ResponseEntity<byte[]> exportCurrentMonthExcel() {
-        return logExcelOutPutService.outputExcel();
+    @GetMapping("/excel/{yearMonth}")
+    public ResponseEntity<byte[]> exportExcel(@PathVariable String yearMonth) {
+        return logExcelOutPutService.outputExcel(yearMonth);
     }
 
     @ResponseStatus(HttpStatus.OK)

@@ -1,8 +1,10 @@
 package com.example.gujeuck_server.domain.admin.service.excel;
 
 import com.example.gujeuck_server.domain.admin.exception.ExcelGenerationException;
+import com.example.gujeuck_server.domain.admin.exception.InvalidDateException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.dto.response.LogResponse;
+import com.example.gujeuck_server.domain.log.entity.Log;
 import com.example.gujeuck_server.domain.log.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -14,26 +16,44 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class LogExcelOutPutService {
+public class LogExcelOutPutService { // 이건 엑셀 다운로드 관련 클래스
     private final LogRepository logRepository;
     private final AdminFacade adminFacade;
 
     private static final String EXCEL_MEDIA_TYPE_NAME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final MediaType EXCEL_MEDIA_TYPE = MediaType.parseMediaType(EXCEL_MEDIA_TYPE_NAME);
     private static final String FILE_NAME = "%d년 %d월 이용 신청 현황.xlsx";
+    private static final DateTimeFormatter YEAR_MONTH =
+            DateTimeFormatter.ofPattern("yyyy-MM");      // 들어오는 값 형식
 
-    public ResponseEntity<byte[]> outputExcel() {
-        adminFacade.currentUser();
+    private static final DateTimeFormatter VISIT_DATE =
+            DateTimeFormatter.ofPattern("yyyy년MM월");   // DB에 저장된 형식의 prefix
+
+    public ResponseEntity<byte[]> outputExcel(String yearMonth) {
+//        adminFacade.currentUser();
 
         try {
-            List<LogResponse> logs = logRepository.findAllByCurrentMonth();
+            String visitDatePrefix = toVisitDatePrefix(yearMonth);
 
-            byte[] excelFile = ExcelGenerator.generateLogExcel(logs);
-            String encodedFilename = encodeFileName(generateExcelFileName());
+
+            List<Log> logs = logRepository.findAllByVisitDateStartingWith(visitDatePrefix);
+
+            List<LogResponse> responses = logs.stream()
+                    .map(LogResponse::from)
+                    .toList();
+
+            byte[] excelFile = ExcelGenerator.generateLogExcel(responses);
+
+            // 파일 이름에 월 넣고 싶으면 이렇게
+            String fileName = "logs-" + yearMonth + ".xlsx";
+            String encodedFilename = encodeFileName(fileName);
             HttpHeaders headers = buildExcelHeaders(encodedFilename);
 
             return ResponseEntity.ok()
@@ -44,8 +64,19 @@ public class LogExcelOutPutService {
             throw ExcelGenerationException.EXCEPTION;
         }
     }
+    private String toVisitDatePrefix(String yearMonth) {
+        try {
+            YearMonth ym = YearMonth.parse(yearMonth, YEAR_MONTH); // 문자열로 나와있는 연-월을 날짜로 파싱
 
-    private String generateExcelFileName() {
+            return ym.format(VISIT_DATE);
+
+        } catch (DateTimeParseException e) {
+            throw InvalidDateException.EXCEPTION;
+        }
+    }
+
+
+    private String generateExcelFileName() { // 다운로드 되는 파일 이름 정하는 메서드
         LocalDate now = LocalDate.now();
         return String.format(FILE_NAME, now.getYear(), now.getMonthValue());
     }

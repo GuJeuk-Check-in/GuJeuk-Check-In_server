@@ -1,12 +1,18 @@
 package com.example.gujeuck_server.domain.log.dto.response;
 
+import com.example.gujeuck_server.domain.log.entity.Log;
 import com.example.gujeuck_server.domain.user.entity.enums.Age;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class LogResponse {
+
     private String name;
 
     private String phone;
@@ -27,27 +33,19 @@ public class LogResponse {
 
     private boolean privacyAgreed;
 
-    public LogResponse(
-            String visitDate,
-            String visitTime,
-            String name,
-            Age age,
-            Integer maleCount,
-            Integer femaleCount,
-            String phone,
-            String purpose,
-            String residence,
-            Boolean privacyAgreed
-    ) {
-        this.visitDate = visitDate;
-        this.visitTime = visitTime;
-        this.name = name;
-        this.age = age;
-        this.maleCount = maleCount;
-        this.femaleCount = femaleCount;
-        this.phone = phone;
-        this.purpose = purpose;
-        this.residence = residence;
-        this.privacyAgreed = privacyAgreed;
+    // Log 엔티티 -> LogResponse 로 바꿔주는 정적 메서드
+    public static LogResponse from(Log log) {
+        return LogResponse.builder()
+                .name(log.getName())
+                .phone(log.getPhone())
+                .maleCount(log.getMaleCount())
+                .femaleCount(log.getFemaleCount())
+                .visitDate(log.getVisitDate())
+                .visitTime(log.getVisitTime())
+                .purpose(log.getPurpose())
+                .age(log.getAge())
+                .residence(log.getResidence())
+                .privacyAgreed(log.isPrivacyAgreed())
+                .build();
     }
 }

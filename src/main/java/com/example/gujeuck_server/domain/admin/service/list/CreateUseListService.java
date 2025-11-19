@@ -63,11 +63,18 @@ public class CreateUseListService {
     }
 
     private String resolveVisitDate(String requestDate) {
+        if (requestDate == null || requestDate.isBlank()) {
+            return DateFormatter.LocalDateForm(LocalDate.now());
+        }
+
         if (isKoreanDateFormat(requestDate)) {
             return requestDate;
         }
-        return DateFormatter.LocalDateForm(LocalDate.now());
+
+        LocalDate parsed = LocalDate.parse(requestDate);
+        return DateFormatter.LocalDateForm(parsed);
     }
+
 
     private boolean isKoreanDateFormat(String date) {
         return date != null && date.matches(KOREAN_DATE_REGEX);
