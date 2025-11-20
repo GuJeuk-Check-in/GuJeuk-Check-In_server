@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.admin.service.token;
 
 import com.example.gujeuck_server.domain.admin.entity.RefreshToken;
+import com.example.gujeuck_server.domain.user.exception.InvalidTokenException;
 import com.example.gujeuck_server.domain.user.repository.RefreshTokenRepository;
 import com.example.gujeuck_server.domain.user.exception.RefreshTokenNotFoundException;
 import com.example.gujeuck_server.domain.admin.dto.request.RefreshTokenRequest;
@@ -19,8 +20,16 @@ public class ReissueService {
     @Transactional
     public TokenResponse reissue(RefreshTokenRequest request) {
 
+        if (request.getToken() == null || request.getToken().isBlank()) {
+            throw RefreshTokenNotFoundException.EXCEPTION;
+        }
+
         RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getToken())
                 .orElseThrow(() -> RefreshTokenNotFoundException.EXCEPTION);
+
+        if (refreshToken.getPassword() == null || refreshToken.getPassword().isBlank()) {
+            throw RefreshTokenNotFoundException.EXCEPTION;
+        }
 
         return jwtTokenProvider.receiveToken(refreshToken.getPassword());
     }

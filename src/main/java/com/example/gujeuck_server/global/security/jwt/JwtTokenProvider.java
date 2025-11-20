@@ -99,7 +99,7 @@ public class JwtTokenProvider {
 
         Date now = new Date();
 
-        Admin admin = adminRepository.findByPassword(password)
+        adminRepository.findByPassword(password)
                 .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
 
         return TokenResponse
