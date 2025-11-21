@@ -19,8 +19,17 @@ public class ReissueService {
 
     @Transactional
     public TokenResponse reissue(RefreshTokenRequest request) {
+        if (request.getToken() == null || request.getToken().isBlank()) {
+            throw RefreshTokenNotFoundException.EXCEPTION;
+        }
+
         RefreshToken refreshToken = refreshTokenRepository.findByToken(request.getToken())
                 .orElseThrow(() -> RefreshTokenNotFoundException.EXCEPTION);
+
+        if (refreshToken.getPassword() == null || refreshToken.getPassword().isBlank()) {
+            throw RefreshTokenNotFoundException.EXCEPTION;
+        }
+
         return jwtTokenProvider.receiveToken(refreshToken.getPassword());
     }
 }
