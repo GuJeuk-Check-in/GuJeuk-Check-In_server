@@ -21,7 +21,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CreateUseListService {
+public class  CreateUseListService {
 
     private final LogRepository logRepository;
     private final PurposeRepository purposeRepository;

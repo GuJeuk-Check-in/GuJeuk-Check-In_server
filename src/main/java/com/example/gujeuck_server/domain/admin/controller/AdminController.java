@@ -12,7 +12,6 @@ import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
 import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
 import com.example.gujeuck_server.domain.user.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.dto.response.UserDto;
-import com.example.gujeuck_server.domain.admin.dto.request.RefreshTokenRequest;
 import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
 import jakarta.validation.Valid;
@@ -24,8 +23,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,6 +52,7 @@ public class AdminController {
             Pageable pageable) {
         return readAllUserListService.readAllUserList(pageable);
     }
+
     @GetMapping("/user")
     public UserResponse getALlUserByResidenceList(@RequestParam String residence) {
         return readAllUserListByResidenceService.readAllUserListByResidence(residence);
@@ -104,7 +102,7 @@ public class AdminController {
 
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/re-issue")
-    public TokenResponse reissue(@RequestBody @Valid RefreshTokenRequest request) {
-        return reissueService.reissue(request);
+    public TokenResponse reissue(@RequestHeader(name = "RefreshToken") String token) {
+        return reissueService.reissue(token);
     }
 }

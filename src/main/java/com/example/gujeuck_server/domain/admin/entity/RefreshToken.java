@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
-@RedisHash
+@RedisHash("RefreshToken")
 @Builder
 @Getter
 @NoArgsConstructor
@@ -17,10 +17,10 @@ import org.springframework.data.redis.core.index.Indexed;
 public class RefreshToken {
 
     @Id
-    private String password;
+    private String token;
 
     @Indexed
-    private String token;
+    private String password;
 
     @TimeToLive
     private Long timeToLive;
