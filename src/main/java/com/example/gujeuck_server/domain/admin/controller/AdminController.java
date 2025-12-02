@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.admin.controller;
 
+import com.example.gujeuck_server.domain.admin.dto.response.AccessTokenResponse;
 import com.example.gujeuck_server.domain.admin.dto.response.UseListResponse;
 import com.example.gujeuck_server.domain.admin.dto.request.AdminRequest;
 import com.example.gujeuck_server.domain.admin.dto.request.ChangePasswordRequest;
@@ -81,7 +82,7 @@ public class AdminController {
     }
 
     @PostMapping("/login")
-    public TokenResponse login(@RequestBody @Valid AdminRequest request) {
+    public AccessTokenResponse login(@RequestBody @Valid AdminRequest request) {
         return adminLoginService.login(request);
     }
 
@@ -102,7 +103,7 @@ public class AdminController {
 
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/re-issue")
-    public TokenResponse reissue(@RequestHeader(name = "RefreshToken") String token) {
+    public AccessTokenResponse reissue(@RequestHeader(name = "Authorization") String token) {
         return reissueService.reissue(token);
     }
 }

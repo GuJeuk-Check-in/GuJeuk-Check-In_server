@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.global.security.jwt;
 
+import com.example.gujeuck_server.domain.admin.dto.response.AccessTokenResponse;
 import com.example.gujeuck_server.domain.admin.entity.Admin;
 import com.example.gujeuck_server.domain.admin.exception.AdminNotFoundException;
 import com.example.gujeuck_server.domain.admin.repository.AdminRepository;
@@ -79,6 +80,13 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    public String getUsernameFromToken(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    public Date getExpirationDateFromToken(String token) {
+        return getClaims(token).getExpiration();
+    }
     public Claims getClaims(String token) {
         try {
             return Jwts
@@ -95,19 +103,25 @@ public class JwtTokenProvider {
         }
     }
 
-    public TokenResponse receiveToken(String password) {
+    public AccessTokenResponse receiveToken(String password) {
 
         Date now = new Date();
 
         adminRepository.findByPassword(password)
                 .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
 
-        return TokenResponse
+        RefreshToken refreshToken = RefreshToken.builder()
+                .password(password)
+                .token(createRefreshToken(password))
+                .timeToLive((jwtProperties.getRefreshExpiration()))
+                .build();
+
+        refreshTokenRepository.save(refreshToken);
+
+        return AccessTokenResponse
                 .builder()
                 .accessToken(createAccessToken(password))
-                .refreshToken(createRefreshToken(password))
                 .accessExpiredAt(new Date(now.getTime() + jwtProperties.getAccessExpiration()))
-                .refreshExpiredAt(new Date(now.getTime() + jwtProperties.getRefreshExpiration()))
                 .build();
     }
 
