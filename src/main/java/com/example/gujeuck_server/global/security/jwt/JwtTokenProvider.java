@@ -1,14 +1,11 @@
 package com.example.gujeuck_server.global.security.jwt;
 
-import com.example.gujeuck_server.domain.admin.dto.response.AccessTokenResponse;
-import com.example.gujeuck_server.domain.admin.entity.Admin;
 import com.example.gujeuck_server.domain.admin.exception.AdminNotFoundException;
 import com.example.gujeuck_server.domain.admin.repository.AdminRepository;
 import com.example.gujeuck_server.domain.admin.entity.RefreshToken;
 import com.example.gujeuck_server.domain.user.repository.RefreshTokenRepository;
 import com.example.gujeuck_server.domain.user.exception.ExpiredTokenException;
 import com.example.gujeuck_server.domain.user.exception.InvalidTokenException;
-import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.user.repository.UserRepository;
 import com.example.gujeuck_server.global.security.auth.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
@@ -30,7 +27,6 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
     private final JwtProperties jwtProperties;
-    private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -102,8 +98,20 @@ public class JwtTokenProvider {
             throw InvalidTokenException.EXCEPTION;
         }
     }
+    public boolean isTokenExpired(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(jwtProperties.getSecretKey())
+                    .parseClaimsJws(token)
+                    .getBody();
 
-    public AccessTokenResponse receiveToken(String password) {
+            return claims.getExpiration().before(new Date()); // 만료되면 true
+        } catch (ExpiredJwtException e) {
+            return true; // 만료된 경우
+        }
+    }
+
+    public String receiveToken(String password) {
 
         Date now = new Date();
 
@@ -118,11 +126,7 @@ public class JwtTokenProvider {
 
         refreshTokenRepository.save(refreshToken);
 
-        return AccessTokenResponse
-                .builder()
-                .accessToken(createAccessToken(password))
-                .accessExpiredAt(new Date(now.getTime() + jwtProperties.getAccessExpiration()))
-                .build();
+        return createAccessToken(refreshToken.getToken());
     }
 
     //HTTP 요청 헤더에서 토큰을 가져오는 메서드

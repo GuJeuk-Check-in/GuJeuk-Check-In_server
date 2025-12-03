@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.admin.controller;
 
-import com.example.gujeuck_server.domain.admin.dto.response.AccessTokenResponse;
 import com.example.gujeuck_server.domain.admin.dto.response.UseListResponse;
 import com.example.gujeuck_server.domain.admin.dto.request.AdminRequest;
 import com.example.gujeuck_server.domain.admin.dto.request.ChangePasswordRequest;
@@ -13,7 +12,6 @@ import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
 import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
 import com.example.gujeuck_server.domain.user.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.dto.response.UserDto;
-import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -82,8 +80,13 @@ public class AdminController {
     }
 
     @PostMapping("/login")
-    public AccessTokenResponse login(@RequestBody @Valid AdminRequest request) {
-        return adminLoginService.login(request);
+    public ResponseEntity<Void> login(@RequestBody @Valid AdminRequest request) {
+
+        String accessToken = adminLoginService.login(request);
+
+        return ResponseEntity.ok()
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
     }
 
     @PostMapping("/create")
@@ -103,7 +106,12 @@ public class AdminController {
 
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/re-issue")
-    public AccessTokenResponse reissue(@RequestHeader(name = "Authorization") String token) {
-        return reissueService.reissue(token);
+    public ResponseEntity<Void> reissue(@RequestHeader(name = "Authorization") String token) {
+
+        String accessToken = reissueService.reissue(token);
+
+        return ResponseEntity.ok()
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
     }
 }
