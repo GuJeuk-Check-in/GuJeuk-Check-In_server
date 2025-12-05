@@ -112,21 +112,28 @@ public class JwtTokenProvider {
     }
 
     public String receiveToken(String password) {
-
-        Date now = new Date();
-
         adminRepository.findByPassword(password)
                 .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
 
-        RefreshToken refreshToken = RefreshToken.builder()
-                .password(password)
-                .token(createRefreshToken(password))
-                .timeToLive((jwtProperties.getRefreshExpiration()))
-                .build();
+        Date now = new Date();
 
-        refreshTokenRepository.save(refreshToken);
+        String refreshToken = Jwts.builder()
+                .claim("type", "refresh")  //refresh 토큰임을 나타냄
+                .setIssuedAt(now)
+                .setExpiration(new java.sql.Timestamp(now.getTime() + jwtProperties.getRefreshExpiration() * 1000))
+                .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecretKey()) //
+                .compact();
 
-        return createAccessToken(refreshToken.getToken());
+
+        refreshTokenRepository.save(
+                RefreshToken.builder()
+                        .password(password)
+                        .token(refreshToken)
+                        .timeToLive((jwtProperties.getRefreshExpiration()))
+                        .build()
+        );
+
+        return createAccessToken(password);
     }
 
     //HTTP 요청 헤더에서 토큰을 가져오는 메서드
