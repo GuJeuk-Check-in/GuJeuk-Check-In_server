@@ -100,14 +100,11 @@ public class JwtTokenProvider {
     }
     public boolean isTokenExpired(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(jwtProperties.getSecretKey())
-                    .parseClaimsJws(token)
-                    .getBody();
+            Claims claims = getClaims(token);
 
-            return claims.getExpiration().before(new Date()); // 만료되면 true
+            return claims.getExpiration().before(new Date());
         } catch (ExpiredJwtException e) {
-            return true; // 만료된 경우
+            return true;
         }
     }
 
