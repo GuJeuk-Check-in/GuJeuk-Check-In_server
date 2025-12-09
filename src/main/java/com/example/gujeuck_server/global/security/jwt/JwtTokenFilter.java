@@ -20,6 +20,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = jwtTokenProvider.resolveToken(request);
 
 
