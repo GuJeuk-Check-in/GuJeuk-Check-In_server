@@ -47,7 +47,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "https://gujeuk.dsmhs.kr", "https://gu-jeuk-check-in.vercel.app", "http://localhost:5173/"
+                "https://gujeuk.dsmhs.kr", "https://gu-jeuk-check-in.vercel.app", "http://localhost:5173"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"));
