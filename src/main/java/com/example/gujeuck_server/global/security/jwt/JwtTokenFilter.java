@@ -21,19 +21,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             throws IOException, ServletException {
         String token = jwtTokenProvider.resolveToken(request);
 
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            return;
-        }
-
         if (token != null && !jwtTokenProvider.isTokenExpired(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         if (token != null && jwtTokenProvider.isTokenExpired(token)) {
-          throw ExpiredTokenException.EXCEPTION;
-          //response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            // return;
+            throw ExpiredTokenException.EXCEPTION;
         }
 
         // System.out.println("Next Filter = " + filterChain);
