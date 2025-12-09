@@ -10,7 +10,6 @@ import lombok.Getter;
 public enum ErrorCode {
 
     //jwt
-    EXPIRED_TOKEN(401, "만료된 토큰입니다."),
     INVALID_TOKEN(401, "유효하지 않은 토큰입니다."),
     REFRESH_TOKEN_NOT_FOUND(404, "RefreshToken이 존재 하지 않습니다."),
     INVALID_ROLE(401,"유효 하지 않은 역할입니다."),

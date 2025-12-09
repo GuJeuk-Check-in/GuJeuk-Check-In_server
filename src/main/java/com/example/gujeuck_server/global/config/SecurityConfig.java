@@ -33,7 +33,9 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/user/**", "/admin/**", "/purpose/**").permitAll()
+                        .requestMatchers("/user/login", "/user/sign-up").permitAll()
+                        .requestMatchers("/admin/create", "admin/login", "/admin/re-issue").permitAll()
+                        .requestMatchers("/purpose/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .with(new SecurityFilterConfig(jwtTokenProvider, objectMapper), Customizer.withDefaults())

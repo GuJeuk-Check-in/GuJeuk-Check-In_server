@@ -78,9 +78,6 @@ public class JwtTokenProvider {
         return getClaims(token).getSubject();
     }
 
-    public Date getExpirationDateFromToken(String token) {
-        return getClaims(token).getExpiration();
-    }
     public Claims getClaims(String token) {
         try {
             return Jwts
@@ -109,6 +106,8 @@ public class JwtTokenProvider {
     public String receiveToken(String password) {
         adminRepository.findByPassword(password)
                 .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
+
+        createRefreshToken(password);
 
         return createAccessToken(password);
     }
