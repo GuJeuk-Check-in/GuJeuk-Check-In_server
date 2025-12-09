@@ -107,7 +107,6 @@ public class AdminController {
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/re-issue")
     public ResponseEntity<Void> reissue(@RequestHeader(name = "Authorization") String token) {
-
         String accessToken = reissueService.reissue(token);
 
         return ResponseEntity.ok()

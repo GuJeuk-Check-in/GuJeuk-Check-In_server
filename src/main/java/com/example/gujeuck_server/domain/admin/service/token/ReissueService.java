@@ -12,6 +12,7 @@ public class ReissueService {
 
     @Transactional
     public String reissue(String token) {
+
         String password = jwtTokenProvider.getUsernameFromToken(token);
 
         return jwtTokenProvider.receiveToken(password);

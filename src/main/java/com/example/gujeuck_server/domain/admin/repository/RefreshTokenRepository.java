@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.user.repository;
+package com.example.gujeuck_server.domain.admin.repository;
 
 import com.example.gujeuck_server.domain.admin.entity.RefreshToken;
 import org.springframework.data.repository.CrudRepository;

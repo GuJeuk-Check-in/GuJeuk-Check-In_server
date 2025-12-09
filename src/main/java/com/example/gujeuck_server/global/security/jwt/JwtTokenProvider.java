@@ -3,10 +3,8 @@ package com.example.gujeuck_server.global.security.jwt;
 import com.example.gujeuck_server.domain.admin.exception.AdminNotFoundException;
 import com.example.gujeuck_server.domain.admin.repository.AdminRepository;
 import com.example.gujeuck_server.domain.admin.entity.RefreshToken;
-import com.example.gujeuck_server.domain.user.repository.RefreshTokenRepository;
-import com.example.gujeuck_server.domain.user.exception.ExpiredTokenException;
+import com.example.gujeuck_server.domain.admin.repository.RefreshTokenRepository;
 import com.example.gujeuck_server.domain.user.exception.InvalidTokenException;
-import com.example.gujeuck_server.domain.user.repository.UserRepository;
 import com.example.gujeuck_server.global.security.auth.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -91,8 +89,8 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token)
                     .getBody();
         }
-        catch (ExpiredJwtException E) {
-            throw ExpiredTokenException.EXCEPTION;
+        catch (ExpiredJwtException e) {
+            return e.getClaims();
         }
         catch (Exception E) {
             throw InvalidTokenException.EXCEPTION;
@@ -112,28 +110,9 @@ public class JwtTokenProvider {
         adminRepository.findByPassword(password)
                 .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
 
-        Date now = new Date();
-
-        String refreshToken = Jwts.builder()
-                .claim("type", "refresh")  //refresh 토큰임을 나타냄
-                .setIssuedAt(now)
-                .setExpiration(new java.sql.Timestamp(now.getTime() + jwtProperties.getRefreshExpiration() * 1000))
-                .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecretKey()) //
-                .compact();
-
-
-        refreshTokenRepository.save(
-                RefreshToken.builder()
-                        .password(password)
-                        .token(refreshToken)
-                        .timeToLive((jwtProperties.getRefreshExpiration()))
-                        .build()
-        );
-
         return createAccessToken(password);
     }
 
-    //HTTP 요청 헤더에서 토큰을 가져오는 메서드
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(jwtProperties.getHeader());
 
@@ -144,5 +123,4 @@ public class JwtTokenProvider {
 
         return null;
     }
-
 }

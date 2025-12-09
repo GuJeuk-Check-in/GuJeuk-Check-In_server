@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.global.security.jwt;
 
+import com.example.gujeuck_server.domain.user.exception.ExpiredTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,11 +22,17 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         String token = jwtTokenProvider.resolveToken(request);
 
+
+
         if (token != null && !jwtTokenProvider.isTokenExpired(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+        else if(token != null && jwtTokenProvider.isTokenExpired(token)) {
+            throw ExpiredTokenException.EXCEPTION;
+        }
 
+        // System.out.println("Next Filter = " + filterChain);
         filterChain.doFilter(request, response);
     }
 }
