@@ -17,6 +17,8 @@ public class ReadAllPurposeService {
 
     @Transactional(readOnly = true)
     public List<PurposeResponse> readAll() {
+        adminFacade.currentUser();
+
         return purposeRepository.findAll().stream()
                 .map(purpose -> new PurposeResponse(purpose.getId(), purpose.getPurpose()))
                 .toList();
