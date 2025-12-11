@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.admin.controller;
 
+import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.admin.dto.response.UseListResponse;
 import com.example.gujeuck_server.domain.admin.dto.request.AdminRequest;
 import com.example.gujeuck_server.domain.admin.dto.request.ChangePasswordRequest;
@@ -13,6 +14,7 @@ import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
 import com.example.gujeuck_server.domain.user.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.dto.response.UserDto;
 import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
+import com.example.gujeuck_server.domain.user.service.LoginService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -80,13 +83,8 @@ public class AdminController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody @Valid AdminRequest request) {
-
-        String accessToken = adminLoginService.login(request);
-
-        return ResponseEntity.ok()
-                .header("Authorization", "Bearer " + accessToken)
-                .build();
+    public TokenResponse login(@RequestBody @Valid AdminRequest request) {
+        return adminLoginService.login(request);
     }
 
     @PostMapping("/create")
@@ -104,13 +102,8 @@ public class AdminController {
         return logExcelOutPutService.outputExcel(yearMonth);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/re-issue")
-    public ResponseEntity<Void> reissue(@RequestHeader(name = "Authorization") String token) {
-        String accessToken = reissueService.reissue(token);
-
-        return ResponseEntity.ok()
-                .header("Authorization", "Bearer " + accessToken)
-                .build();
+    public TokenResponse reissue(Authentication authentication) {
+        return reissueService.reissue(authentication);
     }
 }

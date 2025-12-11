@@ -1,9 +1,11 @@
 package com.example.gujeuck_server.global.security.jwt;
 
+import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.admin.exception.AdminNotFoundException;
 import com.example.gujeuck_server.domain.admin.repository.AdminRepository;
 import com.example.gujeuck_server.domain.admin.entity.RefreshToken;
 import com.example.gujeuck_server.domain.admin.repository.RefreshTokenRepository;
+import com.example.gujeuck_server.domain.user.exception.ExpiredTokenException;
 import com.example.gujeuck_server.domain.user.exception.InvalidTokenException;
 import com.example.gujeuck_server.global.security.auth.CustomUserDetailsService;
 import io.jsonwebtoken.Claims;
@@ -74,10 +76,6 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public String getUsernameFromToken(String token) {
-        return getClaims(token).getSubject();
-    }
-
     public Claims getClaims(String token) {
         try {
             return Jwts
@@ -87,29 +85,21 @@ public class JwtTokenProvider {
                     .getBody();
         }
         catch (ExpiredJwtException e) {
-            return e.getClaims();
+            throw  ExpiredTokenException.EXCEPTION;
         }
         catch (Exception E) {
             throw InvalidTokenException.EXCEPTION;
         }
     }
-    public boolean isTokenExpired(String token) {
-        try {
-            Claims claims = getClaims(token);
 
-            return claims.getExpiration().before(new Date());
-        } catch (ExpiredJwtException e) {
-            return true;
-        }
-    }
-
-    public String receiveToken(String password) {
+    public TokenResponse receiveToken(String password) {
         adminRepository.findByPassword(password)
                 .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
 
-        createRefreshToken(password);
-
-        return createAccessToken(password);
+        return TokenResponse.builder()
+                .accessToken(createAccessToken(password))
+                .refreshToken(createRefreshToken(password))
+                .build();
     }
 
     public String resolveToken(HttpServletRequest request) {

@@ -1,7 +1,9 @@
 package com.example.gujeuck_server.domain.admin.service.token;
 
+import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
 import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,10 +13,7 @@ public class ReissueService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public String reissue(String token) {
-
-        String password = jwtTokenProvider.getUsernameFromToken(token);
-
-        return jwtTokenProvider.receiveToken(password);
+    public TokenResponse reissue(Authentication authentication) {
+        return jwtTokenProvider.receiveToken(authentication.getName());
     }
 }
