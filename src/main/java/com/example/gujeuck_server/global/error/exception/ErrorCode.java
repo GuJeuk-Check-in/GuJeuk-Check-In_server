@@ -42,17 +42,6 @@ public enum ErrorCode {
     INVALID_PASSWORD_CONFIRM(401, "비밀번호 확인이 일치하지 않습니다."),
     SAME_OLD_PASSWORD(400, "기존 비밀번호와 동일한 비밀번호로 변경할 수 없습니다."),
 
-    //s3
-    IMAGE_NOT_FOUND(404, "이미지를 찾을 수 없음"),
-    FAILED_UPLOAD(1001, "업로드 실패"),
-    FAILED_DELETE(1002, "삭제 실패"),
-
-    //problem
-    PROBLEM_NOT_FOUND(404, "Problem Not Found"),
-
-    //completion
-    COMPLETION_NOT_FOUND(404, "Completion Not Found"),
-
     // general
     BAD_REQUEST(400, "프론트 탓"),
     INTERNAL_SERVER_ERROR(500, "서버 탓");
