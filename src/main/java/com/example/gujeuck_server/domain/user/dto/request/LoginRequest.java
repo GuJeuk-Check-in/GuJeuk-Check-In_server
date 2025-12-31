@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.user.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,5 +19,11 @@ public class LoginRequest {
     @NotBlank
     private String purpose;
 
-    private List<String> companionIds;
+    @NotNull
+    private int maleCount;
+
+    @NotNull
+    private int femaleCount;
+
+//    private List<String> companionIds;
 }
