@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.user.controller;
 
 import com.example.gujeuck_server.domain.user.dto.request.LoginRequest;
 import com.example.gujeuck_server.domain.user.dto.request.SignupRequest;
+import com.example.gujeuck_server.domain.user.dto.response.SignUpResponse;
 import com.example.gujeuck_server.domain.user.service.LoginService;
 import com.example.gujeuck_server.domain.user.service.SignupService;
 import jakarta.validation.Valid;
@@ -18,8 +19,8 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/sign-up")
-    public void signup(@RequestBody @Valid SignupRequest request) {
-        signupService.signup(request);
+    public SignUpResponse signup(@RequestBody @Valid SignupRequest request) {
+        return signupService.signup(request);
     }
 
     @ResponseStatus(HttpStatus.OK)

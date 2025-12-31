@@ -5,6 +5,7 @@ import com.example.gujeuck_server.domain.log.repository.LogRepository;
 import com.example.gujeuck_server.domain.purpose.entity.Purpose;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
 import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
+import com.example.gujeuck_server.domain.user.dto.response.SignUpResponse;
 import com.example.gujeuck_server.domain.user.entity.User;
 import com.example.gujeuck_server.domain.user.entity.enums.Age;
 import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
@@ -33,9 +34,12 @@ public class SignupService {
     private static final String TIME = "HH:mm";
 
     @Transactional
-    public void signup(SignupRequest request) {
+    public SignUpResponse signup(SignupRequest request) {
 
         String userId = generateUserId(request);
+        SignUpResponse response = SignUpResponse.builder()
+                .userId(userId)
+                .build();
         validateDuplicateUserId(userId);
 
         Age age = calculateAge(request);
@@ -52,6 +56,8 @@ public class SignupService {
 
         Log log = createSignupLog(request, age, purpose, formattedDate, visitTime, currentYear, resolvedResidence);
         logRepository.save(log);
+
+        return response;
     }
 
     private String generateUserId(SignupRequest request) {
