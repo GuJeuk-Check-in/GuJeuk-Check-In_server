@@ -125,6 +125,8 @@ public class SignupService {
                 .name(request.getName())
                 .phone(request.getPhone())
                 .age(age)
+                .maleCount(request.getMaleCount())
+                .femaleCount(request.getFemaleCount())
                 .purpose(purpose.getPurpose())
                 .privacyAgreed(request.isPrivacyAgreed())
                 .visitDate(date)

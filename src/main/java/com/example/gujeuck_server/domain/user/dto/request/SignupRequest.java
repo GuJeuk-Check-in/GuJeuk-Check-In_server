@@ -17,6 +17,12 @@ public class SignupRequest {
     @NotBlank
     private String phone;
 
+    @NotNull
+    private int maleCount;
+
+    @NotNull
+    private int femaleCount;
+
     @NotBlank
     private String birthYMD;
 
