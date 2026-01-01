@@ -42,6 +42,7 @@ public class AdminController {
     private final UpdateUseListService updateUseListService;
     private final ReadAllUserListByResidenceService readAllUserListByResidenceService;
     private final ReadOneUseListService readOneUseListService;
+    private final DeleteAllThingService deleteAllThingService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
@@ -105,5 +106,10 @@ public class AdminController {
     @PatchMapping("/re-issue")
     public TokenResponse reissue(Authentication authentication) {
         return reissueService.reissue(authentication);
+    }
+
+    @DeleteMapping("/all")
+    public void delete() {
+        deleteAllThingService.deleteALl();
     }
 }
