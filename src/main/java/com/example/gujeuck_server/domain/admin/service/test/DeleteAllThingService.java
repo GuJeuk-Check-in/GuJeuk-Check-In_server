@@ -19,6 +19,8 @@ public class DeleteAllThingService {
         adminFacade.currentUser();
 
         logRepository.deleteAll();
-        userRepository.deleteAll();
+
+        userRepository.findAll()
+                .forEach(userRepository::delete);
     }
 }
