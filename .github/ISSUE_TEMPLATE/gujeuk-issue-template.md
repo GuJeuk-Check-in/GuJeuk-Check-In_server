@@ -2,10 +2,8 @@
 name: Gujeuk issue template
 about: For Gujeuk Issue Template
 title: ''
-labels: "\U0001F41E bug, \U0001F9F9 Chore, \U0001F4DA Docs, \U0001F9D1\U0001F3FB‍\U0001F4BB
-  feat, \U0001F528Fix, \U0001F9EA HotFix, ♻️ refactor, ⚙️ Setting, \U0001F9F6 Style,
-  ✅ Test"
-assignees: cartooncompany, parktaesu123, oijwef098234, kn4tti, hxm2n
+labels: ''
+assignees: ''
 
 ---
 
