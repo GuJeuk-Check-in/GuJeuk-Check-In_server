@@ -5,7 +5,6 @@ import com.example.gujeuck_server.domain.log.exception.DuplicateLogException;
 import com.example.gujeuck_server.domain.log.repository.LogRepository;
 import com.example.gujeuck_server.domain.user.dto.request.LoginRequest;
 import com.example.gujeuck_server.domain.user.entity.User;
-import com.example.gujeuck_server.domain.user.exception.CompanionIdNotFoundException;
 import com.example.gujeuck_server.domain.user.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
 import com.example.gujeuck_server.global.utility.DateFormatter;
