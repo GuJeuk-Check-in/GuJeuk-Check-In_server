@@ -46,7 +46,6 @@ public class JwtTokenProvider {
     }
 
     //refresh token 생성
-    @Transactional
     public String createRefreshToken(String password) {
         Date now = new Date();
 
