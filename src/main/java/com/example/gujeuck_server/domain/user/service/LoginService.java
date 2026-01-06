@@ -42,11 +42,7 @@ public class LoginService {
         List<Log> logs = new ArrayList<>();
 
         logs.add(createUserLog(user, request, formattedDate, visitTime, currentYear));
-
-//        if (hasCompanions(request)) {
-//            logs.addAll(processCompanionLogs(request, formattedDate, visitTime, currentYear));
-//        }
-
+        
         logRepository.saveAll(logs);
     }
 
@@ -95,54 +91,4 @@ public class LoginService {
                 .residence(user.getResidence())
                 .build();
     }
-
-//    private boolean hasCompanions(LoginRequest request) {
-//        return request.getCompanionIds() != null && !request.getCompanionIds().isEmpty();
-//    }
-
-//    private List<Log> processCompanionLogs(
-//            LoginRequest request,
-//            String date,
-//            String time,
-//            int currentYear
-//    ) {
-//        List<Log> logs = new ArrayList<>();
-//        List<String> invalidIds = new ArrayList<>();
-//
-//        for (String companionId : request.getCompanionIds()) {
-//            userRepository.findByUserId(companionId)
-//                    .ifPresentOrElse(
-//                            companion -> logs.add(createCompanionLog(companion, request, date, time, currentYear)),
-//                            () -> invalidIds.add(companionId)
-//                    );
-//        }
-//
-//        if (!invalidIds.isEmpty()) {
-//            throw new CompanionIdNotFoundException(invalidIds);
-//        }
-//
-//        return logs;
-//    }
-//
-//    private Log createCompanionLog(
-//            User companion,
-//            LoginRequest request,
-//            String date,
-//            String time,
-//            int currentYear
-//    ) {
-//        companion.increaseCount();
-//
-//        return Log.builder()
-//                .name(companion.getName())
-//                .age(companion.getAge())
-//                .phone(companion.getPhone())
-//                .privacyAgreed(companion.isPrivacyAgreed())
-//                .purpose(request.getPurpose())
-//                .visitDate(date)
-//                .visitTime(time)
-//                .year(currentYear)
-//                .residence(companion.getResidence())
-//                .build();
-//    }
 }
