@@ -3,10 +3,10 @@ package com.example.gujeuck_server.domain.admin.service.list;
 
 import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
-import com.example.gujeuck_server.domain.user.dto.response.UserDto;
-import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
-import com.example.gujeuck_server.domain.user.entity.enums.Residence;
-import com.example.gujeuck_server.domain.user.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserResponse;
+import com.example.gujeuck_server.domain.user.domain.enums.Residence;
+import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

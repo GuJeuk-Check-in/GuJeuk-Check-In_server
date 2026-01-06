@@ -1,11 +1,11 @@
 package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.log.entity.Log;
+import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.exception.DuplicateLogException;
-import com.example.gujeuck_server.domain.log.repository.LogRepository;
-import com.example.gujeuck_server.domain.user.dto.request.LoginRequest;
-import com.example.gujeuck_server.domain.user.entity.User;
-import com.example.gujeuck_server.domain.user.repository.UserRepository;
+import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.user.presentation.dto.request.LoginRequest;
+import com.example.gujeuck_server.domain.user.domain.User;
+import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
 import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class LoginService {
         List<Log> logs = new ArrayList<>();
 
         logs.add(createUserLog(user, request, formattedDate, visitTime, currentYear));
-        
+
         logRepository.saveAll(logs);
     }
 

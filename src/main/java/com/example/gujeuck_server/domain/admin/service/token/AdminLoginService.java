@@ -1,10 +1,10 @@
 package com.example.gujeuck_server.domain.admin.service.token;
 
-import com.example.gujeuck_server.domain.admin.dto.request.AdminRequest;
-import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
-import com.example.gujeuck_server.domain.admin.entity.Admin;
+import com.example.gujeuck_server.domain.admin.presentation.dto.request.AdminRequest;
+import com.example.gujeuck_server.domain.admin.presentation.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.admin.exception.AdminNotFoundException;
-import com.example.gujeuck_server.domain.admin.repository.AdminRepository;
+import com.example.gujeuck_server.domain.admin.domain.repository.AdminRepository;
 import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

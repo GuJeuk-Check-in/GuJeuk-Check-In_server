@@ -1,11 +1,11 @@
 package com.example.gujeuck_server.domain.admin.service.etc;
 
-import com.example.gujeuck_server.domain.admin.dto.request.ChangePasswordRequest;
-import com.example.gujeuck_server.domain.admin.entity.Admin;
+import com.example.gujeuck_server.domain.admin.presentation.dto.request.ChangePasswordRequest;
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.admin.exception.AdminNotFoundException;
 import com.example.gujeuck_server.domain.admin.exception.InvalidPasswordConfirmException;
 import com.example.gujeuck_server.domain.admin.exception.SameOldPasswordException;
-import com.example.gujeuck_server.domain.admin.repository.AdminRepository;
+import com.example.gujeuck_server.domain.admin.domain.repository.AdminRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

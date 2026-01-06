@@ -1,11 +1,11 @@
 package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.log.repository.LogRepository;
-import com.example.gujeuck_server.domain.user.dto.request.LoginRequest;
-import com.example.gujeuck_server.domain.user.entity.User;
-import com.example.gujeuck_server.domain.user.entity.enums.Age;
-import com.example.gujeuck_server.domain.user.entity.enums.Gender;
-import com.example.gujeuck_server.domain.user.repository.UserRepository;
+import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.user.presentation.dto.request.LoginRequest;
+import com.example.gujeuck_server.domain.user.domain.User;
+import com.example.gujeuck_server.domain.user.domain.enums.Age;
+import com.example.gujeuck_server.domain.user.domain.enums.Gender;
+import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

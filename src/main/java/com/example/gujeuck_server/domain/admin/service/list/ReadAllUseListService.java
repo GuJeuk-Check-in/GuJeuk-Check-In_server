@@ -1,8 +1,8 @@
 package com.example.gujeuck_server.domain.admin.service.list;
 
-import com.example.gujeuck_server.domain.admin.dto.response.UseListResponse;
+import com.example.gujeuck_server.domain.admin.presentation.dto.response.UseListResponse;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
-import com.example.gujeuck_server.domain.log.repository.LogRepository;
+import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

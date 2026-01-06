@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.admin.service.excel;
 
-import com.example.gujeuck_server.domain.log.dto.response.LogResponse;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.LogResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;

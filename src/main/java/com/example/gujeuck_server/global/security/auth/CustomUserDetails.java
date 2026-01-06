@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.global.security.auth;
 
-import com.example.gujeuck_server.domain.admin.entity.Admin;
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

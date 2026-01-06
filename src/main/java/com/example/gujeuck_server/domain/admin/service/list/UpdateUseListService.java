@@ -1,13 +1,13 @@
 package com.example.gujeuck_server.domain.admin.service.list;
 
-import com.example.gujeuck_server.domain.admin.dto.request.UseListRequest;
+import com.example.gujeuck_server.domain.admin.presentation.dto.request.UseListRequest;
 import com.example.gujeuck_server.domain.log.exception.LogNotFountException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
-import com.example.gujeuck_server.domain.log.entity.Log;
-import com.example.gujeuck_server.domain.log.repository.LogRepository;
-import com.example.gujeuck_server.domain.purpose.entity.Purpose;
+import com.example.gujeuck_server.domain.log.domain.Log;
+import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
-import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
+import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,4 +48,3 @@ public class UpdateUseListService {
         );
     }
 }
- 

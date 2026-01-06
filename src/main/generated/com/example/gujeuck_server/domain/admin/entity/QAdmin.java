@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.admin.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;

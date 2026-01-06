@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.admin.service.token;
 
-import com.example.gujeuck_server.domain.admin.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.admin.presentation.dto.response.TokenResponse;
 import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

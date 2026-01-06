@@ -1,8 +1,8 @@
 package com.example.gujeuck_server.domain.admin.facade;
 
-import com.example.gujeuck_server.domain.admin.entity.Admin;
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.admin.exception.AdminNotFoundException;
-import com.example.gujeuck_server.domain.admin.repository.AdminRepository;
+import com.example.gujeuck_server.domain.admin.domain.repository.AdminRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

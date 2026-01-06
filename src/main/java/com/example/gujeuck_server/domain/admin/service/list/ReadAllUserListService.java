@@ -1,11 +1,9 @@
 package com.example.gujeuck_server.domain.admin.service.list;
 
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
-import com.example.gujeuck_server.domain.user.dto.response.SliceWithTotalResponse;
-import com.example.gujeuck_server.domain.user.dto.response.UserDto;
-import com.example.gujeuck_server.domain.user.dto.response.UserResponse;
-import com.example.gujeuck_server.domain.user.entity.User;
-import com.example.gujeuck_server.domain.user.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
+import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,8 +11,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

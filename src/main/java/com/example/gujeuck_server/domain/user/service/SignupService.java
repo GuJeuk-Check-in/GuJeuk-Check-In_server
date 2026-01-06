@@ -1,16 +1,16 @@
 package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.log.entity.Log;
-import com.example.gujeuck_server.domain.log.repository.LogRepository;
-import com.example.gujeuck_server.domain.purpose.entity.Purpose;
+import com.example.gujeuck_server.domain.log.domain.Log;
+import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
-import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
-import com.example.gujeuck_server.domain.user.dto.response.SignUpResponse;
-import com.example.gujeuck_server.domain.user.entity.User;
-import com.example.gujeuck_server.domain.user.entity.enums.Age;
+import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
+import com.example.gujeuck_server.domain.user.domain.User;
+import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
-import com.example.gujeuck_server.domain.user.repository.UserRepository;
-import com.example.gujeuck_server.domain.user.dto.request.SignupRequest;
+import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
 import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
