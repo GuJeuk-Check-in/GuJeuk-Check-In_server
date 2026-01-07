@@ -6,8 +6,12 @@ import lombok.Getter;
 
 @Getter
 public class PurposeRequest {
+    @NotBlank
+    private Long id;
 
     @Size(min = 1, max = 30)
     @NotBlank
     private String purpose;
+
+    private Long indexId;
 }
