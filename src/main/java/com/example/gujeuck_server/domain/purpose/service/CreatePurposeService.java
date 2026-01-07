@@ -15,12 +15,14 @@ public class CreatePurposeService {
     private final AdminFacade adminFacade;
 
     @Transactional
-    public void createPurpose(PurposeRequest purposeDto) {
+    public void createPurpose(PurposeRequest purpose) {
 
         adminFacade.currentUser();
 
         purposeRepository.save(Purpose.builder()
-                .purpose(purposeDto.getPurpose())
+                .id(purpose.getId())
+                .purpose(purpose.getPurpose())
+                .indexId(purpose.getIndexId())
                 .build());
     }
 }
