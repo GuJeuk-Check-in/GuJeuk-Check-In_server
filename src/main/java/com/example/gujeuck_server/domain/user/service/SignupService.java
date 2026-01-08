@@ -3,8 +3,7 @@ package com.example.gujeuck_server.domain.user.service;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
-import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
-import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
+import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +27,7 @@ public class SignupService {
     private final UserRepository userRepository;
     private final CalculateAgeService calculateAgeService;
     private final LogRepository logRepository;
-    private final PurposeRepository purposeRepository;
+    private final PurposeFacade purposeFacade;
 
     private static final String TIME = "HH:mm";
 
@@ -47,8 +45,7 @@ public class SignupService {
         String visitTime = getVisitTime();
         int currentYear = getCurrentYear();
 
-        Purpose purpose = purposeRepository.findByPurpose(request.getPurpose())
-                .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
+        Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
 
         String resolvedResidence = resolveResidence(request.getResidence());
 
