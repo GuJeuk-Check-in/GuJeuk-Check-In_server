@@ -6,7 +6,7 @@ import com.example.gujeuck_server.global.error.exception.GujeukException;
 public class PurposeNotFoundException extends GujeukException {
     public static final GujeukException EXCEPTION = new PurposeNotFoundException();
 
-    public PurposeNotFoundException() {
+    private PurposeNotFoundException() {
         super(ErrorCode.PURPOSE_NOT_FOUND);
     };
 }

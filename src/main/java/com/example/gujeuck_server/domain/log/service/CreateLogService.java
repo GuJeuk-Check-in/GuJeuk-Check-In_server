@@ -37,7 +37,9 @@ public class CreateLogService {
         String visitTime = getCurrentTime();
         int currentYear = getCurrentYear();
 
-        Purpose purpose = findPurpose(useListRequest.getPurpose());
+        Purpose purpose = purposeRepository.findByPurpose(useListRequest.getPurpose())
+                .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
+
         String formattedDate = resolveVisitDate(useListRequest.getVisitDate());
 
         Log log = createUseLog(useListRequest, purpose, formattedDate, visitTime, currentYear);
@@ -50,15 +52,6 @@ public class CreateLogService {
 
     private int getCurrentYear() {
         return LocalDate.now().getYear();
-    }
-
-    private Purpose findPurpose(String purposeName) {
-        List<Purpose> list = purposeRepository.findByPurpose(purposeName);
-
-        if (list.isEmpty()) {
-            throw PurposeNotFoundException.EXCEPTION;
-        }
-        return list.get(0);
     }
 
     private String resolveVisitDate(String requestDate) {

@@ -47,7 +47,9 @@ public class SignupService {
         String visitTime = getVisitTime();
         int currentYear = getCurrentYear();
 
-        Purpose purpose = findPurpose(request.getPurpose());
+        Purpose purpose = purposeRepository.findByPurpose(request.getPurpose())
+                .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
+
         String resolvedResidence = resolveResidence(request.getResidence());
 
         User user = createUserEntity(request, age, userId, resolvedResidence);
@@ -84,15 +86,6 @@ public class SignupService {
 
     private int getCurrentYear() {
         return LocalDate.now().getYear();
-    }
-
-    private Purpose findPurpose(String purposeName) {
-        List<Purpose> list = purposeRepository.findByPurpose(purposeName);
-
-        if (list.isEmpty()) {
-            throw PurposeNotFoundException.EXCEPTION;
-        }
-        return list.get(0);
     }
 
     private String resolveResidence(String residence) {
