@@ -25,16 +25,11 @@ public class UpdateLogService {
     public void updateLog(Long id, UseListRequest useListRequest) {
         adminFacade.currentUser();
 
-        Log log = logRepository.findById(id).orElseThrow(
-                () -> LogNotFountException.EXCEPTION);
+        Log log = logRepository.findById(id)
+                .orElseThrow(() -> LogNotFountException.EXCEPTION);
 
-        List<Purpose> purposeList = purposeRepository.findByPurpose(useListRequest.getPurpose());
-
-        if (purposeList.isEmpty()) {
-            throw PurposeNotFoundException.EXCEPTION;
-        }
-
-        Purpose purpose = purposeList.get(0);
+        Purpose purpose = purposeRepository.findByPurpose(useListRequest.getPurpose())
+                .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
 
         log.updateLog(
                 useListRequest.getName(),
