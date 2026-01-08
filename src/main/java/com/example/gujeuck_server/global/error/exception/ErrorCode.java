@@ -46,7 +46,6 @@ public enum ErrorCode {
     BAD_REQUEST(400, "프론트 탓"),
     INTERNAL_SERVER_ERROR(500, "서버 탓");
 
-
     private final int statusCode;
     private final String ErrorMessage;
 }

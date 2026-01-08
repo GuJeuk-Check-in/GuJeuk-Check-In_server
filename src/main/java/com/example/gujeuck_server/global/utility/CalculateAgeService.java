@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.global.utility;
 
-import com.example.gujeuck_server.domain.user.entity.enums.Age;
+import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

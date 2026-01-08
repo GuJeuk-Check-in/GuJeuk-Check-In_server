@@ -1,36 +1,30 @@
 package com.example.gujeuck_server.global.error;
 
 import com.example.gujeuck_server.global.error.exception.ErrorCode;
-import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Builder
-@Getter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-@AllArgsConstructor
-public class ErrorResponse {
-    private String message;
-    private Integer status;
-    private LocalDateTime timestamp;
-    private String description;
-
+public record ErrorResponse(
+        String message,
+        Integer status,
+        LocalDateTime timestamp,
+        String description
+) {
     public static ErrorResponse of(ErrorCode errorCode, String description) {
-        return ErrorResponse.builder()
-                .message(errorCode.getErrorMessage())
-                .status(errorCode.getStatusCode())
-                .timestamp(LocalDateTime.now())
-                .description(description)
-                .build();
+        return new ErrorResponse(
+                errorCode.getErrorMessage(),
+                errorCode.getStatusCode(),
+                LocalDateTime.now(),
+                description
+        );
     }
 
     public static ErrorResponse of(int statusCode, String description) {
-        return ErrorResponse.builder()
-                .message(description)
-                .status(statusCode)
-                .timestamp(LocalDateTime.now())
-                .description(description)
-                .build();
+        return new ErrorResponse(
+                description,
+                statusCode,
+                LocalDateTime.now(),
+                description
+        );
     }
-
 }

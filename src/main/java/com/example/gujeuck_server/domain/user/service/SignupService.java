@@ -1,16 +1,15 @@
 package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.log.entity.Log;
-import com.example.gujeuck_server.domain.log.repository.LogRepository;
-import com.example.gujeuck_server.domain.purpose.entity.Purpose;
-import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
-import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
-import com.example.gujeuck_server.domain.user.dto.response.SignUpResponse;
-import com.example.gujeuck_server.domain.user.entity.User;
-import com.example.gujeuck_server.domain.user.entity.enums.Age;
+import com.example.gujeuck_server.domain.log.domain.Log;
+import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.purpose.domain.Purpose;
+import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
+import com.example.gujeuck_server.domain.user.domain.User;
+import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
-import com.example.gujeuck_server.domain.user.repository.UserRepository;
-import com.example.gujeuck_server.domain.user.dto.request.SignupRequest;
+import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
 import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +27,7 @@ public class SignupService {
     private final UserRepository userRepository;
     private final CalculateAgeService calculateAgeService;
     private final LogRepository logRepository;
-    private final PurposeRepository purposeRepository;
+    private final PurposeFacade purposeFacade;
 
     private static final String TIME = "HH:mm";
 
@@ -47,7 +45,8 @@ public class SignupService {
         String visitTime = getVisitTime();
         int currentYear = getCurrentYear();
 
-        Purpose purpose = findPurpose(request.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
+
         String resolvedResidence = resolveResidence(request.getResidence());
 
         User user = createUserEntity(request, age, userId, resolvedResidence);
@@ -84,15 +83,6 @@ public class SignupService {
 
     private int getCurrentYear() {
         return LocalDate.now().getYear();
-    }
-
-    private Purpose findPurpose(String purposeName) {
-        List<Purpose> list = purposeRepository.findByPurpose(purposeName);
-
-        if (list.isEmpty()) {
-            throw PurposeNotFoundException.EXCEPTION;
-        }
-        return list.get(0);
     }
 
     private String resolveResidence(String residence) {
