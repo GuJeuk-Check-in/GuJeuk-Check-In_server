@@ -1,16 +1,13 @@
 package com.example.gujeuck_server.domain.admin.presentation;
 
 import com.example.gujeuck_server.domain.admin.presentation.dto.response.TokenResponse;
-import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogResponse;
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.AdminRequest;
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.ChangePasswordRequest;
-import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.admin.service.ChangePasswordService;
 import com.example.gujeuck_server.domain.admin.service.CreateAdminService;
 import com.example.gujeuck_server.domain.admin.service.LogExcelOutPutService;
 import com.example.gujeuck_server.domain.admin.service.LoginAdminService;
 import com.example.gujeuck_server.domain.admin.service.ReissueService;
-import com.example.gujeuck_server.domain.log.service.*;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserResponse;
@@ -19,7 +16,6 @@ import com.example.gujeuck_server.domain.user.service.QueryUserListService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
