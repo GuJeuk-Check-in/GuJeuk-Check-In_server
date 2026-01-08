@@ -4,7 +4,7 @@ import com.example.gujeuck_server.global.error.exception.ErrorCode;
 import com.example.gujeuck_server.global.error.exception.GujeukException;
 
 public class SameOldPasswordException extends GujeukException {
-    public static final SameOldPasswordException EXCEPTION = new SameOldPasswordException();
+    public static final GujeukException EXCEPTION = new SameOldPasswordException();
 
     private SameOldPasswordException() {
         super(ErrorCode.SAME_OLD_PASSWORD);
