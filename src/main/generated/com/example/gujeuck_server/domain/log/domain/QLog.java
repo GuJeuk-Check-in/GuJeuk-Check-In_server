@@ -16,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QLog extends EntityPathBase<Log> {
 
-    private static final long serialVersionUID = -1926511906L;
+    private static final long serialVersionUID = -1687397569L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 

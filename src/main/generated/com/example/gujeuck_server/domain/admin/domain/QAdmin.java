@@ -1,8 +1,7 @@
-package com.example.gujeuck_server.domain.admin.entity;
+package com.example.gujeuck_server.domain.admin.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
@@ -16,7 +15,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QAdmin extends EntityPathBase<Admin> {
 
-    private static final long serialVersionUID = -1826081922L;
+    private static final long serialVersionUID = 329529247L;
 
     public static final QAdmin admin = new QAdmin("admin");
 
