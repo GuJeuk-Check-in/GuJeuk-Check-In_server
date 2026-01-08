@@ -5,16 +5,17 @@ import com.example.gujeuck_server.domain.admin.presentation.dto.response.UseList
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.AdminRequest;
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.ChangePasswordRequest;
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.UseListRequest;
-import com.example.gujeuck_server.domain.admin.service.etc.ChangePasswordService;
-import com.example.gujeuck_server.domain.admin.service.etc.CreateAdminService;
-import com.example.gujeuck_server.domain.admin.service.excel.LogExcelOutPutService;
-import com.example.gujeuck_server.domain.admin.service.list.*;
-import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
-import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
+import com.example.gujeuck_server.domain.admin.service.ChangePasswordService;
+import com.example.gujeuck_server.domain.admin.service.CreateAdminService;
+import com.example.gujeuck_server.domain.admin.service.LogExcelOutPutService;
+import com.example.gujeuck_server.domain.admin.service.AdminLoginService;
+import com.example.gujeuck_server.domain.admin.service.ReissueService;
 import com.example.gujeuck_server.domain.log.service.*;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserResponse;
+import com.example.gujeuck_server.domain.user.service.QueryUserListByResidenceService;
+import com.example.gujeuck_server.domain.user.service.QueryUserListService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -36,10 +37,10 @@ public class AdminController {
     private final ChangePasswordService changePasswordService;
     private final LogExcelOutPutService logExcelOutPutService;
     private final ReissueService reissueService;
-    private final ReadAllUserListService readAllUserListService;
+    private final QueryUserListService readAllUserListService;
     private final DeleteLogService deleteUseListService;
     private final UpdateLogService updateUseListService;
-    private final ReadAllUserListByResidenceService readAllUserListByResidenceService;
+    private final QueryUserListByResidenceService readAllUserListByResidenceService;
     private final queryLogDetailService readOneUseListService;
 
     @PostMapping("/list/create")

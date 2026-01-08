@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.service.excel;
+package com.example.gujeuck_server.domain.admin.service;
 
 import com.example.gujeuck_server.domain.admin.exception.ExcelGenerationException;
 import com.example.gujeuck_server.domain.admin.exception.InvalidDateException;

@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.service.token;
+package com.example.gujeuck_server.domain.admin.service;
 
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.AdminRequest;
 import com.example.gujeuck_server.domain.admin.presentation.dto.response.TokenResponse;

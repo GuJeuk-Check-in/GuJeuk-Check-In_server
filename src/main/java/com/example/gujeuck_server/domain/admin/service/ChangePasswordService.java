@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.service.etc;
+package com.example.gujeuck_server.domain.admin.service;
 
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.ChangePasswordRequest;
 import com.example.gujeuck_server.domain.admin.domain.Admin;
