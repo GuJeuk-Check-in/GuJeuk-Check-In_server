@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.service.list;
+package com.example.gujeuck_server.domain.user.service;
 
 
 import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ReadAllUserListByResidenceService {
+public class QueryUserListByResidenceService {
     private final UserRepository userRepository;
     private static final String ETC = "기타";
     private final AdminFacade adminFacade;
