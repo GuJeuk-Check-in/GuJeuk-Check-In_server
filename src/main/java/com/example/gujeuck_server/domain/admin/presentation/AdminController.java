@@ -9,7 +9,6 @@ import com.example.gujeuck_server.domain.admin.service.etc.ChangePasswordService
 import com.example.gujeuck_server.domain.admin.service.etc.CreateAdminService;
 import com.example.gujeuck_server.domain.admin.service.excel.LogExcelOutPutService;
 import com.example.gujeuck_server.domain.admin.service.list.*;
-import com.example.gujeuck_server.domain.admin.service.test.DeleteAllThingService;
 import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
 import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
 import com.example.gujeuck_server.domain.log.service.*;
@@ -42,7 +41,6 @@ public class AdminController {
     private final UpdateLogService updateUseListService;
     private final ReadAllUserListByResidenceService readAllUserListByResidenceService;
     private final queryLogDetailService readOneUseListService;
-    private final DeleteAllThingService deleteAllThingService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
@@ -106,10 +104,5 @@ public class AdminController {
     @PatchMapping("/re-issue")
     public TokenResponse reissue(Authentication authentication) {
         return reissueService.reissue(authentication);
-    }
-
-    @DeleteMapping("/all")
-    public void delete() {
-        deleteAllThingService.deleteALl();
     }
 }
