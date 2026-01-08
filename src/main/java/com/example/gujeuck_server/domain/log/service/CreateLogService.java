@@ -28,18 +28,18 @@ public class CreateLogService {
     private static final String KOREAN_DATE_REGEX = "\\d{4}년\\d{2}월\\d{2}일";
 
     @Transactional
-    public void creatUseList(LogRequest useListRequest) {
+    public void execute(LogRequest request) {
 
         adminFacade.currentUser();
 
         String visitTime = getCurrentTime();
         int currentYear = getCurrentYear();
 
-        Purpose purpose = purposeFacade.getPurpose(useListRequest.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
 
-        String formattedDate = resolveVisitDate(useListRequest.getVisitDate());
+        String formattedDate = resolveVisitDate(request.getVisitDate());
 
-        Log log = createUseLog(useListRequest, purpose, formattedDate, visitTime, currentYear);
+        Log log = createUseLog(request, purpose, formattedDate, visitTime, currentYear);
         logRepository.save(log);
     }
 

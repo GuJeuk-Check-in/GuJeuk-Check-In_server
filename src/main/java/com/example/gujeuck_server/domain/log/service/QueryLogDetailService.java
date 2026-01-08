@@ -14,10 +14,10 @@ public class QueryLogDetailService {
     private final LogRepository logRepository;
     private final AdminFacade adminFacade;
 
-    public QueryLogResponse readOneUseList(Long id) {
+    public QueryLogResponse execute(Long logId) {
         adminFacade.currentUser();
 
-        Log log = logRepository.findById(id).orElseThrow(
+        Log log = logRepository.findById(logId).orElseThrow(
                 () -> LogNotFountException.EXCEPTION
         );
 

@@ -23,28 +23,28 @@ public class LogController {
 
     @PostMapping
     public void createLog(@RequestBody @Valid LogRequest request) {
-        createUseListService.creatUseList(request);
+        createUseListService.execute(request);
     }
 
     @DeleteMapping("/{log-id}")
     public void deleteLog(@PathVariable("log-id") Long logId) {
-        deleteLogService.deleteUseList(logId);
+        deleteLogService.execute(logId);
     }
 
     @PatchMapping("/{log-id}")
     public void updateLog(@PathVariable("log-id") Long logId, @RequestBody @Valid LogRequest request) {
-        updateLogService.updateLog(logId, request);
+        updateLogService.execute(logId, request);
     }
 
     @GetMapping
     public Slice<QueryLogResponse> queryLogList(
             @PageableDefault(size = 30, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
-        return queryLogListService.readAllUseList(pageable);
+        return queryLogListService.execute(pageable);
     }
 
     @GetMapping("/{log-id}")
     public QueryLogResponse queryLogDetail(@PathVariable("log-id") Long logId) {
-        return queryLogDetailService.readOneUseList(logId);
+        return queryLogDetailService.execute(logId);
     }
 }

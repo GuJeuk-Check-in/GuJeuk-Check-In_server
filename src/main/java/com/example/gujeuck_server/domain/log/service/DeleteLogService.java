@@ -15,10 +15,10 @@ public class DeleteLogService {
     private final AdminFacade adminFacade;
 
     @Transactional
-    public void deleteUseList(Long id) {
+    public void execute(Long logId) {
         adminFacade.currentUser();
 
-        Log log = logRepository.findById(id).orElseThrow(
+        Log log = logRepository.findById(logId).orElseThrow(
                 () -> LogNotFountException.EXCEPTION);
 
         logRepository.delete(log);

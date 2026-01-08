@@ -18,7 +18,7 @@ public class QueryLogListService {
     private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
-    public Slice<QueryLogResponse> readAllUseList(Pageable p) {
+    public Slice<QueryLogResponse> execute(Pageable p) {
         adminFacade.currentUser();
 
          Pageable pageable = PageRequest.of(

@@ -19,23 +19,23 @@ public class UpdateLogService {
     private final PurposeFacade purposeFacade;
 
     @Transactional
-    public void updateLog(Long id, LogRequest useListRequest) {
+    public void execute(Long logId, LogRequest request) {
         adminFacade.currentUser();
 
-        Log log = logRepository.findById(id)
+        Log log = logRepository.findById(logId)
                 .orElseThrow(() -> LogNotFountException.EXCEPTION);
 
-        Purpose purpose = purposeFacade.getPurpose(useListRequest.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
 
         log.updateLog(
-                useListRequest.getName(),
-                useListRequest.getAge(),
-                useListRequest.getPhone(),
-                useListRequest.getMaleCount(),
-                useListRequest.getFemaleCount(),
+                request.getName(),
+                request.getAge(),
+                request.getPhone(),
+                request.getMaleCount(),
+                request.getFemaleCount(),
                 purpose.getPurpose(),
-                useListRequest.getVisitDate(),
-                useListRequest.isPrivacyAgreed()
+                request.getVisitDate(),
+                request.isPrivacyAgreed()
         );
     }
 }
