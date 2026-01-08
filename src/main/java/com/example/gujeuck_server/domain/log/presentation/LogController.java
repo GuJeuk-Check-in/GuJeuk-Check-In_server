@@ -1,7 +1,8 @@
 package com.example.gujeuck_server.domain.log.presentation;
 
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
-import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogResponse;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogDetailResponse;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
 import com.example.gujeuck_server.domain.log.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +38,14 @@ public class LogController {
     }
 
     @GetMapping
-    public Slice<QueryLogResponse> queryLogList(
+    public Slice<QueryLogListResponse> queryLogList(
             @PageableDefault(size = 30, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         return queryLogListService.execute(pageable);
     }
 
     @GetMapping("/{log-id}")
-    public QueryLogResponse queryLogDetail(@PathVariable("log-id") Long logId) {
+    public QueryLogDetailResponse queryLogDetail(@PathVariable("log-id") Long logId) {
         return queryLogDetailService.execute(logId);
     }
 }

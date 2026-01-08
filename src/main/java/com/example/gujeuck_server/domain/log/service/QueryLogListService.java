@@ -1,8 +1,8 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogResponse;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +18,7 @@ public class QueryLogListService {
     private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
-    public Slice<QueryLogResponse> execute(Pageable p) {
+    public Slice<QueryLogListResponse> execute(Pageable p) {
         adminFacade.currentUser();
 
          Pageable pageable = PageRequest.of(
@@ -29,6 +29,6 @@ public class QueryLogListService {
                 );
 
         return logRepository.findAllBy(pageable)
-                .map(QueryLogResponse::from);
+                .map(QueryLogListResponse::from);
     }
 }
