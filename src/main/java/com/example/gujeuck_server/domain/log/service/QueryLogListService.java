@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.admin.presentation.dto.response.UseListResponse;
+import com.example.gujeuck_server.domain.admin.presentation.dto.response.LogResponse;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class QueryLogListService {
     private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
-    public Slice<UseListResponse> readAllUseList(Pageable p) {
+    public Slice<LogResponse> readAllUseList(Pageable p) {
         adminFacade.currentUser();
 
          Pageable pageable = PageRequest.of(
@@ -29,6 +29,6 @@ public class QueryLogListService {
                 );
 
         return logRepository.findAllBy(pageable)
-                .map(UseListResponse::from);
+                .map(LogResponse::from);
     }
 }

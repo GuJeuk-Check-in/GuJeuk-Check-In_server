@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.admin.presentation;
 
 import com.example.gujeuck_server.domain.admin.presentation.dto.response.TokenResponse;
-import com.example.gujeuck_server.domain.admin.presentation.dto.response.UseListResponse;
+import com.example.gujeuck_server.domain.admin.presentation.dto.response.LogResponse;
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.AdminRequest;
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.ChangePasswordRequest;
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.UseListRequest;
@@ -41,7 +41,7 @@ public class AdminController {
     private final DeleteLogService deleteUseListService;
     private final UpdateLogService updateUseListService;
     private final QueryUserListByResidenceService readAllUserListByResidenceService;
-    private final queryLogDetailService readOneUseListService;
+    private final QueryLogDetailService readOneUseListService;
 
     @PostMapping("/list/create")
     public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
@@ -71,14 +71,14 @@ public class AdminController {
     }
 
     @GetMapping("/list/all")
-    public Slice<UseListResponse> getAllUseList(
+    public Slice<LogResponse> getAllUseList(
             @PageableDefault(size = 30, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         return readAllUseListService.readAllUseList(pageable);
     }
 
     @GetMapping("/list/{id}")
-    public UseListResponse getOneUseList(@PathVariable Long id) {
+    public LogResponse getOneUseList(@PathVariable Long id) {
         return readOneUseListService.readOneUseList(id);
     }
 

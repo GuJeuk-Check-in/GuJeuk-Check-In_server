@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UseListResponse {
+public class LogResponse {
     private Long id;
 
     @NotBlank(message = "이름은 필수 입력 항목입니다.")
@@ -42,8 +42,8 @@ public class UseListResponse {
     @AssertTrue(message = "개인정보 수집 및 이용 동의를 체크해주세요.")
     private boolean privacyAgreed;
 
-    public static UseListResponse from(Log log) {
-        return UseListResponse.builder()
+    public static LogResponse from(Log log) {
+        return LogResponse.builder()
                 .id(log.getId())
                 .name(log.getName())
                 .age(log.getAge())
@@ -56,7 +56,7 @@ public class UseListResponse {
                 .build();
     }
 
-    public UseListResponse(Log log) {
+    public LogResponse(Log log) {
         this.id = log.getId();
         this.name = log.getName();
         this.age = log.getAge();
