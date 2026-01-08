@@ -12,6 +12,7 @@ import com.example.gujeuck_server.domain.admin.service.list.*;
 import com.example.gujeuck_server.domain.admin.service.test.DeleteAllThingService;
 import com.example.gujeuck_server.domain.admin.service.token.AdminLoginService;
 import com.example.gujeuck_server.domain.admin.service.token.ReissueService;
+import com.example.gujeuck_server.domain.log.service.*;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserResponse;
@@ -29,18 +30,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminController {
-    private final CreateUseListService createUseListService;
-    private final ReadAllUseListService readAllUseListService;
+    private final CreateLogService createUseListService;
+    private final QueryLogListService readAllUseListService;
     private final AdminLoginService adminLoginService;
     private final CreateAdminService createAdminService;
     private final ChangePasswordService changePasswordService;
     private final LogExcelOutPutService logExcelOutPutService;
     private final ReissueService reissueService;
     private final ReadAllUserListService readAllUserListService;
-    private final DeleteUseListService deleteUseListService;
-    private final UpdateUseListService updateUseListService;
+    private final DeleteLogService deleteUseListService;
+    private final UpdateLogService updateUseListService;
     private final ReadAllUserListByResidenceService readAllUserListByResidenceService;
-    private final ReadOneUseListService readOneUseListService;
+    private final queryLogDetailService readOneUseListService;
     private final DeleteAllThingService deleteAllThingService;
 
     @PostMapping("/list/create")

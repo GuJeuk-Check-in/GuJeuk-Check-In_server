@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.service.list;
+package com.example.gujeuck_server.domain.log.service;
 
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.UseListRequest;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class  CreateUseListService {
+public class CreateLogService {
 
     private final LogRepository logRepository;
     private final PurposeRepository purposeRepository;

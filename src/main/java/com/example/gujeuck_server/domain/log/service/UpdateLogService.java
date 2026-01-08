@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.service.list;
+package com.example.gujeuck_server.domain.log.service;
 
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.UseListRequest;
 import com.example.gujeuck_server.domain.log.exception.LogNotFountException;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UpdateUseListService {
+public class UpdateLogService {
     private final LogRepository logRepository;
     private final PurposeRepository purposeRepository;
     private final AdminFacade adminFacade;

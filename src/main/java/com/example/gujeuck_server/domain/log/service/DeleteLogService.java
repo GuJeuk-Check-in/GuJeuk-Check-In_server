@@ -1,26 +1,26 @@
-package com.example.gujeuck_server.domain.admin.service.list;
+package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.admin.presentation.dto.response.UseListResponse;
 import com.example.gujeuck_server.domain.log.exception.LogNotFountException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class ReadOneUseListService {
+public class DeleteLogService {
     private final LogRepository logRepository;
     private final AdminFacade adminFacade;
 
-    public UseListResponse readOneUseList(Long id) {
+    @Transactional
+    public void deleteUseList(Long id) {
         adminFacade.currentUser();
 
         Log log = logRepository.findById(id).orElseThrow(
-                () -> LogNotFountException.EXCEPTION
-        );
+                () -> LogNotFountException.EXCEPTION);
 
-        return new UseListResponse(log);
+        logRepository.delete(log);
     }
 }

@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.service.list;
+package com.example.gujeuck_server.domain.log.service;
 
 import com.example.gujeuck_server.domain.admin.presentation.dto.response.UseListResponse;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class ReadAllUseListService {
+public class QueryLogListService {
     private final LogRepository logRepository;
     private final AdminFacade adminFacade;
 
