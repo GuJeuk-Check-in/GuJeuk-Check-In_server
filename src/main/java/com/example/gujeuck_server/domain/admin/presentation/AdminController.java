@@ -30,23 +30,13 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminController {
-    private final CreateLogService createUseListService;
-    private final QueryLogListService queryLogListService;
     private final LoginAdminService loginAdminService;
     private final CreateAdminService createAdminService;
     private final ChangePasswordService changePasswordService;
     private final LogExcelOutPutService logExcelOutPutService;
     private final ReissueService reissueService;
     private final QueryUserListService queryUserListService;
-    private final DeleteLogService deleteLogService;
-    private final UpdateLogService updateLogService;
     private final QueryUserListByResidenceService queryUserListByResidenceService;
-    private final QueryLogDetailService queryLogDetailService;
-
-    @PostMapping("/list/create")
-    public void createUseList(@RequestBody @Valid LogRequest useListRequest) {
-        createUseListService.creatUseList(useListRequest);
-    }
 
     @GetMapping("/user/all")
     public SliceWithTotalResponse<UserDto> getAllUserList(
@@ -58,28 +48,6 @@ public class AdminController {
     @GetMapping("/user")
     public UserResponse getALlUserByResidenceList(@RequestParam String residence) {
         return queryUserListByResidenceService.readAllUserListByResidence(residence);
-    }
-
-    @DeleteMapping("/list/{id}")
-    public void deleteUseList(@PathVariable Long id) {
-        deleteLogService.deleteUseList(id);
-    }
-
-    @PatchMapping("/list/{id}")
-    public void updateUseList(@PathVariable Long id, @RequestBody @Valid LogRequest useListRequest) {
-        updateLogService.updateLog(id, useListRequest);
-    }
-
-    @GetMapping("/list/all")
-    public Slice<QueryLogResponse> getAllUseList(
-            @PageableDefault(size = 30, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
-            Pageable pageable) {
-        return queryLogListService.readAllUseList(pageable);
-    }
-
-    @GetMapping("/list/{id}")
-    public QueryLogResponse getOneUseList(@PathVariable Long id) {
-        return queryLogDetailService.readOneUseList(id);
     }
 
     @PostMapping("/login")
