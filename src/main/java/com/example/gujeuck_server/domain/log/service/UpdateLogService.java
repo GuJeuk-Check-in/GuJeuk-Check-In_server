@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.admin.presentation.dto.request.UseListRequest;
+import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.log.exception.LogNotFountException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.domain.Log;
@@ -19,7 +19,7 @@ public class UpdateLogService {
     private final PurposeFacade purposeFacade;
 
     @Transactional
-    public void updateLog(Long id, UseListRequest useListRequest) {
+    public void updateLog(Long id, LogRequest useListRequest) {
         adminFacade.currentUser();
 
         Log log = logRepository.findById(id)

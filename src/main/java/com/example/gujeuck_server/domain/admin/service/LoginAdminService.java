@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class AdminLoginService {
+public class LoginAdminService {
     private final AdminRepository adminRepository;
     private final JwtTokenProvider jwtTokenProvider;
 

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LogResponse {
+public class LogExcelResponse {
 
     private String name;
 
@@ -34,8 +34,8 @@ public class LogResponse {
     private boolean privacyAgreed;
 
     // Log 엔티티 -> LogResponse 로 바꿔주는 정적 메서드
-    public static LogResponse from(Log log) {
-        return LogResponse.builder()
+    public static LogExcelResponse from(Log log) {
+        return LogExcelResponse.builder()
                 .name(log.getName())
                 .phone(log.getPhone())
                 .maleCount(log.getMaleCount())

@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.presentation.dto.response;
+package com.example.gujeuck_server.domain.log.presentation.dto.response;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogResponse {
+public class QueryLogResponse {
     private Long id;
 
     @NotBlank(message = "이름은 필수 입력 항목입니다.")
@@ -42,8 +42,8 @@ public class LogResponse {
     @AssertTrue(message = "개인정보 수집 및 이용 동의를 체크해주세요.")
     private boolean privacyAgreed;
 
-    public static LogResponse from(Log log) {
-        return LogResponse.builder()
+    public static QueryLogResponse from(Log log) {
+        return QueryLogResponse.builder()
                 .id(log.getId())
                 .name(log.getName())
                 .age(log.getAge())
@@ -56,7 +56,7 @@ public class LogResponse {
                 .build();
     }
 
-    public LogResponse(Log log) {
+    public QueryLogResponse(Log log) {
         this.id = log.getId();
         this.name = log.getName();
         this.age = log.getAge();

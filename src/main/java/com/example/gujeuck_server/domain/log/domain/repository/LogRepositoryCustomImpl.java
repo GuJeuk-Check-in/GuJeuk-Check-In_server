@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
-import com.example.gujeuck_server.domain.log.presentation.dto.response.LogResponse;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.QLog;
 import com.querydsl.core.types.Projections;
@@ -22,11 +22,11 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
     String currentYearMonth = String.format("%d년%02d월", currentYear, now.getMonthValue());
 
     @Override
-    public List<LogResponse> findAllByCurrentMonth() {
+    public List<LogExcelResponse> findAllByCurrentMonth() {
 
         return jpaQueryFactory
                 .select(Projections.constructor(
-                        LogResponse.class,
+                        LogExcelResponse.class,
                         qLog.visitDate,
                         qLog.visitTime,
                         qLog.name,

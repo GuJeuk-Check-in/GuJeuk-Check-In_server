@@ -1,14 +1,14 @@
 package com.example.gujeuck_server.domain.admin.presentation;
 
 import com.example.gujeuck_server.domain.admin.presentation.dto.response.TokenResponse;
-import com.example.gujeuck_server.domain.admin.presentation.dto.response.LogResponse;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogResponse;
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.AdminRequest;
 import com.example.gujeuck_server.domain.admin.presentation.dto.request.ChangePasswordRequest;
-import com.example.gujeuck_server.domain.admin.presentation.dto.request.UseListRequest;
+import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.admin.service.ChangePasswordService;
 import com.example.gujeuck_server.domain.admin.service.CreateAdminService;
 import com.example.gujeuck_server.domain.admin.service.LogExcelOutPutService;
-import com.example.gujeuck_server.domain.admin.service.AdminLoginService;
+import com.example.gujeuck_server.domain.admin.service.LoginAdminService;
 import com.example.gujeuck_server.domain.admin.service.ReissueService;
 import com.example.gujeuck_server.domain.log.service.*;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
@@ -31,20 +31,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin")
 public class AdminController {
     private final CreateLogService createUseListService;
-    private final QueryLogListService readAllUseListService;
-    private final AdminLoginService adminLoginService;
+    private final QueryLogListService queryLogListService;
+    private final LoginAdminService loginAdminService;
     private final CreateAdminService createAdminService;
     private final ChangePasswordService changePasswordService;
     private final LogExcelOutPutService logExcelOutPutService;
     private final ReissueService reissueService;
-    private final QueryUserListService readAllUserListService;
-    private final DeleteLogService deleteUseListService;
-    private final UpdateLogService updateUseListService;
-    private final QueryUserListByResidenceService readAllUserListByResidenceService;
-    private final QueryLogDetailService readOneUseListService;
+    private final QueryUserListService queryUserListService;
+    private final DeleteLogService deleteLogService;
+    private final UpdateLogService updateLogService;
+    private final QueryUserListByResidenceService queryUserListByResidenceService;
+    private final QueryLogDetailService queryLogDetailService;
 
     @PostMapping("/list/create")
-    public void createUseList(@RequestBody @Valid UseListRequest useListRequest) {
+    public void createUseList(@RequestBody @Valid LogRequest useListRequest) {
         createUseListService.creatUseList(useListRequest);
     }
 
@@ -52,39 +52,39 @@ public class AdminController {
     public SliceWithTotalResponse<UserDto> getAllUserList(
             @PageableDefault(size = 30, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
-        return readAllUserListService.readAllUserList(pageable);
+        return queryUserListService.readAllUserList(pageable);
     }
 
     @GetMapping("/user")
     public UserResponse getALlUserByResidenceList(@RequestParam String residence) {
-        return readAllUserListByResidenceService.readAllUserListByResidence(residence);
+        return queryUserListByResidenceService.readAllUserListByResidence(residence);
     }
 
     @DeleteMapping("/list/{id}")
     public void deleteUseList(@PathVariable Long id) {
-        deleteUseListService.deleteUseList(id);
+        deleteLogService.deleteUseList(id);
     }
 
     @PatchMapping("/list/{id}")
-    public void updateUseList(@PathVariable Long id, @RequestBody @Valid UseListRequest useListRequest) {
-        updateUseListService.updateLog(id, useListRequest);
+    public void updateUseList(@PathVariable Long id, @RequestBody @Valid LogRequest useListRequest) {
+        updateLogService.updateLog(id, useListRequest);
     }
 
     @GetMapping("/list/all")
-    public Slice<LogResponse> getAllUseList(
+    public Slice<QueryLogResponse> getAllUseList(
             @PageableDefault(size = 30, sort = {"visitDate", "id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
-        return readAllUseListService.readAllUseList(pageable);
+        return queryLogListService.readAllUseList(pageable);
     }
 
     @GetMapping("/list/{id}")
-    public LogResponse getOneUseList(@PathVariable Long id) {
-        return readOneUseListService.readOneUseList(id);
+    public QueryLogResponse getOneUseList(@PathVariable Long id) {
+        return queryLogDetailService.readOneUseList(id);
     }
 
     @PostMapping("/login")
     public TokenResponse login(@RequestBody @Valid AdminRequest request) {
-        return adminLoginService.login(request);
+        return loginAdminService.login(request);
     }
 
     @PostMapping("/create")

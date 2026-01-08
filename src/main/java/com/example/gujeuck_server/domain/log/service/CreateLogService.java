@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.admin.presentation.dto.request.UseListRequest;
+import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
@@ -28,7 +28,7 @@ public class CreateLogService {
     private static final String KOREAN_DATE_REGEX = "\\d{4}년\\d{2}월\\d{2}일";
 
     @Transactional
-    public void creatUseList(UseListRequest useListRequest) {
+    public void creatUseList(LogRequest useListRequest) {
 
         adminFacade.currentUser();
 
@@ -70,7 +70,7 @@ public class CreateLogService {
     }
 
     private Log createUseLog(
-            UseListRequest request,
+            LogRequest request,
             Purpose purpose,
             String date,
             String time,

@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.infrastructure.excel.util;
 
-import com.example.gujeuck_server.domain.log.presentation.dto.response.LogResponse;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -16,7 +16,7 @@ public class ExcelGenerator { // 이건 엑셀 파일 내용 관련한 클래스
     };
     private static final String sheetTitle = "구즉 청소년 문화의집 월간 방문 기록";
 
-    public static byte[] generateLogExcel(List<LogResponse> logs) throws IOException { // 아래 있는 메서드 가지고 조물조물 해서 엑셀 파일 만드는 메서드
+    public static byte[] generateLogExcel(List<LogExcelResponse> logs) throws IOException { // 아래 있는 메서드 가지고 조물조물 해서 엑셀 파일 만드는 메서드
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
 
@@ -99,11 +99,11 @@ public class ExcelGenerator { // 이건 엑셀 파일 내용 관련한 클래스
     }
 
 
-    private static void createBodyRows(Sheet sheet, List<LogResponse> logs, CellStyle style) { // 얘도 본문 내용 정하는거임
+    private static void createBodyRows(Sheet sheet, List<LogExcelResponse> logs, CellStyle style) { // 얘도 본문 내용 정하는거임
         int rowIdx = 2;
         int no = 1;
 
-        for (LogResponse log : logs) {
+        for (LogExcelResponse log : logs) {
             Row row = sheet.createRow(rowIdx++);
             row.setHeightInPoints(18);
 

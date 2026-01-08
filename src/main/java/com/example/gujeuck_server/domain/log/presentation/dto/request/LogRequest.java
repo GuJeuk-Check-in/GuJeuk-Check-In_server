@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.admin.presentation.dto.request;
+package com.example.gujeuck_server.domain.log.presentation.dto.request;
 
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import jakarta.validation.constraints.*;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UseListRequest {
+public class LogRequest {
     @NotBlank(message = "이름은 필수 입력 항목입니다.")
     @Size(max = 30, message = "이름은 30자 이하로 입력해주세요.")
     private String name;

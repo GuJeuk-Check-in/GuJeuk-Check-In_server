@@ -19,7 +19,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class LoginServiceTest {
 
     @Autowired
-    private LoginService loginService;
+    private LoginUserService loginService;
 
     @Autowired
     private UserRepository userRepository;

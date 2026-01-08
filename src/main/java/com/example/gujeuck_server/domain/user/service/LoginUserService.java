@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class LoginService {
+public class LoginUserService {
 
     private final UserRepository userRepository;
     private final LogRepository logRepository;
