@@ -24,7 +24,6 @@ public class CreatePurposeService {
         List<Purpose> purposes = purposeRepository.findAll();
 
         purposeRepository.save(Purpose.builder()
-                .id(purpose.getId())
                 .purpose(purpose.getPurpose())
                 .index(purposes.size() + 1)
                 .build());
