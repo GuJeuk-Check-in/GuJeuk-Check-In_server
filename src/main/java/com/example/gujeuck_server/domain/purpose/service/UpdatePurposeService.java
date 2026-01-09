@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,19 +27,5 @@ public class UpdatePurposeService {
                 .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
 
         purpose.updatePurpose(purposeRequest.getPurpose());
-    }
-
-    @Transactional
-    public void movePurpose(List<PurposeRequest> purposeRequests) {
-        adminFacade.currentUser();
-
-        for(int i = 0; i < purposeRequests.size(); i++) {
-            Purpose purpose = purposeRepository.findById(purposeRequests.get(i).getId())
-                    .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
-
-            purpose.setIndexId(purposeRequests.get(i).getIndexId());
-        }
-
-        purposeRepository.saveAll(purposeRepository.findAll());
     }
 }

@@ -12,6 +12,4 @@ public class PurposeRequest {
     @Size(min = 1, max = 30)
     @NotBlank
     private String purpose;
-
-    private Long indexId;
 }

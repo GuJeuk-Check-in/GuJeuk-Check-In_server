@@ -18,8 +18,6 @@ public class Purpose {
     @Column(nullable = false, length = 30)
     private String purpose;
 
-    private Long indexId;
-
     public void updatePurpose(String purpose) {
         this.purpose = purpose;
     }
