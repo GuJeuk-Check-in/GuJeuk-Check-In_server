@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CreatePurposeService {
@@ -19,10 +21,12 @@ public class CreatePurposeService {
 
         adminFacade.currentUser();
 
+        List<Purpose> purposes = purposeRepository.findAll();
+
         purposeRepository.save(Purpose.builder()
                 .id(purpose.getId())
                 .purpose(purpose.getPurpose())
-                .indexId(purpose.getIndexId())
+                .index(purposes.size() + 1)
                 .build());
     }
-}
+} 
