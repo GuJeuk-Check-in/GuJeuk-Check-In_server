@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface PurposeRepository extends JpaRepository<Purpose, Long> {
     List<Purpose> findByPurpose(String purpose);
+    List<Purpose> findAllByOrderByPurposeIndexAsc();
 }
