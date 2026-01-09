@@ -2,37 +2,22 @@ package com.example.gujeuck_server.domain.log.presentation.dto.response;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class LogExcelResponse {
+public record LogExcelResponse(
 
-    private String name;
-
-    private String phone;
-
-    private int maleCount;
-
-    private int femaleCount;
-
-    private String visitDate;
-
-    private String visitTime;
-
-    private String purpose;
-
-    private Age age;
-
-    private String residence;
-
-    private boolean privacyAgreed;
-
+        String name,
+        String phone,
+        int maleCount,
+        int femaleCount,
+        String visitDate,
+        String visitTime,
+        String purpose,
+        Age age,
+        String residence,
+        boolean privacyAgreed
+) {
     // Log 엔티티 -> LogResponse 로 바꿔주는 정적 메서드
     public static LogExcelResponse from(Log log) {
         return LogExcelResponse.builder()
