@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.purpose.controller;
 
+import com.example.gujeuck_server.domain.purpose.dto.request.PurposeMoveRequest;
 import com.example.gujeuck_server.domain.purpose.dto.request.PurposeRequest;
 import com.example.gujeuck_server.domain.purpose.dto.response.PurposeResponse;
 import com.example.gujeuck_server.domain.purpose.service.*;
@@ -46,7 +47,7 @@ public class PurposeController {
         return readAllPurpose.readAll();
     }
     @PatchMapping("/move")
-    public void movePurpose(@RequestBody List<Long> id) {
-        updatePurpose.movementPurpose(id);
+    public void movePurpose(@RequestBody PurposeMoveRequest PurposeMoveRequest) {
+        updatePurpose.movementPurpose(PurposeMoveRequest);
     }
 }

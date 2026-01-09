@@ -18,7 +18,7 @@ public class Purpose {
     @Column(nullable = false, length = 30)
     private String purpose;
 
-    private int index;
+    private int purposeIndex;
 
     public void updatePurpose(String purpose) {
         this.purpose = purpose;

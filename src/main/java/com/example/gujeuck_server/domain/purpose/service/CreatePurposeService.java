@@ -25,7 +25,7 @@ public class CreatePurposeService {
 
         purposeRepository.save(Purpose.builder()
                 .purpose(purpose.getPurpose())
-                .index(purposes.size() + 1)
+                .purposeIndex(purposes.size() + 1)
                 .build());
     }
 }
