@@ -45,4 +45,8 @@ public class PurposeController {
     public List<PurposeResponse> getAllPurpose() {
         return readAllPurpose.readAll();
     }
+    @PatchMapping("/move")
+    public void movePurpose(@RequestBody List<Long> id) {
+        updatePurpose.movementPurpose(id);
+    }
 }
