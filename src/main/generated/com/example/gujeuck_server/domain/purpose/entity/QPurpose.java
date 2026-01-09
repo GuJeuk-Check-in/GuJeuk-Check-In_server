@@ -21,6 +21,8 @@ public class QPurpose extends EntityPathBase<Purpose> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final NumberPath<Integer> index = createNumber("index", Integer.class);
+
     public final StringPath purpose = createString("purpose");
 
     public QPurpose(String variable) {
