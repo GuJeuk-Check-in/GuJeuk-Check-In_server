@@ -12,6 +12,7 @@ import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWit
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDetailResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserResponse;
+import com.example.gujeuck_server.domain.user.service.QueryUserDetailService;
 import com.example.gujeuck_server.domain.user.service.QueryUserListByResidenceService;
 import com.example.gujeuck_server.domain.user.service.QueryUserListService;
 import jakarta.validation.Valid;
@@ -34,6 +35,7 @@ public class AdminController {
     private final ReissueService reissueService;
     private final QueryUserListService queryUserListService;
     private final QueryUserListByResidenceService queryUserListByResidenceService;
+    private final QueryUserDetailService queryUserDetailService;
 
     @GetMapping("/user/all")
     public SliceWithTotalResponse<UserDto> getAllUserList(
@@ -48,8 +50,8 @@ public class AdminController {
     }
 
     @GetMapping("/user/{id}")
-    public UserDetailResponse getUserDetail() {
-        return null;
+    public UserDetailResponse getUserDetail(@PathVariable Long id) {
+        return queryUserDetailService.execute(id);
     }
 
     @PostMapping("/login")
