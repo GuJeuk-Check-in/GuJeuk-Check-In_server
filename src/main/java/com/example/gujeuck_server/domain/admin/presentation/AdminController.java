@@ -8,6 +8,7 @@ import com.example.gujeuck_server.domain.admin.service.CreateAdminService;
 import com.example.gujeuck_server.domain.admin.service.LogExcelOutPutService;
 import com.example.gujeuck_server.domain.admin.service.LoginAdminService;
 import com.example.gujeuck_server.domain.admin.service.ReissueService;
+import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDetailResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
@@ -51,7 +52,8 @@ public class AdminController {
 
     @GetMapping("/user/{id}")
     public UserDetailResponse getUserDetail(@PathVariable Long id) {
-        return queryUserDetailService.execute(id);
+        User user = queryUserDetailService.execute(id);
+        return UserDetailResponse.from(user);
     }
 
     @PostMapping("/login")
