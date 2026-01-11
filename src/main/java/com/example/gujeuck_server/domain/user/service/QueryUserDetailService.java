@@ -7,6 +7,6 @@ import org.springframework.stereotype.Service;
 public class QueryUserDetailService {
 
     public User execute(final Long id) {
-        return null;
+        // 유저를 데이터베이스에서 id로 찾기
     }
 }
