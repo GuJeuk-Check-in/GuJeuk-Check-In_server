@@ -13,7 +13,7 @@ public class QueryUserDetailService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public User execute(final Long id) {
+    public User execute(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
     }
