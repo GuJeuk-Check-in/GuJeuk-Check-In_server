@@ -8,6 +8,7 @@ import com.example.gujeuck_server.domain.admin.service.CreateAdminService;
 import com.example.gujeuck_server.domain.admin.service.LogExcelOutPutService;
 import com.example.gujeuck_server.domain.admin.service.LoginAdminService;
 import com.example.gujeuck_server.domain.admin.service.ReissueService;
+import com.example.gujeuck_server.domain.user.presentation.dto.request.UpdateUserRequest;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserResponse;
@@ -44,6 +45,10 @@ public class AdminController {
     @GetMapping("/user")
     public UserResponse getALlUserByResidenceList(@RequestParam String residence) {
         return queryUserListByResidenceService.readAllUserListByResidence(residence);
+    }
+
+    @PatchMapping("/user/{id}")
+    public void updateUser(@RequestBody @Valid UpdateUserRequest request) {
     }
 
     @PostMapping("/login")
