@@ -34,13 +34,22 @@ public class UpdatePurposeService {
     public void movementPurpose(PurposeMoveRequest purposeMoveRequest) {
         adminFacade.currentUser();
 
+        List<Long> purposesId = purposeMoveRequest.getPurposeId();
         List<Purpose> purposes = purposeRepository.findAllById(purposeMoveRequest.getPurposeId());
+
+        if(purposesId.size() != purposes.size()) {
+            throw PurposeNotFoundException.EXCEPTION;
+        }
 
         Map<Long, Purpose> purposeMap = purposes.stream()
                 .collect(Collectors.toMap(Purpose::getId, purpose -> purpose));
 
         for(int i = 0; i < purposeMoveRequest.getPurposeId().size(); i++) {
             Purpose purpose = purposeMap.get(purposeMoveRequest.getPurposeId().get(i));
+
+            if(purpose == null) {
+                throw PurposeNotFoundException.EXCEPTION;
+            }
 
             purpose.setPurposeIndex(i + 1);
         }
