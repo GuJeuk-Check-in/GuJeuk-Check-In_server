@@ -1,9 +1,12 @@
 package com.example.gujeuck_server.domain.user.service;
 
 import com.example.gujeuck_server.domain.user.domain.User;
+import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
 import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.UpdateUserRequest;
+import com.example.gujeuck_server.global.utility.CalculateAgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +14,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UpdateUserService {
     private final UserRepository userRepository;
+    private final CalculateAgeService calculateAgeService;
 
     public void execute(Long id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
-        // request 값으로 해당 유저의 정보를 수정
-            // 수정 요청된 userId가 다른 유저와 중복되면 오류
+        if (userRepository.existsByUserId(request.userId())) {
+            throw ExistUserIdException.EXCEPTION;
+        }
+
+        Age age = calculateAgeService.getAge(request.birthYMD());
+        user.updateUser(request.name(), request.userId(), request.phone(), request.gender(), request.birthYMD(), age, request.residence());
     }
 }
