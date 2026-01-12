@@ -26,9 +26,11 @@ public class UpdateUserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
-        if (userRepository.existsByUserId(request.userId())) {
-            throw ExistUserIdException.EXCEPTION;
-        }
+        userRepository.findByUserId(request.userId())
+                .filter(existUser -> !existUser.getId().equals(id))
+                .ifPresent(existUser -> {
+                    throw ExistUserIdException.EXCEPTION;
+                });
 
         Age age = calculateAgeService.getAge(request.birthYMD());
         user.updateUser(request.name(), request.userId(), request.phone(), request.gender(), request.birthYMD(), age, request.residence());
