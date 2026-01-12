@@ -52,8 +52,7 @@ public class AdminController {
 
     @GetMapping("/user/{id}")
     public UserDetailResponse getUserDetail(@PathVariable Long id) {
-        User user = queryUserDetailService.execute(id);
-        return UserDetailResponse.from(user);
+        return queryUserDetailService.execute(id);
     }
 
     @PostMapping("/login")
