@@ -47,6 +47,8 @@ public class User {
     @Column(nullable = false)
     private int count;
 
+    public void updateUser(String name, String userId, String phone, Gender gender, String birthYMD, String residence) {}
+
     public static String generateUserId(String name, String birthYMD) {
         String monthDay = birthYMD.substring(5).replace("-", "");
         return name + monthDay;
