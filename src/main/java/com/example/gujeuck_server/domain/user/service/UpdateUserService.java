@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.user.service;
 
+import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
@@ -14,11 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UpdateUserService {
+    private final AdminFacade adminFacade;
     private final UserRepository userRepository;
     private final CalculateAgeService calculateAgeService;
 
     @Transactional
     public void execute(Long id, UpdateUserRequest request) {
+        adminFacade.currentUser();
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
