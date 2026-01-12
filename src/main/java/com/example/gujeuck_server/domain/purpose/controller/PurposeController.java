@@ -20,6 +20,7 @@ public class PurposeController {
     private final DeletePurposeService deletePurpose;
     private final ReadOnePurposeService readOnePurpose;
     private final ReadAllPurposeService readAllPurpose;
+    private final MovePurposeService movePurpose;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -48,6 +49,6 @@ public class PurposeController {
     }
     @PatchMapping("/move")
     public void movePurpose(@RequestBody PurposeMoveRequest PurposeMoveRequest) {
-        updatePurpose.movementPurpose(PurposeMoveRequest);
+        movePurpose.movementPurpose(PurposeMoveRequest);
     }
 }
