@@ -23,6 +23,8 @@ public class QPurpose extends EntityPathBase<Purpose> {
 
     public final StringPath purpose = createString("purpose");
 
+    public final NumberPath<Integer> purposeIndex = createNumber("purposeIndex", Integer.class);
+
     public QPurpose(String variable) {
         super(Purpose.class, forVariable(variable));
     }
