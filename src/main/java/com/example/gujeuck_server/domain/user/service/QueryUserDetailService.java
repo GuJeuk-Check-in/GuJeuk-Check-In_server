@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.user.service;
 
+import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
@@ -12,11 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QueryUserDetailService {
     private final UserRepository userRepository;
+    private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
     public UserDetailResponse execute(Long id) {
+        adminFacade.currentUser();
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
+
         return UserDetailResponse.from(user);
     }
 }
