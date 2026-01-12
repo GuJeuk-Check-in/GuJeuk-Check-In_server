@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface PurposeRepository extends JpaRepository<Purpose, Long> {
     List<Purpose> findByPurpose(String purpose);
     List<Purpose> findAllByOrderByPurposeIndexAsc();
+    List<Purpose> findAllByPurposeIndexGreaterThan(int purposeIndex);
 }
