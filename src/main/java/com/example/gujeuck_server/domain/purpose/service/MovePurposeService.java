@@ -1,10 +1,10 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.purpose.domain.Purpose;
+import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
 import com.example.gujeuck_server.domain.purpose.dto.request.PurposeMoveRequest;
-import com.example.gujeuck_server.domain.purpose.entity.Purpose;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
-import com.example.gujeuck_server.domain.purpose.repository.PurposeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
