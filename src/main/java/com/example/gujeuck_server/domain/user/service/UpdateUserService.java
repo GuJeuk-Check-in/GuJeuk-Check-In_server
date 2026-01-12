@@ -9,6 +9,7 @@ import com.example.gujeuck_server.domain.user.presentation.dto.request.UpdateUse
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +17,7 @@ public class UpdateUserService {
     private final UserRepository userRepository;
     private final CalculateAgeService calculateAgeService;
 
+    @Transactional
     public void execute(Long id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
