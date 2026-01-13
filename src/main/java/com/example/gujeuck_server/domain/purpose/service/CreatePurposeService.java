@@ -18,12 +18,12 @@ public class CreatePurposeService {
     public void createPurpose(PurposeRequest request) {
         adminFacade.currentUser();
 
-        int nextIndex = purposeRepository.findMaxPurposeIndex() + 1;
+        int purposeIndex = purposeRepository.findMaxPurposeIndex() + 1;
 
         purposeRepository.save(
                 Purpose.builder()
                         .purpose(request.getPurpose())
-                        .purposeIndex(nextIndex)
+                        .purposeIndex(purposeIndex)
                         .build()
         );
     }
