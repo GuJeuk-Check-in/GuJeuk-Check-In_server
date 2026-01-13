@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface PurposeRepository extends JpaRepository<Purpose, Long>, PurposeRepositoryCustom {
 
-    Optional<Purpose> findByPurposeName(String purpose);
+    Optional<Purpose> findByPurposeName(String purposeName);
 
     List<Purpose> findAllByOrderByPurposeIndexAsc();
 
