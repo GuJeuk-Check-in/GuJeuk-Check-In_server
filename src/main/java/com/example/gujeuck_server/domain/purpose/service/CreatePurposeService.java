@@ -26,10 +26,6 @@ public class CreatePurposeService {
         
         int purposeIndex = purposeRepository.findMaxPurposeIndex() + 1;
 
-        if(purposeIndex == 0){
-            throw PurposeNotFoundException.EXCEPTION;
-        }
-
         purposeRepository.save(
                 Purpose.builder()
                         .purposeName(request.getPurpose())

@@ -16,6 +16,6 @@ public class PurposeRepositoryCustomImpl implements PurposeRepositoryCustom {
                 .from(qPurpose)
                 .fetchOne();
 
-        return max != null ? max : 0;
+        return max;
     }
 }
