@@ -7,14 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface PurposeRepository extends JpaRepository<Purpose, Long> {
+public interface PurposeRepository extends JpaRepository<Purpose, Long>, PurposeRepositoryCustom {
 
-    Optional<Purpose> findByPurpose(String purpose);
+    Optional<Purpose> findByPurposeName(String purpose);
 
     List<Purpose> findAllByOrderByPurposeIndexAsc();
 
     List<Purpose> findAllByPurposeIndexGreaterThan(int purposeIndex);
-
-    @Query("select coalesce(max(p.purposeIndex), 0) from Purpose p")
-    int findMaxPurposeIndex();
 }

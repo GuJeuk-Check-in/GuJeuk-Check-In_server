@@ -82,7 +82,7 @@ public class CreateLogService {
                 .phone(request.getPhone())
                 .maleCount(request.getMaleCount())
                 .femaleCount(request.getFemaleCount())
-                .purpose(purpose.getPurpose())
+                .purpose(purpose.getPurposeName())
                 .visitTime(time)
                 .visitDate(date)
                 .year(year)

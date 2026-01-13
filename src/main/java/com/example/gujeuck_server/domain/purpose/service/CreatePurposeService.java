@@ -19,15 +19,19 @@ public class CreatePurposeService {
     public void createPurpose(PurposeRequest request) {
         adminFacade.currentUser();
 
-        if(purposeRepository.findByPurpose(request.getPurpose()).isPresent()) {
+        if(purposeRepository.findByPurposeName(request.getPurpose()).isPresent()) {
             throw PurposeNotFoundException.EXCEPTION;
         }
         
         int purposeIndex = purposeRepository.findMaxPurposeIndex() + 1;
 
+        if(purposeIndex == 0){
+            throw PurposeNotFoundException.EXCEPTION;
+        }
+
         purposeRepository.save(
                 Purpose.builder()
-                        .purpose(request.getPurpose())
+                        .purposeName(request.getPurpose())
                         .purposeIndex(purposeIndex)
                         .build()
         );

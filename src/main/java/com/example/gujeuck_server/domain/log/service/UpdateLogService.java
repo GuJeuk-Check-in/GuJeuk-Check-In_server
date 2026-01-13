@@ -33,7 +33,7 @@ public class UpdateLogService {
                 request.getPhone(),
                 request.getMaleCount(),
                 request.getFemaleCount(),
-                purpose.getPurpose(),
+                purpose.getPurposeName(),
                 request.getVisitDate(),
                 request.isPrivacyAgreed()
         );

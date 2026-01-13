@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.purpose.dto.request;
+package com.example.gujeuck_server.domain.purpose.presentation.dto.request;
 
 import lombok.Getter;
 
