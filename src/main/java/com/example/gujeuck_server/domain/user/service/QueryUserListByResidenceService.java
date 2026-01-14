@@ -4,8 +4,7 @@ package com.example.gujeuck_server.domain.user.service;
 import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.domain.enums.Residence;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class QueryUserListByResidenceService {
     private static final String ETC = "기타";
     private final AdminFacade adminFacade;
 
-    public SliceWithTotalResponse<UserDto> readAllUserListByResidence(String residence, Pageable p) {
+    public SliceWithTotalResponse<UserInfoResponse> readAllUserListByResidence(String residence, Pageable p) {
         adminFacade.currentUser();
 
         Pageable pageable = PageRequest.of(
@@ -43,8 +42,8 @@ public class QueryUserListByResidenceService {
 
             long total = userRepository.countByResidenceNotIn(registeredResidences);
 
-            Slice<UserDto> slice = userRepository.findByResidenceNotIn(registeredResidences, pageable)
-                    .map(UserDto::from);
+            Slice<UserInfoResponse> slice = userRepository.findByResidenceNotIn(registeredResidences, pageable)
+                    .map(UserInfoResponse::from);
 
             return new SliceWithTotalResponse<>(total, slice);
         }
@@ -55,8 +54,8 @@ public class QueryUserListByResidenceService {
             String kr = matched.getKoreanName();
             long total = userRepository.countByResidence(kr);
 
-            Slice<UserDto> slice = userRepository.findByResidence(kr, pageable)
-                    .map(UserDto::from);
+            Slice<UserInfoResponse> slice = userRepository.findByResidence(kr, pageable)
+                    .map(UserInfoResponse::from);
 
             return new SliceWithTotalResponse<>(total, slice);
         }

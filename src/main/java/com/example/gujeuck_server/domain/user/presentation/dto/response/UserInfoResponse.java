@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserInfoResponse {
     private Long id;
     private String name;
     private String age;
@@ -21,8 +21,8 @@ public class UserDto {
     private boolean privacyAgreed;
     private int count;
 
-    public static UserDto from(User u) {
-        return UserDto.builder()
+    public static UserInfoResponse from(User u) {
+        return UserInfoResponse.builder()
                 .id(u.getId())
                 .name(u.getName())
                 .age(u.getAge().getLabel())
