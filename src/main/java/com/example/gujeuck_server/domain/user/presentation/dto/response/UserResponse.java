@@ -7,9 +7,9 @@ import java.util.List;
 @Getter
 public class UserResponse {
     private long totalCount;
-    private List<UserDto> users;
+    private List<UserInfoResponse> users;
 
-    public UserResponse(long totalCount, List<UserDto> users) {
+    public UserResponse(long totalCount, List<UserInfoResponse> users) {
         this.totalCount = totalCount;
         this.users = users;
     }
