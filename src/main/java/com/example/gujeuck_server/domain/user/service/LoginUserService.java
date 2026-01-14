@@ -32,13 +32,20 @@ public class LoginUserService {
 
         user.increaseCount();
 
+        String visitDate = DateFormatter.LocalDateForm(LocalDate.now());;
+
+        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));;
+
         int currentYear = LocalDate.now().getYear();
 
-        String visitDate = DateFormatter.LocalDateForm(LocalDate.now());
+        Log log = createUserLog(user, request, visitDate, visitTime, currentYear);
 
-        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
+        logRepository.save(log);
+    }
 
-        Log log = Log.builder()
+    private Log createUserLog(User user, LoginRequest request, String visitDate, String visitTime, int currentYear) {
+
+        return Log.builder()
                 .user(user)
                 .name(user.getName())
                 .age(user.getAge())
@@ -52,7 +59,5 @@ public class LoginUserService {
                 .year(currentYear)
                 .residence(user.getResidence())
                 .build();
-
-        logRepository.save(log);
     }
 }
