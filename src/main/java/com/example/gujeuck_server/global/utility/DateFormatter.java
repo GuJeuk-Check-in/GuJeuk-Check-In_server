@@ -14,5 +14,4 @@ public class DateFormatter {
     public static String LocalDateForm(LocalDate date) {
         return date.format(FORMATTER);
     }
-
 }
