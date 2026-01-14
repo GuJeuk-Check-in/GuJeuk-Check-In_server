@@ -8,30 +8,30 @@ import lombok.Getter;
 @Getter
 public class SignupRequest {
 
-    @NotBlank
+    @NotBlank(message = "이름을 입력해주세요.")
     private String name;
 
-    @NotNull
+    @NotNull(message = "성별을 입력해주세요.")
     private Gender gender;
 
-    @NotBlank
+    @NotBlank(message = "전화번호를 입력해주세요.")
     private String phone;
 
-    @NotNull
+    @NotNull(message = "남자 동행인 수는 null일 수 없습니다.")
     private int maleCount;
 
-    @NotNull
+    @NotNull(message = "여자 동행인 수는 null일 수 없습니다.")
     private int femaleCount;
 
-    @NotBlank
+    @NotBlank(message = "생년월일을 입력해주세요.")
     private String birthYMD;
 
-    @NotBlank
+    @NotBlank(message = "거주지를 입력해주세요.")
     private String residence;
 
-    @NotNull
+    @NotNull(message = "개인정보 동의 여부를 입력해주세요.")
     private boolean privacyAgreed;
 
-    @NotBlank
+    @NotBlank(message = "방문목적을 입력해주세요.")
     private String purpose;
 }
