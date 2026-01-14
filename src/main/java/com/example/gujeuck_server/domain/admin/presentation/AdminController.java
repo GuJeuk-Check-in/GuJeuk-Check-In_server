@@ -46,8 +46,8 @@ public class AdminController {
     }
 
     @GetMapping("/user")
-    public UserResponse getALlUserByResidenceList(@RequestParam String residence) {
-        return queryUserListByResidenceService.readAllUserListByResidence(residence);
+    public SliceWithTotalResponse<UserDto> getALlUserByResidenceList(@RequestParam String residence, Pageable pageable) {
+        return queryUserListByResidenceService.readAllUserListByResidence(residence, pageable);
     }
 
     @GetMapping("/user/{id}")

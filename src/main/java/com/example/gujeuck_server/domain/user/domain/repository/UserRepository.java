@@ -11,9 +11,9 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     Boolean existsByUserId(String userId);
 
-    List<User> findByResidence(String residence);
+    Slice<User> findByResidence(String residence, Pageable pageable);
 
-    List<User> findByResidenceNotIn (List<String> residences);
+    Slice<User> findByResidenceNotIn (List<String> residences, Pageable pageable);
 
     Slice<User> findAllBy(Pageable pageable);
 
