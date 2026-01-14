@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
-import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
 import com.example.gujeuck_server.domain.log.domain.Log;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
 
 import java.util.List;
 import java.util.Optional;
