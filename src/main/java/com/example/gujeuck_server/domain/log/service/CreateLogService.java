@@ -32,8 +32,9 @@ public class CreateLogService {
 
         adminFacade.currentUser();
 
-        String visitTime = getCurrentTime();
-        int currentYear = getCurrentYear();
+        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
+
+        int currentYear = LocalDate.now().getYear();
 
         Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
 
@@ -41,14 +42,6 @@ public class CreateLogService {
 
         Log log = createUseLog(request, purpose, formattedDate, visitTime, currentYear);
         logRepository.save(log);
-    }
-
-    private String getCurrentTime() {
-        return LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
-    }
-
-    private int getCurrentYear() {
-        return LocalDate.now().getYear();
     }
 
     private String resolveVisitDate(String requestDate) {
