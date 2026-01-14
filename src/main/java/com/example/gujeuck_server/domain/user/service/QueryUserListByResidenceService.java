@@ -4,11 +4,12 @@ package com.example.gujeuck_server.domain.user.service;
 import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserResponse;
 import com.example.gujeuck_server.domain.user.domain.enums.Residence;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,11 +17,14 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class QueryUserListByResidenceService {
+
     private final UserRepository userRepository;
-    private static final String ETC = "기타";
     private final AdminFacade adminFacade;
 
-    public UserResponse readAllUserListByResidence(String residence) {
+    private static final String ETC = "기타";
+
+    @Transactional(readOnly = true)
+    public UserListResponse readAllUserListByResidence(String residence) {
         adminFacade.currentUser();
 
         String data = residence.trim();
@@ -37,7 +41,10 @@ public class QueryUserListByResidenceService {
                     .map(UserDto::from)
                     .toList();
 
-            return new UserResponse(total, users);
+            return UserListResponse.builder()
+                        .totalCount(total)
+                        .users(users)
+                    .build();
         }
 
         Residence matched = Residence.fromKoreanName(data);
@@ -51,7 +58,10 @@ public class QueryUserListByResidenceService {
                     .map(UserDto::from)
                     .toList();
 
-            return new UserResponse(total, users);
+            return UserListResponse.builder()
+                        .totalCount(total)
+                        .users(users)
+                    .build();
         }
 
         throw InvalidResidenceException.EXCEPTION;

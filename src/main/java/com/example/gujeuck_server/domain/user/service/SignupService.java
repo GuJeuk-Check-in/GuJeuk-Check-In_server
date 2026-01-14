@@ -75,7 +75,7 @@ public class SignupService {
     }
 
     private User createUser(SignupRequest request, Age age, String userId, String residence) {
-        
+
         return User.builder()
                 .name(request.getName())
                 .phone(request.getPhone())

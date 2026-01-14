@@ -7,6 +7,8 @@ import org.springframework.data.domain.Slice;
 @Getter
 @AllArgsConstructor
 public class SliceWithTotalResponse<T> {
+
     private long totalCount;
+
     private Slice<T> slice;
 }
