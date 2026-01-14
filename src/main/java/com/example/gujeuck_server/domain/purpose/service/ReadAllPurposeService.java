@@ -17,7 +17,7 @@ public class ReadAllPurposeService {
     public List<PurposeResponse> readAll() {
 
         return purposeRepository.findAllByOrderByPurposeIndexAsc().stream()
-                .map(purpose -> new PurposeResponse(purpose.getId(), purpose.getPurpose()))
+                .map(PurposeResponse::from)
                 .toList();
     }
 }

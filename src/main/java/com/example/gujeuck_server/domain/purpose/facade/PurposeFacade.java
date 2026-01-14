@@ -13,7 +13,7 @@ public class PurposeFacade {
 
     public Purpose getPurpose(String purpose) {
 
-        return purposeRepository.findByPurpose(purpose)
+        return purposeRepository.findByPurposeName(purpose)
                 .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
     }
 

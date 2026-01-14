@@ -2,7 +2,7 @@ package com.example.gujeuck_server.domain.purpose.presentation;
 
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeRequest;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.response.PurposeResponse;
-import com.example.gujeuck_server.domain.purpose.dto.request.PurposeMoveRequest;
+import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeMoveRequest;
 import com.example.gujeuck_server.domain.purpose.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

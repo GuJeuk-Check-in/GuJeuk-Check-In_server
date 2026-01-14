@@ -117,7 +117,7 @@ public class SignupService {
                 .age(age)
                 .maleCount(request.getMaleCount())
                 .femaleCount(request.getFemaleCount())
-                .purpose(purpose.getPurpose())
+                .purpose(purpose.getPurposeName())
                 .privacyAgreed(request.isPrivacyAgreed())
                 .visitDate(date)
                 .visitTime(time)
