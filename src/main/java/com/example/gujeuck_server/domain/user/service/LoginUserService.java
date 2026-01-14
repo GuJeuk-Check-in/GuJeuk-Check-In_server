@@ -30,43 +30,22 @@ public class LoginUserService {
     @Transactional
     public void login(LoginRequest request) {
 
-        User user = findUser(request.getUserId());
+        User user = userRepository.findByUserId(request.getUserId())
+                .orElseThrow(() -> UserNotFoundException.EXCEPTION);
+
         user.increaseCount();
 
-        String formattedDate = getFormattedDate();
-        String visitTime = getVisitTime();
-        int currentYear = getCurrentYear();
+        String formattedDate = DateFormatter.LocalDateForm(LocalDate.now());;
 
-        validateDuplicateLog(user.getUserId(), formattedDate, visitTime);
+        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));;
+
+        int currentYear = LocalDate.now().getYear();
 
         List<Log> logs = new ArrayList<>();
 
         logs.add(createUserLog(user, request, formattedDate, visitTime, currentYear));
 
         logRepository.saveAll(logs);
-    }
-
-    private User findUser(String userId) {
-        return userRepository.findByUserId(userId)
-                .orElseThrow(() -> UserNotFoundException.EXCEPTION);
-    }
-
-    private String getFormattedDate() {
-        return DateFormatter.LocalDateForm(LocalDate.now());
-    }
-
-    private String getVisitTime() {
-        return LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
-    }
-
-    private int getCurrentYear() {
-        return LocalDate.now().getYear();
-    }
-
-    private void validateDuplicateLog(String userId, String date, String time) {
-        if (logRepository.findByUserIdAndVisitTime(userId, date, time).isPresent()) {
-            throw DuplicateLogException.EXCEPTION;
-        }
     }
 
     private Log createUserLog(
