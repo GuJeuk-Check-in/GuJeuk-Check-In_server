@@ -23,10 +23,10 @@ public class LogRequest {
 
     private int femaleCount;
 
-    @NotNull(message = "방문 목적을 선택해주세요.")
+    @NotBlank(message = "방문 목적을 선택해주세요.")
     private String purpose;
 
-    @NotNull(message = "방문 날짜를 선택해주세요.")
+    @NotBlank(message = "방문 날짜를 선택해주세요.")
     private String visitDate;
 
     @AssertTrue(message = "개인정보 수집 및 이용 동의를 체크해주세요.")

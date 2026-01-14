@@ -110,16 +110,16 @@ public class ExcelGenerator { // 이건 엑셀 파일 내용 관련한 클래스
             int col = 0;
             createCell(row, col++, no++, style);
 
-            createCell(row, col++, log.getVisitDate(), style); // 이렇게 list로 가져온 값 하나하나 다 넣고 있는거임
-            createCell(row, col++, log.getVisitTime(), style);
-            createCell(row, col++, log.getName(), style);
-            createCell(row, col++, log.getAge().getLabel(), style);
-            createCell(row, col++, log.getMaleCount(), style);
-            createCell(row, col++, log.getFemaleCount(), style);
-            createCell(row, col++, log.getPhone(), style);
-            createCell(row, col++, log.getPurpose(), style);
-            createCell(row, col++, log.getResidence(), style);
-            createCell(row, col++, log.isPrivacyAgreed() ? "동의" : "미동의", style);
+            createCell(row, col++, log.visitDate(), style); // 이렇게 list로 가져온 값 하나하나 다 넣고 있는거임
+            createCell(row, col++, log.visitTime(), style);
+            createCell(row, col++, log.name(), style);
+            createCell(row, col++, log.age().getLabel(), style);
+            createCell(row, col++, log.maleCount(), style);
+            createCell(row, col++, log.femaleCount(), style);
+            createCell(row, col++, log.phone(), style);
+            createCell(row, col++, log.purpose(), style);
+            createCell(row, col++, log.residence(), style);
+            createCell(row, col++, log.privacyAgreed() ? "동의" : "미동의", style);
         }
     }
 
