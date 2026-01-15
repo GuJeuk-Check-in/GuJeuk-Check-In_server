@@ -52,9 +52,15 @@ public class LogController {
         return queryLogDetailService.execute(logId);
     }
 
-    @GetMapping("/month")
-    public SliceWithTotalResponse<QueryLogListResponse>  queryLogListByMonth(QueryLogListByResidenceRequest queryLogListByResidenceRequest) {
-        return queryLogListByResidenceService.queryLogListByResidence(queryLogListByResidenceRequest);
+    @GetMapping("/{year}/{month}")
+    public SliceWithTotalResponse<QueryLogListResponse>  queryLogListByMonth(
+            @ModelAttribute QueryLogListByResidenceRequest queryLogListByResidenceRequest,
+            Pageable pageable
+    ) {
+        return queryLogListByResidenceService.queryLogListByResidence(
+                queryLogListByResidenceRequest,
+                pageable
+        );
     }
 
 }

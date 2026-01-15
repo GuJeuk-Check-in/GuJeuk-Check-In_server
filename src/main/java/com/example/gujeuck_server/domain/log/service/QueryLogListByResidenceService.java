@@ -5,6 +5,7 @@ import com.example.gujeuck_server.domain.log.presentation.dto.request.QueryLogLi
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.SliceWithTotalResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +14,14 @@ import org.springframework.stereotype.Service;
 public class QueryLogListByResidenceService {
     private final LogRepository logRepository;
 
-    public SliceWithTotalResponse<QueryLogListResponse> queryLogListByResidence(QueryLogListByResidenceRequest queryLogListByResidenceRequest) {
+    public SliceWithTotalResponse<QueryLogListResponse> queryLogListByResidence(
+            QueryLogListByResidenceRequest queryLogListByResidenceRequest,
+            Pageable pageable
+    ) {
         Slice<QueryLogListResponse> logs = logRepository.findByYearAndMonth(
                 queryLogListByResidenceRequest.getYear(),
-                queryLogListByResidenceRequest.getMonth()
+                queryLogListByResidenceRequest.getMonth(),
+                pageable
         );
 
         long total = logRepository.countByYearAndMonth(

@@ -23,7 +23,8 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
     """)
   Slice<QueryLogListResponse> findByYearAndMonth(
           @Param("year") int year,
-          @Param("month") int month
+          @Param("month") int month,
+          Pageable pageable
   );
 
   @Query("""
