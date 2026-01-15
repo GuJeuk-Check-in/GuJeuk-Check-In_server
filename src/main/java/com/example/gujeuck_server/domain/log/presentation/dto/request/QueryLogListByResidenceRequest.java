@@ -5,6 +5,9 @@ import lombok.Getter;
 
 @Getter
 public class QueryLogListByResidenceRequest {
+    @NotBlank(message = "년도을 선택해주세요")
+    private int year;
+
     @NotBlank(message = "월을 선택해주세요")
     private int month;
 }
