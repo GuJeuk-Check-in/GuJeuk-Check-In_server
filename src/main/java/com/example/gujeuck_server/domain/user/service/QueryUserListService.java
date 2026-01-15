@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.user.service;
 
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class QueryUserListService {
     private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
-    public SliceWithTotalResponse<UserInfoResponse> readAllUserList(Pageable p) {
+    public UserSliceWithTotalResponse<UserInfoResponse> readAllUserList(Pageable p) {
         adminFacade.currentUser();
 
         Pageable pageable = PageRequest.of(
@@ -33,6 +33,6 @@ public class QueryUserListService {
         Slice<UserInfoResponse> slice = userRepository.findAllBy(pageable)
                 .map(UserInfoResponse::from);
 
-        return new SliceWithTotalResponse<>(total, slice);
+        return new UserSliceWithTotalResponse<>(total, slice);
     }
 }

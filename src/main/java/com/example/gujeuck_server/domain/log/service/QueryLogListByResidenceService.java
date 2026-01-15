@@ -1,7 +1,5 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
-import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

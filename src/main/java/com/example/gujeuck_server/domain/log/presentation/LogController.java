@@ -49,4 +49,7 @@ public class LogController {
     public QueryLogDetailResponse queryLogDetail(@PathVariable("log-id") Long logId) {
         return queryLogDetailService.execute(logId);
     }
+
+    @GetMapping("/{date}")
+    public
 }

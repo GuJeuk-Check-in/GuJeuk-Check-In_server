@@ -8,7 +8,7 @@ import com.example.gujeuck_server.domain.admin.service.CreateAdminService;
 import com.example.gujeuck_server.domain.admin.service.LogExcelOutPutService;
 import com.example.gujeuck_server.domain.admin.service.LoginAdminService;
 import com.example.gujeuck_server.domain.admin.service.ReissueService;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDetailResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.service.QueryUserDetailService;
@@ -37,14 +37,14 @@ public class AdminController {
     private final QueryUserDetailService queryUserDetailService;
 
     @GetMapping("/user/all")
-    public SliceWithTotalResponse<UserInfoResponse> getAllUserList(
+    public UserSliceWithTotalResponse<UserInfoResponse> getAllUserList(
             @PageableDefault(size = 30, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         return queryUserListService.readAllUserList(pageable);
     }
 
     @GetMapping("/user")
-    public SliceWithTotalResponse<UserInfoResponse> getALlUserByResidenceList(@RequestParam String residence, Pageable pageable) {
+    public UserSliceWithTotalResponse<UserInfoResponse> getALlUserByResidenceList(@RequestParam String residence, Pageable pageable) {
         return queryUserListByResidenceService.readAllUserListByResidence(residence, pageable);
     }
 

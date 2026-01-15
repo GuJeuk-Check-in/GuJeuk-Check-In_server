@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Slice;
 
 @AllArgsConstructor
-public class SliceWithTotalResponse<T> {
-
+public class UserSliceWithTotalResponse<T> {
     private long totalCount;
 
     private Slice<T> slice;
