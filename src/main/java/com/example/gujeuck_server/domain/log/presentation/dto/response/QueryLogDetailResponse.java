@@ -1,7 +1,6 @@
 package com.example.gujeuck_server.domain.log.presentation.dto.response;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
-import com.example.gujeuck_server.domain.log.service.QueryLogDetailService;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import lombok.Builder;
 

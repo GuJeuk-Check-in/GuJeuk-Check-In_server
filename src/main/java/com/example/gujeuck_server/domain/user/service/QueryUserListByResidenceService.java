@@ -3,12 +3,17 @@ package com.example.gujeuck_server.domain.user.service;
 
 import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.domain.enums.Residence;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,12 +21,22 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class QueryUserListByResidenceService {
+
     private final UserRepository userRepository;
-    private static final String ETC = "기타";
     private final AdminFacade adminFacade;
 
-    public UserResponse readAllUserListByResidence(String residence) {
+    private static final String ETC = "기타";
+
+    @Transactional(readOnly = true)
+    public SliceWithTotalResponse<UserInfoResponse> readAllUserListByResidence(String residence, Pageable p) {
+
         adminFacade.currentUser();
+
+        Pageable pageable = PageRequest.of(
+                p.getPageNumber(),
+                p.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "id")
+        );
 
         String data = residence.trim();
 
@@ -32,12 +47,10 @@ public class QueryUserListByResidenceService {
 
             long total = userRepository.countByResidenceNotIn(registeredResidences);
 
-            List<UserDto> users = userRepository.findByResidenceNotIn(registeredResidences)
-                    .stream()
-                    .map(UserDto::from)
-                    .toList();
+            Slice<UserInfoResponse> slice = userRepository.findByResidenceNotIn(registeredResidences, pageable)
+                    .map(UserInfoResponse::from);
 
-            return new UserResponse(total, users);
+            return new SliceWithTotalResponse<>(total, slice);
         }
 
         Residence matched = Residence.fromKoreanName(data);
@@ -46,12 +59,10 @@ public class QueryUserListByResidenceService {
             String kr = matched.getKoreanName();
             long total = userRepository.countByResidence(kr);
 
-            List<UserDto> users = userRepository.findByResidence(kr)
-                    .stream()
-                    .map(UserDto::from)
-                    .toList();
+            Slice<UserInfoResponse> slice = userRepository.findByResidence(kr, pageable)
+                    .map(UserInfoResponse::from);
 
-            return new UserResponse(total, users);
+            return new SliceWithTotalResponse<>(total, slice);
         }
 
         throw InvalidResidenceException.EXCEPTION;

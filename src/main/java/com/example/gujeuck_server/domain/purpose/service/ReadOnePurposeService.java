@@ -1,8 +1,8 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
-import com.example.gujeuck_server.domain.purpose.presentation.dto.response.PurposeResponse;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
+import com.example.gujeuck_server.domain.purpose.presentation.dto.response.PurposeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +17,6 @@ public class ReadOnePurposeService {
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 
-        return new PurposeResponse(purpose.getId(), purpose.getPurpose());
+        return new PurposeResponse(purpose.getId(), purpose.getPurposeName());
     }
 }

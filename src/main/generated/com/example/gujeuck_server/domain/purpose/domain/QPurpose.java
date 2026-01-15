@@ -17,11 +17,13 @@ public class QPurpose extends EntityPathBase<Purpose> {
 
     private static final long serialVersionUID = 1447514367L;
 
-    public static final QPurpose purpose1 = new QPurpose("purpose1");
+    public static final QPurpose purpose = new QPurpose("purpose");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath purpose = createString("purpose");
+    public final NumberPath<Integer> purposeIndex = createNumber("purposeIndex", Integer.class);
+
+    public final StringPath purposeName = createString("purposeName");
 
     public QPurpose(String variable) {
         super(Purpose.class, forVariable(variable));

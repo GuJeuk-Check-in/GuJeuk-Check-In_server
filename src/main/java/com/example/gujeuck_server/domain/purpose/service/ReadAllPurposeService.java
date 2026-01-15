@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.purpose.presentation.dto.response.PurposeResponse;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
+import com.example.gujeuck_server.domain.purpose.presentation.dto.response.PurposeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +16,8 @@ public class ReadAllPurposeService {
     @Transactional(readOnly = true)
     public List<PurposeResponse> readAll() {
 
-        return purposeRepository.findAll().stream()
-                .map(purpose -> new PurposeResponse(purpose.getId(), purpose.getPurpose()))
+        return purposeRepository.findAllByOrderByPurposeIndexAsc().stream()
+                .map(PurposeResponse::from)
                 .toList();
     }
 }

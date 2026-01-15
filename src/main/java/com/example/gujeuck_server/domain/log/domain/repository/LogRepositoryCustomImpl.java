@@ -1,8 +1,8 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
-import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.QLog;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.LockModeType;
@@ -61,7 +61,5 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                         .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                         .fetchOne()
         );
-
     }
-
 }
