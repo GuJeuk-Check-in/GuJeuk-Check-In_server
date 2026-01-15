@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class QueryLogListByResidenceService {
+public class QueryLogListByDateService {
     private final LogRepository logRepository;
     private final AdminFacade  adminFacade;
 
