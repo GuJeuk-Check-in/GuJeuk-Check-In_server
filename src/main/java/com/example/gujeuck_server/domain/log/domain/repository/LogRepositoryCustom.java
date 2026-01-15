@@ -10,6 +10,4 @@ public interface LogRepositoryCustom {
     List<LogExcelResponse> findAllByCurrentMonth();
 
     Optional<Log> findByUserIdAndVisitTime(String userId, String visitDate, String visitTime);
-
-    List<Log> findBy
 }
