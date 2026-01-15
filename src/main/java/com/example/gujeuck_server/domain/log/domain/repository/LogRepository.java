@@ -16,24 +16,6 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
 
   List<Log> findAllByVisitDateStartingWith(String visitDatePrefix);
 
-  @Query("""
-        SELECT l
-        FROM Log l
-        WHERE l.visitDate LIKE CONCAT(:year, '년', :month, '월%')
-    """)
-  Slice<QueryLogListResponse> findByYearAndMonth(
-          @Param("year") int year,
-          @Param("month") int month,
-          Pageable pageable
-  );
+  Slice<Log> findByVisitDateStartingWith(String visitDatePrefix, Pageable pageable);
 
-  @Query("""
-    SELECT COUNT(l)
-    FROM Log l
-    WHERE l.visitDate LIKE CONCAT(:year, '년', :month, '월%')
-""")
-  long countByYearAndMonth(
-          @Param("year") int year,
-          @Param("month") int month
-  );
 }
