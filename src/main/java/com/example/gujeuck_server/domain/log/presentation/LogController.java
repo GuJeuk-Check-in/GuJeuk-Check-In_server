@@ -2,9 +2,9 @@ package com.example.gujeuck_server.domain.log.presentation;
 
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.QueryLogListByResidenceRequest;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogByResidenceResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogDetailResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
-import com.example.gujeuck_server.domain.log.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.log.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,8 +53,10 @@ public class LogController {
     }
 
     @GetMapping("/{year}/{month}")
-    public SliceWithTotalResponse<QueryLogListResponse>  queryLogListByMonth(
-            @ModelAttribute QueryLogListByResidenceRequest queryLogListByResidenceRequest,
+    public QueryLogByResidenceResponse queryLogListByMonth(
+            @ModelAttribute
+            QueryLogListByResidenceRequest queryLogListByResidenceRequest,
+            @PageableDefault(size = 30, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
         return queryLogListByResidenceService.queryLogListByResidence(
