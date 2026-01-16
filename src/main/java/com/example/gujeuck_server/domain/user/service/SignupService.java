@@ -54,7 +54,7 @@ public class SignupService {
 
         userRepository.save(user);
 
-        Log log = createLog(request, age, purpose, visitDate, visitTime, currentYear, resolvedResidence);
+        Log log = createLog(request, age, purpose, visitDate, visitTime, currentYear, resolvedResidence, user);
 
         logRepository.save(log);
 
@@ -88,8 +88,7 @@ public class SignupService {
                 .build();
     }
 
-    private Log createLog(SignupRequest request, Age age, Purpose purpose, String visitDate, String visitTime, int year, String residence) {
-
+    private Log createLog(SignupRequest request, Age age, Purpose purpose, String visitDate, String visitTime, int year, String residence, User user) {
         return Log.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
@@ -101,6 +100,7 @@ public class SignupService {
                 .visitDate(visitDate)
                 .visitTime(visitTime)
                 .year(year)
+                .user(user)
                 .residence(residence)
                 .build();
     }

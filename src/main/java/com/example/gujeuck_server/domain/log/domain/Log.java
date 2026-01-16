@@ -59,7 +59,7 @@ public class Log {
     private String visitTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",  nullable = true)
     private User user;
 
 
