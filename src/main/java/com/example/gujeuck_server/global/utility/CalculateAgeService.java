@@ -14,7 +14,7 @@ public class CalculateAgeService {
 
         LocalDate birthDate = LocalDate.parse(birthYMD);
 
-        int koreanAge = birthDate.getYear() - LocalDate.now().getYear() + 1;
+        int koreanAge = LocalDate.now().getYear() - birthDate.getYear() + 1;
 
         return Age.from(koreanAge);
     }
