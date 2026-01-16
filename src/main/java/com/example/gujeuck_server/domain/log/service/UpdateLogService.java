@@ -28,31 +28,18 @@ public class UpdateLogService {
 
         Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
 
-        if(log.getUser() != null){
-            validateDuplicateLog(log.getUser().getUserId(), log.getVisitDate(), log.getVisitTime());
+//        validateDuplicateLog(log.getUser().getUserId(), log.getVisitDate(), log.getVisitTime());
 
-            log.updateLog(
-                    request.getName(),
-                    request.getAge(),
-                    request.getPhone(),
-                    request.getMaleCount(),
-                    request.getFemaleCount(),
-                    purpose.getPurposeName(),
-                    request.getVisitDate(),
-                    request.isPrivacyAgreed()
-            );
-        } else {
-            log.updateLog(
-                    request.getName(),
-                    request.getAge(),
-                    request.getPhone(),
-                    request.getMaleCount(),
-                    request.getFemaleCount(),
-                    purpose.getPurposeName(),
-                    request.getVisitDate(),
-                    request.isPrivacyAgreed()
-            );
-        }
+        log.updateLog(
+                request.getName(),
+                request.getAge(),
+                request.getPhone(),
+                request.getMaleCount(),
+                request.getFemaleCount(),
+                purpose.getPurposeName(),
+                request.getVisitDate(),
+                request.isPrivacyAgreed()
+        );
     }
 
     private void validateDuplicateLog(String userId, String visitDate, String visitTime) {
