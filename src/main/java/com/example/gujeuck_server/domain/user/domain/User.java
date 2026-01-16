@@ -47,6 +47,14 @@ public class User {
     @Column(nullable = false)
     private int count;
 
+    public void updateUser(String name, String userId, String phone, String birthYMD, String residence) {
+        this.name = name;
+        this.userId = userId;
+        this.phone = phone;
+        this.birthYMD = birthYMD;
+        this.residence = residence;
+    }
+
     public static String generateUserId(String name, String birthYMD) {
         String monthDay = birthYMD.substring(5).replace("-", "");
         return name + monthDay;

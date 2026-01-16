@@ -16,7 +16,7 @@ public class ReadAllPurposeService {
     @Transactional(readOnly = true)
     public List<PurposeResponse> readAll() {
 
-        return purposeRepository.findAll().stream()
+        return purposeRepository.findAllByOrderByPurposeIndexAsc().stream()
                 .map(PurposeResponse::from)
                 .toList();
     }

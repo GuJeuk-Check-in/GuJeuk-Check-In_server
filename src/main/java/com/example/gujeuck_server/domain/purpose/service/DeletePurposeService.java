@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class DeletePurposeService {
@@ -21,6 +23,14 @@ public class DeletePurposeService {
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 
+        int purposeIndex = purpose.getPurposeIndex();
+
         purposeRepository.delete(purpose);
+
+        List<Purpose> purposes = purposeRepository.findAllByPurposeIndexGreaterThan(purposeIndex);
+
+        for (Purpose p : purposes) {
+            p.setPurposeIndex(p.getPurposeIndex() - 1);
+        }
     }
 }

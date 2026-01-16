@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum Residence {
+
     GWANPYEONG_DONG("관평동"),
     GUJEOK_DONG("구즉동"),
     NOEUN_1_DONG("노은1동"),

@@ -5,6 +5,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,10 +15,12 @@ public class Purpose {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 30)
-    private String purpose;
+    @Column(name = "purpose", nullable = false, length = 30)
+    private String purposeName;
 
-    public void updatePurpose(String purpose) {
-        this.purpose = purpose;
+    private int purposeIndex;
+
+    public void updatePurpose(String purposeName) {
+        this.purposeName = purposeName;
     }
 }

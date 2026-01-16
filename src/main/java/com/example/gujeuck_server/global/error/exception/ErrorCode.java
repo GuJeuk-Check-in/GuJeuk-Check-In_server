@@ -28,6 +28,7 @@ public enum ErrorCode {
 
     // purpose
     PURPOSE_NOT_FOUND(404, "존재하지 않는 방문목적입니다."),
+    PURPOSE_ALREADY_EXIST(409, "이미 존재하는 방문 목적입니다."),
 
     //user
     USER_NOT_FOUND(404, "해당 유저가 존재 하지 않습니다."),

@@ -11,11 +11,10 @@ import java.time.LocalDate;
 public class CalculateAgeService {
 
     public Age getAge(String birthYMD) {
-        LocalDate birthDate = LocalDate.parse(birthYMD);
-        int birthYear = birthDate.getYear();
-        int currentYear = LocalDate.now().getYear();
 
-        int koreanAge = currentYear - birthYear + 1;
+        LocalDate birthDate = LocalDate.parse(birthYMD);
+
+        int koreanAge = LocalDate.now().getYear() - birthDate.getYear() + 1;
 
         return Age.from(koreanAge);
     }

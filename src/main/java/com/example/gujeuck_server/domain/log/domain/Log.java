@@ -19,7 +19,6 @@ import lombok.*;
                 )
         }
 )
-
 public class Log {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +31,7 @@ public class Log {
     @Column(nullable = false)
     private Age age;
 
+    @Column(nullable = false)
     private boolean privacyAgreed;
 
     @Column(nullable = false, length = 30)
@@ -40,10 +40,13 @@ public class Log {
     @Column(nullable = false, length = 20)
     private String phone;
 
+    @Column(nullable = false)
     private int maleCount;
 
+    @Column(nullable = false)
     private int femaleCount;
 
+    @Column(nullable = false)
     private String visitDate;
 
     @Column(nullable = false)
@@ -52,10 +55,11 @@ public class Log {
     @Column(length = 30)
     private String residence;
 
+    @Column(nullable = false)
     private String visitTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",  nullable = true)
     private User user;
 
 

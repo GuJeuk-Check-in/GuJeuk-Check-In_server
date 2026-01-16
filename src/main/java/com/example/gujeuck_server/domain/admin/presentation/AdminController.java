@@ -8,11 +8,14 @@ import com.example.gujeuck_server.domain.admin.service.CreateAdminService;
 import com.example.gujeuck_server.domain.admin.service.LogExcelOutPutService;
 import com.example.gujeuck_server.domain.admin.service.LoginAdminService;
 import com.example.gujeuck_server.domain.admin.service.ReissueService;
+import com.example.gujeuck_server.domain.user.presentation.dto.request.UpdateUserRequest;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDto;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDetailResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
+import com.example.gujeuck_server.domain.user.service.QueryUserDetailService;
 import com.example.gujeuck_server.domain.user.service.QueryUserListByResidenceService;
 import com.example.gujeuck_server.domain.user.service.QueryUserListService;
+import com.example.gujeuck_server.domain.user.service.UpdateUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,17 +38,29 @@ public class AdminController {
     private final ReissueService reissueService;
     private final QueryUserListService queryUserListService;
     private final QueryUserListByResidenceService queryUserListByResidenceService;
-
+    private final UpdateUserService updateUserService;
+    private final QueryUserDetailService queryUserDetailService;
+  
     @GetMapping("/user/all")
-    public SliceWithTotalResponse<UserDto> getAllUserList(
+    public SliceWithTotalResponse<UserInfoResponse> getAllUserList(
             @PageableDefault(size = 30, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         return queryUserListService.readAllUserList(pageable);
     }
 
     @GetMapping("/user")
-    public UserResponse getALlUserByResidenceList(@RequestParam String residence) {
-        return queryUserListByResidenceService.readAllUserListByResidence(residence);
+    public SliceWithTotalResponse<UserInfoResponse> getALlUserByResidenceList(@RequestParam String residence, Pageable pageable) {
+        return queryUserListByResidenceService.readAllUserListByResidence(residence, pageable);
+    }
+
+    @GetMapping("/user/{id}")
+    public UserDetailResponse getUserDetail(@PathVariable Long id) {
+        return queryUserDetailService.execute(id);
+    }
+
+    @PatchMapping("/user/{id}")
+    public void updateUser(@PathVariable Long id, @RequestBody @Valid UpdateUserRequest request) {
+        updateUserService.execute(id, request);
     }
 
     @PostMapping("/login")

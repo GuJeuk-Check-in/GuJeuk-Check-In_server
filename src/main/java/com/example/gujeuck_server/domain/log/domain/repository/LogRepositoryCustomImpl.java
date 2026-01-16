@@ -61,7 +61,5 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                         .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                         .fetchOne()
         );
-
     }
-
 }

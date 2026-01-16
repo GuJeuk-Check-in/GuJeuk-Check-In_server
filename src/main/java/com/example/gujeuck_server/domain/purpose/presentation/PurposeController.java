@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.purpose.presentation;
 
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeRequest;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.response.PurposeResponse;
+import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeMoveRequest;
 import com.example.gujeuck_server.domain.purpose.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class PurposeController {
     private final DeletePurposeService deletePurpose;
     private final ReadOnePurposeService readOnePurpose;
     private final ReadAllPurposeService readAllPurpose;
+    private final MovePurposeService movePurpose;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,5 +46,10 @@ public class PurposeController {
     @GetMapping("/all")
     public List<PurposeResponse> getAllPurpose() {
         return readAllPurpose.readAll();
+    }
+
+    @PatchMapping("/move")
+    public void movePurpose(@RequestBody PurposeMoveRequest PurposeMoveRequest) {
+        movePurpose.movementPurpose(PurposeMoveRequest);
     }
 }

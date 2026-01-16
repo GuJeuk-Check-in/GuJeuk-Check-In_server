@@ -17,6 +17,6 @@ public class ReadOnePurposeService {
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 
-        return new PurposeResponse(purpose.getId(), purpose.getPurpose());
+        return new PurposeResponse(purpose.getId(), purpose.getPurposeName());
     }
 }

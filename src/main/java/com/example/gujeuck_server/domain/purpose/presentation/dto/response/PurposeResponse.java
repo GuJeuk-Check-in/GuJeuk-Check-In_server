@@ -11,7 +11,7 @@ public record PurposeResponse(
     public static PurposeResponse from(Purpose purpose) {
         return PurposeResponse.builder()
                 .id(purpose.getId())
-                .purpose(purpose.getPurpose())
+                .purpose(purpose.getPurposeName())
                 .build();
     }
 }
