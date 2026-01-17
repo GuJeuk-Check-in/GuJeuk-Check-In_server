@@ -2,14 +2,18 @@ package com.example.gujeuck_server.domain.log.service;
 
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.log.exception.LogNotFountException;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
+import com.example.gujeuck_server.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +42,18 @@ public class QueryLogListByDateService {
 
     private String toYearMonthPrefix(String yearMonth) {
         String[] parts = yearMonth.split("-");
+        LocalDate now = LocalDate.now();
 
         String year = parts[0];
         String month = parts[1];
+
+        if (!yearMonth.matches("\\d{4}-\\d{2}")) {
+            throw LogNotFountException.EXCEPTION;
+        }
+
+        if(Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1 || Integer.parseInt(year) > now.getYear()) {
+            throw LogNotFountException.EXCEPTION;
+        }
 
         return year + "년" + month + "월";
     }
