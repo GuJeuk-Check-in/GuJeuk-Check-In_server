@@ -19,7 +19,7 @@ public class QueryUserListService {
     private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
-    public UserSliceWithTotalResponse<UserInfoResponse> readAllUserList(Pageable p) {
+    public UserSliceWithTotalResponse readAllUserList(Pageable p) {
         adminFacade.currentUser();
 
         Pageable pageable = PageRequest.of(
@@ -33,6 +33,6 @@ public class QueryUserListService {
         Slice<UserInfoResponse> slice = userRepository.findAllBy(pageable)
                 .map(UserInfoResponse::from);
 
-        return new UserSliceWithTotalResponse<>(total, slice);
+        return new UserSliceWithTotalResponse(total, slice);
     }
 }

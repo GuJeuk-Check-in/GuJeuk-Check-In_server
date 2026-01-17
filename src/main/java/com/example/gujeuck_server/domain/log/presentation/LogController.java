@@ -51,7 +51,7 @@ public class LogController {
     }
 
     @GetMapping("/date/{date}")
-    public LogSliceWithTotalResponse<QueryLogListResponse> queryLogListByDate(@PathVariable("date") String date, Pageable pageable) {
+    public LogSliceWithTotalResponse queryLogListByDate(@PathVariable("date") String date, Pageable pageable) {
         return queryLogListByDateService.queryLogListByResidence(date, pageable);
     }
 }

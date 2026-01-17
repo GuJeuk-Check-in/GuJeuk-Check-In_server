@@ -28,7 +28,7 @@ public class QueryUserListByResidenceService {
     private static final String ETC = "기타";
 
     @Transactional(readOnly = true)
-    public UserSliceWithTotalResponse<UserInfoResponse> readAllUserListByResidence(String residence, Pageable p) {
+    public UserSliceWithTotalResponse readAllUserListByResidence(String residence, Pageable p) {
 
         adminFacade.currentUser();
 
@@ -50,7 +50,7 @@ public class QueryUserListByResidenceService {
             Slice<UserInfoResponse> slice = userRepository.findByResidenceNotIn(registeredResidences, pageable)
                     .map(UserInfoResponse::from);
 
-            return new UserSliceWithTotalResponse<>(total, slice);
+            return new UserSliceWithTotalResponse(total, slice);
         }
 
         Residence matched = Residence.fromKoreanName(data);
@@ -62,7 +62,7 @@ public class QueryUserListByResidenceService {
             Slice<UserInfoResponse> slice = userRepository.findByResidence(kr, pageable)
                     .map(UserInfoResponse::from);
 
-            return new UserSliceWithTotalResponse<>(total, slice);
+            return new UserSliceWithTotalResponse(total, slice);
         }
 
         throw InvalidResidenceException.EXCEPTION;

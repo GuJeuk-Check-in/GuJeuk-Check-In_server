@@ -17,7 +17,7 @@ public class QueryLogListByDateService {
     private final LogRepository logRepository;
     private final AdminFacade  adminFacade;
 
-    public LogSliceWithTotalResponse<QueryLogListResponse> queryLogListByResidence(String yearMonth, Pageable p) {
+    public LogSliceWithTotalResponse queryLogListByResidence(String yearMonth, Pageable p) {
         adminFacade.currentUser();
 
         Pageable pageable = PageRequest.of(
@@ -33,7 +33,7 @@ public class QueryLogListByDateService {
 
         long total = logRepository.countByYearMonth(date);
 
-        return new LogSliceWithTotalResponse<>(total, slice);
+        return new LogSliceWithTotalResponse(total, slice);
     }
 
     public static String toYearMonthPrefix(String yearMonth) {
