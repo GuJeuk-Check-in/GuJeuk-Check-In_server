@@ -36,7 +36,7 @@ public class QueryLogListByDateService {
         return new LogSliceWithTotalResponse(total, slice);
     }
 
-    public static String toYearMonthPrefix(String yearMonth) {
+    private String toYearMonthPrefix(String yearMonth) {
         String[] parts = yearMonth.split("-");
 
         String year = parts[0];
