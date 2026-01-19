@@ -8,11 +8,10 @@ public record UserDetailResponse(
         String name,
         String userId,
         String phone,
-        Gender gender,
         String birthYMD,
         String residence
 ) {
     public static UserDetailResponse from(User user) {
-        return new UserDetailResponse(user.getName(), user.getUserId(), user.getPhone(), user.getGender(), user.getBirthYMD(), user.getResidence());
+        return new UserDetailResponse(user.getName(), user.getUserId(), user.getPhone(), user.getBirthYMD(), user.getResidence());
     }
 }

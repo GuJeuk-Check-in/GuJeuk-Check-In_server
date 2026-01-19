@@ -28,7 +28,7 @@ public class UpdateLogService {
 
         Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
 
-        validateDuplicateLog(log.getUser().getUserId(), log.getVisitDate(), log.getVisitTime());
+//        validateDuplicateLog(log.getUser().getUserId(), log.getVisitDate(), log.getVisitTime());
 
         log.updateLog(
                 request.getName(),
