@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.log.domain;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.global.entity.BaseIdEntity;
@@ -60,6 +61,9 @@ public class Log extends BaseIdEntity {
     @JoinColumn(name = "user_id",  nullable = true)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Admin admin;
 
     public void updateLog(String name, Age age, String phone, int maleCount, int femaleCount, String purpose, String visitDate, boolean privacyAgreed) {
         this.name = name;

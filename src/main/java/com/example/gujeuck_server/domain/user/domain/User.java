@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.user.domain;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 import com.example.gujeuck_server.domain.user.domain.enums.Residence;
@@ -44,6 +45,10 @@ public class User extends BaseIdEntity {
 
     @Column(nullable = false)
     private int count;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Admin admin;
 
     public void updateUser(String name, String userId, String phone, String birthYMD, String residence) {
         this.name = name;
