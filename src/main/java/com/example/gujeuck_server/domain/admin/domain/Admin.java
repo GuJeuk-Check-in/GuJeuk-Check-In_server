@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Admin extends BaseIdEntity {
 
+    @Column(nullable = false)
+    private String organName;
+
     @Column(nullable = false, length = 100)
     private String password;
 
