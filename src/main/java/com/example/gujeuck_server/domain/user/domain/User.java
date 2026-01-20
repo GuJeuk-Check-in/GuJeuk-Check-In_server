@@ -3,6 +3,7 @@ package com.example.gujeuck_server.domain.user.domain;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 import com.example.gujeuck_server.domain.user.domain.enums.Residence;
+import com.example.gujeuck_server.global.entity.BaseIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,10 +12,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User extends BaseIdEntity {
 
     @Column(nullable = false, unique = true, length = 30)
     private String userId;

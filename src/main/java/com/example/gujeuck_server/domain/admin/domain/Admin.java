@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.admin.domain;
 
+import com.example.gujeuck_server.global.entity.BaseIdEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Admin {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Admin extends BaseIdEntity {
 
     @Column(nullable = false, length = 100)
     private String password;

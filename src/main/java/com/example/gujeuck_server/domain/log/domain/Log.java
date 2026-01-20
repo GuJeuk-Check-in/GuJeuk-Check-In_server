@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.log.domain;
 
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
+import com.example.gujeuck_server.global.entity.BaseIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,10 +20,7 @@ import lombok.*;
                 )
         }
 )
-public class Log {
-
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Log extends BaseIdEntity {
 
     @Column(nullable = false)
     private String purpose;
