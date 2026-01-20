@@ -7,7 +7,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 
 public class ExcelGenerator { // 이건 엑셀 파일 내용 관련한 클래스
@@ -148,19 +147,4 @@ public class ExcelGenerator { // 이건 엑셀 파일 내용 관련한 클래스
         sheet.setColumnWidth(8, 6000);
         sheet.setColumnWidth(9, 5000);
     }
-
-
-    private static String formatFullDate(String visitDate) {
-        int currentYear = LocalDate.now().getYear();
-
-        if (visitDate.contains("월")) {
-            return currentYear + "년" + visitDate;
-        } else if (visitDate.contains("-")) {
-            String[] parts = visitDate.split("-");
-            return String.format("%d년%s월%s일", currentYear, parts[0], parts[1]);
-        } else {
-            return currentYear + "년 " + visitDate;
-        }
-    }
-
 }
