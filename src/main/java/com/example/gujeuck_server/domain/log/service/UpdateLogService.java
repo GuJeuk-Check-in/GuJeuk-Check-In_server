@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.facade.LogFacade;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
@@ -17,7 +16,6 @@ public class UpdateLogService {
     private final LogFacade logFacade;
     private final AdminFacade adminFacade;
     private final PurposeFacade purposeFacade;
-    private final LogRepository logRepository;
 
     @Transactional
     public void execute(Long logId, LogRequest request) {
