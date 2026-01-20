@@ -9,7 +9,7 @@ import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.SignupResponse;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
 import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +32,9 @@ public class SignupService {
     private static final String TIME = "HH:mm";
 
     @Transactional
-    public SignUpResponse signup(SignupRequest request) {
+    public SignupResponse signup(SignupRequest request) {
 
-        SignUpResponse signupResponse = createUserId(request.getName(), request.getBirthYMD());
+        SignupResponse signupResponse = createUserId(request.getName(), request.getBirthYMD());
 
         Age age = calculateAgeService.getAge(request.getBirthYMD());
 
@@ -61,7 +61,7 @@ public class SignupService {
         return signupResponse;
     }
 
-    private SignUpResponse createUserId(String name, String birthYMD) {
+    private SignupResponse createUserId(String name, String birthYMD) {
 
         String userId = User.generateUserId(name, birthYMD);
 
@@ -69,7 +69,7 @@ public class SignupService {
             throw ExistUserIdException.EXCEPTION;
         }
 
-        return SignUpResponse.builder()
+        return SignupResponse.builder()
                 .userId(userId)
                 .build();
     }
