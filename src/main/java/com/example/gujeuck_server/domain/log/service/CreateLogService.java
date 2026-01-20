@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.log.service;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.domain.Log;
@@ -30,7 +31,7 @@ public class CreateLogService {
     @Transactional
     public void execute(LogRequest request) {
 
-        adminFacade.currentUser();
+        Admin admin = adminFacade.currentUser();
 
         String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
 
@@ -40,7 +41,7 @@ public class CreateLogService {
 
         String formattedDate = resolveVisitDate(request.getVisitDate());
 
-        Log log = createUseLog(request, purpose, formattedDate, visitTime, currentYear);
+        Log log = createUseLog(request, purpose, formattedDate, visitTime, currentYear, admin);
         logRepository.save(log);
     }
 
@@ -67,7 +68,8 @@ public class CreateLogService {
             Purpose purpose,
             String date,
             String time,
-            int year
+            int year,
+            Admin admin
     ) {
         return Log.builder()
                 .name(request.getName())
@@ -80,6 +82,7 @@ public class CreateLogService {
                 .visitDate(date)
                 .year(year)
                 .privacyAgreed(request.isPrivacyAgreed())
+                .admin(admin)
                 .build();
     }
 }
