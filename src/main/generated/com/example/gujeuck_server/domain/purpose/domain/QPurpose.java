@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -17,24 +18,40 @@ public class QPurpose extends EntityPathBase<Purpose> {
 
     private static final long serialVersionUID = 1447514367L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QPurpose purpose = new QPurpose("purpose");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final com.example.gujeuck_server.global.entity.QBaseIdEntity _super = new com.example.gujeuck_server.global.entity.QBaseIdEntity(this);
+
+    public final com.example.gujeuck_server.domain.admin.domain.QAdmin admin;
+
+    //inherited
+    public final NumberPath<Long> id = _super.id;
 
     public final NumberPath<Integer> purposeIndex = createNumber("purposeIndex", Integer.class);
 
     public final StringPath purposeName = createString("purposeName");
 
     public QPurpose(String variable) {
-        super(Purpose.class, forVariable(variable));
+        this(Purpose.class, forVariable(variable), INITS);
     }
 
     public QPurpose(Path<? extends Purpose> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QPurpose(PathMetadata metadata) {
-        super(Purpose.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QPurpose(PathMetadata metadata, PathInits inits) {
+        this(Purpose.class, metadata, inits);
+    }
+
+    public QPurpose(Class<? extends Purpose> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.admin = inits.isInitialized("admin") ? new com.example.gujeuck_server.domain.admin.domain.QAdmin(forProperty("admin")) : null;
     }
 
 }

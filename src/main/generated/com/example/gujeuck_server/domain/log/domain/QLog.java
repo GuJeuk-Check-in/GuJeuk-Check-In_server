@@ -22,11 +22,16 @@ public class QLog extends EntityPathBase<Log> {
 
     public static final QLog log = new QLog("log");
 
+    public final com.example.gujeuck_server.global.entity.QBaseIdEntity _super = new com.example.gujeuck_server.global.entity.QBaseIdEntity(this);
+
+    public final com.example.gujeuck_server.domain.admin.domain.QAdmin admin;
+
     public final EnumPath<com.example.gujeuck_server.domain.user.domain.enums.Age> age = createEnum("age", com.example.gujeuck_server.domain.user.domain.enums.Age.class);
 
     public final NumberPath<Integer> femaleCount = createNumber("femaleCount", Integer.class);
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    //inherited
+    public final NumberPath<Long> id = _super.id;
 
     public final NumberPath<Integer> maleCount = createNumber("maleCount", Integer.class);
 
@@ -66,7 +71,8 @@ public class QLog extends EntityPathBase<Log> {
 
     public QLog(Class<? extends Log> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new com.example.gujeuck_server.domain.user.domain.QUser(forProperty("user")) : null;
+        this.admin = inits.isInitialized("admin") ? new com.example.gujeuck_server.domain.admin.domain.QAdmin(forProperty("admin")) : null;
+        this.user = inits.isInitialized("user") ? new com.example.gujeuck_server.domain.user.domain.QUser(forProperty("user"), inits.get("user")) : null;
     }
 
 }

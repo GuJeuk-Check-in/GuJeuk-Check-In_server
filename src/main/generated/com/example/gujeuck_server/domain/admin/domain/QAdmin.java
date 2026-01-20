@@ -19,7 +19,12 @@ public class QAdmin extends EntityPathBase<Admin> {
 
     public static final QAdmin admin = new QAdmin("admin");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final com.example.gujeuck_server.global.entity.QBaseIdEntity _super = new com.example.gujeuck_server.global.entity.QBaseIdEntity(this);
+
+    //inherited
+    public final NumberPath<Long> id = _super.id;
+
+    public final StringPath organName = createString("organName");
 
     public final StringPath password = createString("password");
 
