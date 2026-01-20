@@ -5,7 +5,6 @@ import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.exception.LogNotFountException;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
-import com.example.gujeuck_server.global.error.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +36,10 @@ public class QueryLogListByDateService {
 
         long total = logRepository.countByYearMonth(date);
 
-        return new LogSliceWithTotalResponse(total, slice);
+        return LogSliceWithTotalResponse.builder()
+                .slice(slice)
+                .totalCount(total)
+                .build();
     }
 
     private String toYearMonthPrefix(String yearMonth) {
