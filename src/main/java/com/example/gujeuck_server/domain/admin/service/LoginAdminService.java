@@ -21,6 +21,6 @@ public class LoginAdminService {
         Admin admin = adminRepository.findByPassword(request.getPassword())
                 .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
 
-        return jwtTokenProvider.receiveToken(request.getPassword());
+        return jwtTokenProvider.receiveToken(admin.getPassword());
     }
 }
