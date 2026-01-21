@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.user.service;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
@@ -21,18 +22,19 @@ public class UpdateUserService {
 
     @Transactional
     public void execute(Long id, UpdateUserRequest request) {
-        adminFacade.currentUser();
+        Admin admin = adminFacade.currentUser();
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
-        userRepository.findByUserId(request.userId())
+        userRepository.findByUserIdAndAdminId(request.userId(), admin.getId())
                 .filter(existUser -> !existUser.getId().equals(id))
                 .ifPresent(existUser -> {
                     throw ExistUserIdException.EXCEPTION;
                 });
 
         Age age = calculateAgeService.getAge(request.birthYMD());
+
         user.updateUser(request.name(), request.userId(), request.phone(), request.birthYMD(), request.residence());
     }
 }
