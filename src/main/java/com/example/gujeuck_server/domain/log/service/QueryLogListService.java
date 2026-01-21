@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.log.service;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
@@ -19,7 +20,7 @@ public class QueryLogListService {
 
     @Transactional(readOnly = true)
     public Slice<QueryLogListResponse> execute(Pageable p) {
-        adminFacade.currentUser();
+        Admin admin = adminFacade.currentUser();
 
          Pageable pageable = PageRequest.of(
                 p.getPageNumber(),
@@ -28,7 +29,7 @@ public class QueryLogListService {
                         .and(Sort.by(Sort.Direction.DESC, "id"))
                 );
 
-        return logRepository.findAllBy(pageable)
+        return logRepository.findAllByAdmin(pageable, admin.getId())
                 .map(QueryLogListResponse::from);
     }
 }
