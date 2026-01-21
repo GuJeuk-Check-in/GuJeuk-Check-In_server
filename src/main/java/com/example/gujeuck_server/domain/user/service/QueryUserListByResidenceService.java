@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.user.service;
 
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
@@ -30,7 +31,7 @@ public class QueryUserListByResidenceService {
     @Transactional(readOnly = true)
     public SliceWithTotalResponse<UserInfoResponse> readAllUserListByResidence(String residence, Pageable p) {
 
-        adminFacade.currentUser();
+        Admin admin = adminFacade.currentUser();
 
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),
@@ -45,9 +46,9 @@ public class QueryUserListByResidenceService {
                     .map(Residence::getKoreanName)
                     .toList();
 
-            long total = userRepository.countByResidenceNotIn(registeredResidences);
+            long total = userRepository.countByAdminIdAndResidenceNotIn(admin.getId(), registeredResidences);
 
-            Slice<UserInfoResponse> slice = userRepository.findByResidenceNotIn(registeredResidences, pageable)
+            Slice<UserInfoResponse> slice = userRepository.findByAdminIdAndResidenceNotIn(admin.getId(), registeredResidences, pageable)
                     .map(UserInfoResponse::from);
 
             return new SliceWithTotalResponse<>(total, slice);
@@ -57,9 +58,9 @@ public class QueryUserListByResidenceService {
 
         if (matched != null) {
             String kr = matched.getKoreanName();
-            long total = userRepository.countByResidence(kr);
+            long total = userRepository.countByResidenceAndAdminId(kr, admin.getId());
 
-            Slice<UserInfoResponse> slice = userRepository.findByResidence(kr, pageable)
+            Slice<UserInfoResponse> slice = userRepository.findByResidenceAndAdminId(kr, admin.getId(), pageable)
                     .map(UserInfoResponse::from);
 
             return new SliceWithTotalResponse<>(total, slice);

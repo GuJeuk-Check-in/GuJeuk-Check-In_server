@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.user.service;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
@@ -20,7 +21,7 @@ public class QueryUserListService {
 
     @Transactional(readOnly = true)
     public SliceWithTotalResponse<UserInfoResponse> readAllUserList(Pageable p) {
-        adminFacade.currentUser();
+        Admin admin = adminFacade.currentUser();
 
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),
@@ -30,7 +31,7 @@ public class QueryUserListService {
 
         long total = userRepository.count();
 
-        Slice<UserInfoResponse> slice = userRepository.findAllBy(pageable)
+        Slice<UserInfoResponse> slice = userRepository.findAllByAdminId(pageable, admin.getId())
                 .map(UserInfoResponse::from);
 
         return new SliceWithTotalResponse<>(total, slice);

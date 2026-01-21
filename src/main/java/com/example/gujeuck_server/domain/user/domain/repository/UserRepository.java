@@ -11,13 +11,13 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     Boolean existsByUserId(String userId);
 
-    Slice<User> findByResidence(String residence, Pageable pageable);
+    Slice<User> findByResidenceAndAdminId(String residence, Long adminId, Pageable pageable);
 
-    Slice<User> findByResidenceNotIn (List<String> residences, Pageable pageable);
+    Slice<User> findByAdminIdAndResidenceNotIn (Long adminId, List<String> residences, Pageable pageable);
 
     Slice<User> findAllByAdminId(Pageable pageable, Long adminId);
 
     long countByResidenceAndAdminId(String residence, Long adminId);
 
-    long countByResidenceNotIn(List<String> residences);
+    long countByAdminIdAndResidenceNotIn(Long adminId, List<String> residences);
 }
