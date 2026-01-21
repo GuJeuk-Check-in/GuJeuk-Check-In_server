@@ -6,6 +6,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 
@@ -20,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
     long countByResidenceAndAdminId(String residence, Long adminId);
 
     long countByAdminIdAndResidenceNotIn(Long adminId, List<String> residences);
+
+    Optional<User> findByUserId(String userId);
 }

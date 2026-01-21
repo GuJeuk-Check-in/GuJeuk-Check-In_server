@@ -11,13 +11,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-    private final QUser qUser = QUser.user;
 
     @Override
-    public Optional<User> findByUserId(String userId) {
+    public Optional<User> findByUserIdAndAdminId(String userId, Long adminId) {
         return Optional.ofNullable(queryFactory
-                .selectFrom(qUser)
-                .where(qUser.userId.eq(userId))
+                .selectFrom(QUser.user)
+                .where(QUser.user.userId.eq(userId), QUser.user.admin.id.eq(adminId))
                 .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                 .fetchOne()
         );
