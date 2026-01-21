@@ -37,6 +37,7 @@ public enum ErrorCode {
     INVALID_USER(401, "유효 하지 않은 사용자입니다."),
     USER_EXIST(401, "유저가 이미 존재합니다."),
     COMPANION_NOT_FOUND(404, "존재하지 않는 동행인 ID입니다."),
+    USER_ACCESS_DENIED(403, "해당 유저에 관한 권한이 없습니다."),
 
     //admin
     ADMIN_NOT_FOUND(404, "해당 관리자 계정이 존재하지 않습니다."),
