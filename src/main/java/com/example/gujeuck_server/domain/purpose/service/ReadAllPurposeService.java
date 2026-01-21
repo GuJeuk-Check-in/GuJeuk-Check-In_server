@@ -21,7 +21,7 @@ public class ReadAllPurposeService {
 
         Admin admin = adminFacade.currentUser();
 
-        return purposeRepository.findAllByOrderByPurposeIndexAscAdmin(admin.getId()).stream()
+        return purposeRepository.findAllByAdminIdOrderByPurposeIndexAsc(admin.getId()).stream()
                 .map(PurposeResponse::from)
                 .toList();
     }

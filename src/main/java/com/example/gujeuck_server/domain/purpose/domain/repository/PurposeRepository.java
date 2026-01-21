@@ -11,7 +11,7 @@ public interface PurposeRepository extends JpaRepository<Purpose, Long>, Purpose
 
     Optional<Purpose> findByPurposeName(String purposeName);
 
-    List<Purpose> findAllByOrderByPurposeIndexAscAdmin(Long adminId);
+    List<Purpose> findAllByAdminIdOrderByPurposeIndexAsc(Long adminId);
 
     List<Purpose> findAllByPurposeIndexGreaterThan(int purposeIndex);
 }

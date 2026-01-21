@@ -29,7 +29,7 @@ public class QueryLogListService {
                         .and(Sort.by(Sort.Direction.DESC, "id"))
                 );
 
-        return logRepository.findAllByAdmin(pageable, admin.getId())
+        return logRepository.findAllByAdminId(pageable, admin.getId())
                 .map(QueryLogListResponse::from);
     }
 }
