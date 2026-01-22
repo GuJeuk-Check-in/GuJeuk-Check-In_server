@@ -1,8 +1,8 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeAlreadyExistException;
-import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeRequest;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
@@ -18,18 +18,19 @@ public class CreatePurposeService {
 
     @Transactional
     public void execute(PurposeRequest request) {
-        adminFacade.currentUser();
+        Admin admin = adminFacade.currentUser();
 
         if(purposeRepository.findByPurposeName(request.getPurpose()).isPresent()) {
             throw PurposeAlreadyExistException.EXCEPTION;
         }
         
-        int purposeIndex = purposeRepository.findMaxPurposeIndex() + 1;
+        int purposeIndex = purposeRepository.findMaxPurposeIndexByAdminId(admin.getId()) + 1;
 
         purposeRepository.save(
                 Purpose.builder()
                         .purposeName(request.getPurpose())
                         .purposeIndex(purposeIndex)
+                        .admin(admin)
                         .build()
         );
     }

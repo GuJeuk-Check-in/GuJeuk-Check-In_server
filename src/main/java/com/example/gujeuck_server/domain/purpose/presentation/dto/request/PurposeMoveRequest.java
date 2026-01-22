@@ -6,5 +6,6 @@ import java.util.List;
 
 @Getter
 public class PurposeMoveRequest {
+
     private List<Long> purposeId;
 }

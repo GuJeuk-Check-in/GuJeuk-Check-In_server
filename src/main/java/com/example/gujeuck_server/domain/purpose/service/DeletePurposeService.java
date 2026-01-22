@@ -33,7 +33,7 @@ public class DeletePurposeService {
 
         purposeRepository.delete(purpose);
 
-        List<Purpose> purposes = purposeRepository.findAllByPurposeIndexGreaterThan(purposeIndex);
+        List<Purpose> purposes = purposeRepository.findAllByAdminIdAndPurposeIndexGreaterThan(admin.getId(), purposeIndex);
 
         for (Purpose p : purposes) {
             p.setPurposeIndex(p.getPurposeIndex() - 1);
