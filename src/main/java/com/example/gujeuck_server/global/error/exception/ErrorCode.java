@@ -18,6 +18,7 @@ public enum ErrorCode {
     //log
     LOG_NOT_FOUND(404, "존재하지 않는 이용목록입니다."),
     DUPLICATE_LOG(409, "이미 해당 시간의 로그가 존재합니다."),
+    LOG_ACCESS_DENIED(403, "해당 방문 기록에 관한 권한이 없습니다."),
 
     //residence
     INVALID_RESIDENCE(400, "존재하지 않는 거주지 이름입니다."),
