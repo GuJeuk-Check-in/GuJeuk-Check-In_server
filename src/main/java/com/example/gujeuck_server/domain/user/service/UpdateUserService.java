@@ -23,7 +23,7 @@ public class UpdateUserService {
 
     @Transactional
     public void execute(Long id, UpdateUserRequest request) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);

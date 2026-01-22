@@ -18,7 +18,7 @@ public class QueryLogDetailService {
 
     @Transactional(readOnly = true)
     public QueryLogDetailResponse execute(Long logId) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         Log log = logFacade.getLogById(logId);
 

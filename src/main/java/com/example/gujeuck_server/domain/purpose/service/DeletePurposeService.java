@@ -21,7 +21,7 @@ public class DeletePurposeService {
 
     @Transactional
     public void execute(Long id) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 

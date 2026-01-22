@@ -21,7 +21,7 @@ public class QueryUserListService {
 
     @Transactional(readOnly = true)
     public SliceWithTotalResponse<UserInfoResponse> execute(Pageable p) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),

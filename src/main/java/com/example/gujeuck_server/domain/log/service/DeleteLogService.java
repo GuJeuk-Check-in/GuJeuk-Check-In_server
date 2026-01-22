@@ -19,7 +19,7 @@ public class DeleteLogService {
 
     @Transactional
     public void execute(Long logId) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         Log log = logFacade.getLogById(logId);
 

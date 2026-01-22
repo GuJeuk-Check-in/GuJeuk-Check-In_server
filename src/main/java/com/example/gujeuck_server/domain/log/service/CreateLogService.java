@@ -31,7 +31,7 @@ public class CreateLogService {
     @Transactional
     public void execute(LogRequest request) {
 
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
 

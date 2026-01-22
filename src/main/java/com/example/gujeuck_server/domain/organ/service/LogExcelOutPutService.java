@@ -38,7 +38,7 @@ public class LogExcelOutPutService {
             DateTimeFormatter.ofPattern("yyyy년MM월");
 
     public ResponseEntity<byte[]> execute(String yearMonth) {
-        organFacade.currentUser();
+        organFacade.currentOrgan();
 
         try {
             String visitDatePrefix = toVisitDatePrefix(yearMonth);

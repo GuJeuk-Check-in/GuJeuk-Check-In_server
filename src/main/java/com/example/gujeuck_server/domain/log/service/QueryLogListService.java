@@ -20,7 +20,7 @@ public class QueryLogListService {
 
     @Transactional(readOnly = true)
     public Slice<QueryLogListResponse> execute(Pageable p) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
          Pageable pageable = PageRequest.of(
                 p.getPageNumber(),

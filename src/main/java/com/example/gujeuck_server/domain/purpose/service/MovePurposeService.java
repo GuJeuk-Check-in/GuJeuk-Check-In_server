@@ -23,7 +23,7 @@ public class MovePurposeService {
 
     @Transactional
     public void execute(PurposeMoveRequest purposeMoveRequest) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         List<Long> purposesId = purposeMoveRequest.getPurposeId();
         List<Purpose> purposes = purposeRepository.findAllById(purposeMoveRequest.getPurposeId());

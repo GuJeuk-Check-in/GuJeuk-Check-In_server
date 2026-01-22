@@ -18,7 +18,7 @@ public class CreatePurposeService {
 
     @Transactional
     public void execute(PurposeRequest request) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         if(purposeRepository.findByPurposeName(request.getPurpose()).isPresent()) {
             throw PurposeAlreadyExistException.EXCEPTION;

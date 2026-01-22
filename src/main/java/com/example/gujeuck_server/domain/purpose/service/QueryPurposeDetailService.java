@@ -18,7 +18,7 @@ public class QueryPurposeDetailService {
 
     @Transactional(readOnly = true)
     public PurposeResponse execute(Long id) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 

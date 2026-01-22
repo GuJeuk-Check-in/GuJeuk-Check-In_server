@@ -37,7 +37,7 @@ public class SignupService {
     @Transactional
     public SignupResponse execute(SignupRequest request) {
 
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         SignupResponse signupResponse = createUserId(organ.getId(), request.getName(), request.getBirthYMD());
 

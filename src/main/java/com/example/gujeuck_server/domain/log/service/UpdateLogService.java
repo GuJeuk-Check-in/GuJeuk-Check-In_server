@@ -21,7 +21,7 @@ public class UpdateLogService {
 
     @Transactional
     public void execute(Long logId, LogRequest request) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         Log log = logFacade.getLogById(logId);
 

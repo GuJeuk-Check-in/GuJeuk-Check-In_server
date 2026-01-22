@@ -31,7 +31,7 @@ public class QueryUserListByResidenceService {
     @Transactional(readOnly = true)
     public SliceWithTotalResponse<UserInfoResponse> execute(String residence, Pageable p) {
 
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),

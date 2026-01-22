@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class OrganFacade {
     private final OrganRepository organRepository;
 
-    public Organ currentUser() {
+    public Organ currentOrgan() {
         String password = SecurityContextHolder.getContext().getAuthentication().getName();
 
         return organRepository.findByPassword(password)

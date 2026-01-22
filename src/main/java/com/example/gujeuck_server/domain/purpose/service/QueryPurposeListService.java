@@ -19,7 +19,7 @@ public class QueryPurposeListService {
     @Transactional(readOnly = true)
     public List<PurposeResponse> execute() {
 
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         return purposeRepository.findAllByOrganIdOrderByPurposeIndexAsc(organ.getId()).stream()
                 .map(PurposeResponse::from)

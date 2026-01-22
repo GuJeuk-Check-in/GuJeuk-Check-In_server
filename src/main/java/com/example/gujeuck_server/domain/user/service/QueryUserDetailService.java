@@ -19,7 +19,7 @@ public class QueryUserDetailService {
 
     @Transactional(readOnly = true)
     public UserDetailResponse execute(Long id) {
-        Organ organ = organFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
