@@ -17,7 +17,7 @@ public class UpdatePurposeService {
     private final PurposeFacade purposeFacade;
 
     @Transactional
-    public void updatePurpose(Long id, PurposeRequest purposeRequest) {
+    public void execute(Long id, PurposeRequest purposeRequest) {
         Admin admin = adminFacade.currentUser();
 
         Purpose purpose = purposeFacade.getPurposeById(id);

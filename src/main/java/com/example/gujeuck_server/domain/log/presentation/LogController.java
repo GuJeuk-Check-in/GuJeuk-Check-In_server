@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class LogController {
-    private final CreateLogService createUseListService;
+    private final CreateLogService createLogService;
     private final QueryLogListService queryLogListService;
     private final DeleteLogService deleteLogService;
     private final UpdateLogService updateLogService;
@@ -24,7 +24,7 @@ public class LogController {
 
     @PostMapping
     public void createLog(@RequestBody @Valid LogRequest request) {
-        createUseListService.execute(request);
+        createLogService.execute(request);
     }
 
     @DeleteMapping("/{log-id}")

@@ -25,7 +25,7 @@ public class LoginUserService {
     private static final String TIME = "HH:mm";
 
     @Transactional
-    public void login(LoginRequest request) {
+    public void execute(LoginRequest request) {
 
         User user = userRepository.findByUserId(request.getUserId())
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);

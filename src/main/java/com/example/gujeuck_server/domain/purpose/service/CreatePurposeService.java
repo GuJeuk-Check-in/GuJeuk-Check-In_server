@@ -17,7 +17,7 @@ public class CreatePurposeService {
     private final AdminFacade adminFacade;
 
     @Transactional
-    public void createPurpose(PurposeRequest request) {
+    public void execute(PurposeRequest request) {
         adminFacade.currentUser();
 
         if(purposeRepository.findByPurposeName(request.getPurpose()).isPresent()) {

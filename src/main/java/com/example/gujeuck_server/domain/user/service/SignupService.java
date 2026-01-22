@@ -35,7 +35,7 @@ public class SignupService {
     private static final String TIME = "HH:mm";
 
     @Transactional
-    public SignupResponse signup(SignupRequest request) {
+    public SignupResponse execute(SignupRequest request) {
 
         Admin admin = adminFacade.currentUser();
 

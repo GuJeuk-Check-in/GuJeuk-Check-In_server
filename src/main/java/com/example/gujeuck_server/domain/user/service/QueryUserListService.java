@@ -20,7 +20,7 @@ public class QueryUserListService {
     private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
-    public SliceWithTotalResponse<UserInfoResponse> readAllUserList(Pageable p) {
+    public SliceWithTotalResponse<UserInfoResponse> execute(Pageable p) {
         Admin admin = adminFacade.currentUser();
 
         Pageable pageable = PageRequest.of(

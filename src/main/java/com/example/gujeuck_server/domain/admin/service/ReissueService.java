@@ -13,7 +13,7 @@ public class ReissueService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public TokenResponse reissue(Authentication authentication) {
+    public TokenResponse execute(Authentication authentication) {
         return jwtTokenProvider.receiveToken(authentication.getName());
     }
 }

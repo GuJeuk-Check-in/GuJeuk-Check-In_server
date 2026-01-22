@@ -22,7 +22,7 @@ public class MovePurposeService {
     private final AdminFacade adminFacade;
 
     @Transactional
-    public void movementPurpose(PurposeMoveRequest purposeMoveRequest) {
+    public void execute(PurposeMoveRequest purposeMoveRequest) {
         Admin admin = adminFacade.currentUser();
 
         List<Long> purposesId = purposeMoveRequest.getPurposeId();

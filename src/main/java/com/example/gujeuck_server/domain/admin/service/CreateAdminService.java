@@ -13,7 +13,7 @@ public class CreateAdminService {
     private final AdminRepository adminRepository;
 
     @Transactional
-    public void createAdmin(AdminRequest request) {
+    public void execute(AdminRequest request) {
 
         adminRepository.save(Admin.builder()
                         .password(request.getPassword())

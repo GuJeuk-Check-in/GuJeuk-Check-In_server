@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class ReadOnePurposeService {
+public class QueryPurposeDetailService {
     private final PurposeFacade purposeFacade;
     private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
-    public PurposeResponse readById(Long id) {
+    public PurposeResponse execute(Long id) {
         Admin admin = adminFacade.currentUser();
 
         Purpose purpose = purposeFacade.getPurposeById(id);

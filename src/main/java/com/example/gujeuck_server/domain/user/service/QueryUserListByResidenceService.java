@@ -29,7 +29,7 @@ public class QueryUserListByResidenceService {
     private static final String ETC = "기타";
 
     @Transactional(readOnly = true)
-    public SliceWithTotalResponse<UserInfoResponse> readAllUserListByResidence(String residence, Pageable p) {
+    public SliceWithTotalResponse<UserInfoResponse> execute(String residence, Pageable p) {
 
         Admin admin = adminFacade.currentUser();
 

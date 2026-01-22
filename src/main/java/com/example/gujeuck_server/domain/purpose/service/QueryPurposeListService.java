@@ -12,12 +12,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ReadAllPurposeService {
+public class QueryPurposeListService {
     private final PurposeRepository purposeRepository;
     private final AdminFacade adminFacade;
 
     @Transactional(readOnly = true)
-    public List<PurposeResponse> readAll() {
+    public List<PurposeResponse> execute() {
 
         Admin admin = adminFacade.currentUser();
 

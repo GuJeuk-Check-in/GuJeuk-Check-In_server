@@ -20,12 +20,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/sign-up")
     public SignupResponse signup(@RequestBody @Valid SignupRequest request) {
-        return signupService.signup(request);
+        return signupService.execute(request);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/login")
     public void login(@RequestBody @Valid LoginRequest request) {
-        loginUserService.login(request);
+        loginUserService.execute(request);
     }
 }

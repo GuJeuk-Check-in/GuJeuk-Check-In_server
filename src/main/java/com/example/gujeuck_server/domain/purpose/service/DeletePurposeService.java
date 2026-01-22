@@ -20,7 +20,7 @@ public class DeletePurposeService {
     private final PurposeFacade purposeFacade;
 
     @Transactional
-    public void deletePurpose(Long id) {
+    public void execute(Long id) {
         Admin admin = adminFacade.currentUser();
 
         Purpose purpose = purposeFacade.getPurposeById(id);

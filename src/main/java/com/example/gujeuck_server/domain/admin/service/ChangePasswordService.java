@@ -16,7 +16,7 @@ public class ChangePasswordService {
     private final AdminRepository adminRepository;
 
     @Transactional
-    public void changePassword(ChangePasswordRequest request) {
+    public void execute(ChangePasswordRequest request) {
         Admin admin = adminRepository.findByPassword(request.getOldPassword())
                 .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
 

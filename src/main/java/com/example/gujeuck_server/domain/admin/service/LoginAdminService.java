@@ -17,7 +17,7 @@ public class LoginAdminService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public TokenResponse login(AdminRequest request) {
+    public TokenResponse execute(AdminRequest request) {
         Admin admin = adminRepository.findByPassword(request.getPassword())
                 .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
 

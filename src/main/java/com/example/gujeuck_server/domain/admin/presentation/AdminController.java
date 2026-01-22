@@ -40,17 +40,17 @@ public class AdminController {
     private final QueryUserListByResidenceService queryUserListByResidenceService;
     private final UpdateUserService updateUserService;
     private final QueryUserDetailService queryUserDetailService;
-  
+
     @GetMapping("/user/all")
     public SliceWithTotalResponse<UserInfoResponse> getAllUserList(
             @PageableDefault(size = 30, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
-        return queryUserListService.readAllUserList(pageable);
+        return queryUserListService.execute(pageable);
     }
 
     @GetMapping("/user")
     public SliceWithTotalResponse<UserInfoResponse> getALlUserByResidenceList(@RequestParam String residence, Pageable pageable) {
-        return queryUserListByResidenceService.readAllUserListByResidence(residence, pageable);
+        return queryUserListByResidenceService.execute(residence, pageable);
     }
 
     @GetMapping("/user/{id}")
@@ -65,26 +65,26 @@ public class AdminController {
 
     @PostMapping("/login")
     public TokenResponse login(@RequestBody @Valid AdminRequest request) {
-        return loginAdminService.login(request);
+        return loginAdminService.execute(request);
     }
 
     @PostMapping("/create")
     public void createAdmin(@RequestBody @Valid AdminRequest request) {
-        createAdminService.createAdmin(request);
+        createAdminService.execute(request);
     }
 
     @PatchMapping("/change")
     public void changeAdmin(@RequestBody @Valid ChangePasswordRequest request) {
-        changePasswordService.changePassword(request);
+        changePasswordService.execute(request);
     }
 
     @GetMapping("/excel/{yearMonth}")
     public ResponseEntity<byte[]> exportExcel(@PathVariable String yearMonth) {
-        return logExcelOutPutService.outputExcel(yearMonth);
+        return logExcelOutPutService.execute(yearMonth);
     }
 
     @PatchMapping("/re-issue")
     public TokenResponse reissue(Authentication authentication) {
-        return reissueService.reissue(authentication);
+        return reissueService.execute(authentication);
     }
 }
