@@ -1,3 +1,6 @@
+/*
+    organ_id NOT NULL 강제 및 FK 등록
+ */
 ALTER TABLE user
     MODIFY organ_id BIGINT NOT NULL,
     ADD CONSTRAINT fk_user_organ

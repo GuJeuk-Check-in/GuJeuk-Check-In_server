@@ -1,3 +1,6 @@
+/*
+    기존 admin 데이터 개념을 organ으로 마이그레이션
+ */
 INSERT INTO organ (id, organ_name, password)
 SELECT
     a.id,
