@@ -1,5 +1,7 @@
 package com.example.gujeuck_server.domain.user.service;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
+import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
@@ -28,13 +30,16 @@ public class SignupService {
     private final CalculateAgeService calculateAgeService;
     private final LogRepository logRepository;
     private final PurposeFacade purposeFacade;
+    private final AdminFacade adminFacade;
 
     private static final String TIME = "HH:mm";
 
     @Transactional
     public SignupResponse signup(SignupRequest request) {
 
-        SignupResponse signupResponse = createUserId(request.getName(), request.getBirthYMD());
+        Admin admin = adminFacade.currentUser();
+
+        SignupResponse signupResponse = createUserId(admin.getId(), request.getName(), request.getBirthYMD());
 
         Age age = calculateAgeService.getAge(request.getBirthYMD());
 
@@ -61,11 +66,11 @@ public class SignupService {
         return signupResponse;
     }
 
-    private SignupResponse createUserId(String name, String birthYMD) {
+    private SignupResponse createUserId(Long adminId, String name, String birthYMD) {
 
         String userId = User.generateUserId(name, birthYMD);
 
-        if (userRepository.findByUserId(userId).isPresent()) {
+        if (userRepository.findByUserIdAndAdminId(userId, adminId).isPresent()) {
             throw ExistUserIdException.EXCEPTION;
         }
 
