@@ -1,6 +1,8 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.purpose.exception.PurposeAccessDeniedException;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeRequest;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
@@ -16,9 +18,13 @@ public class UpdatePurposeService {
 
     @Transactional
     public void updatePurpose(Long id, PurposeRequest purposeRequest) {
-        adminFacade.currentUser();
+        Admin admin = adminFacade.currentUser();
 
         Purpose purpose = purposeFacade.getPurposeById(id);
+
+        if (!purpose.getAdmin().getId().equals(admin.getId())) {
+            throw PurposeAccessDeniedException.EXCEPTION;
+        }
 
         purpose.updatePurpose(purposeRequest.getPurpose());
     }
