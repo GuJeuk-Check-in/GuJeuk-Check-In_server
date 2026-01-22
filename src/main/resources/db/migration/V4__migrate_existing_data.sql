@@ -1,6 +1,7 @@
 /*
     기존 테이블인 user, log, purpose에 organ_id 추가
  */
+ALTER TABLE user ADD COLUMN organ_id BIGINT;
 ALTER TABLE log ADD COLUMN organ_id BIGINT;
 ALTER TABLE purpose ADD COLUMN organ_id BIGINT;
 
