@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeAccessDeniedException;
@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MovePurposeService {
     private final PurposeRepository purposeRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
 
     @Transactional
     public void execute(PurposeMoveRequest purposeMoveRequest) {
-        Admin admin = adminFacade.currentUser();
+        Organ organ = organFacade.currentUser();
 
         List<Long> purposesId = purposeMoveRequest.getPurposeId();
         List<Purpose> purposes = purposeRepository.findAllById(purposeMoveRequest.getPurposeId());
@@ -42,7 +42,7 @@ public class MovePurposeService {
                 throw PurposeNotFoundException.EXCEPTION;
             }
 
-            if (!purpose.getAdmin().getId().equals(admin.getId())) {
+            if (!purpose.getOrgan().getId().equals(organ.getId())) {
                 throw PurposeAccessDeniedException.EXCEPTION;
             }
 

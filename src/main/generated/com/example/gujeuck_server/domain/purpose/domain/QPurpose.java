@@ -24,10 +24,10 @@ public class QPurpose extends EntityPathBase<Purpose> {
 
     public final com.example.gujeuck_server.global.entity.QBaseIdEntity _super = new com.example.gujeuck_server.global.entity.QBaseIdEntity(this);
 
-    public final com.example.gujeuck_server.domain.admin.domain.QAdmin admin;
-
     //inherited
     public final NumberPath<Long> id = _super.id;
+
+    public final com.example.gujeuck_server.domain.organ.domain.QOrgan organ;
 
     public final NumberPath<Integer> purposeIndex = createNumber("purposeIndex", Integer.class);
 
@@ -51,7 +51,7 @@ public class QPurpose extends EntityPathBase<Purpose> {
 
     public QPurpose(Class<? extends Purpose> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.admin = inits.isInitialized("admin") ? new com.example.gujeuck_server.domain.admin.domain.QAdmin(forProperty("admin")) : null;
+        this.organ = inits.isInitialized("organ") ? new com.example.gujeuck_server.domain.organ.domain.QOrgan(forProperty("organ")) : null;
     }
 
 }

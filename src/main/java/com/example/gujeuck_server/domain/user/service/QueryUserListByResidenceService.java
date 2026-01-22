@@ -1,9 +1,9 @@
 package com.example.gujeuck_server.domain.user.service;
 
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
-import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.exception.InvalidResidenceException;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.domain.enums.Residence;
@@ -24,14 +24,14 @@ import java.util.List;
 public class QueryUserListByResidenceService {
 
     private final UserRepository userRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
 
     private static final String ETC = "기타";
 
     @Transactional(readOnly = true)
     public SliceWithTotalResponse<UserInfoResponse> execute(String residence, Pageable p) {
 
-        Admin admin = adminFacade.currentUser();
+        Organ organ = organFacade.currentUser();
 
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),
@@ -46,9 +46,9 @@ public class QueryUserListByResidenceService {
                     .map(Residence::getKoreanName)
                     .toList();
 
-            long total = userRepository.countByAdminIdAndResidenceNotIn(admin.getId(), registeredResidences);
+            long total = userRepository.countByOrganIdAndResidenceNotIn(organ.getId(), registeredResidences);
 
-            Slice<UserInfoResponse> slice = userRepository.findByAdminIdAndResidenceNotIn(admin.getId(), registeredResidences, pageable)
+            Slice<UserInfoResponse> slice = userRepository.findByOrganIdAndResidenceNotIn(organ.getId(), registeredResidences, pageable)
                     .map(UserInfoResponse::from);
 
             return new SliceWithTotalResponse<>(total, slice);
@@ -58,9 +58,9 @@ public class QueryUserListByResidenceService {
 
         if (matched != null) {
             String kr = matched.getKoreanName();
-            long total = userRepository.countByResidenceAndAdminId(kr, admin.getId());
+            long total = userRepository.countByResidenceAndOrganId(kr, organ.getId());
 
-            Slice<UserInfoResponse> slice = userRepository.findByResidenceAndAdminId(kr, admin.getId(), pageable)
+            Slice<UserInfoResponse> slice = userRepository.findByResidenceAndOrganId(kr, organ.getId(), pageable)
                     .map(UserInfoResponse::from);
 
             return new SliceWithTotalResponse<>(total, slice);

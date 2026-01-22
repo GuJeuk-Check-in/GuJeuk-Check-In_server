@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeAlreadyExistException;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeRequest;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
@@ -14,23 +14,23 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CreatePurposeService {
     private final PurposeRepository purposeRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
 
     @Transactional
     public void execute(PurposeRequest request) {
-        Admin admin = adminFacade.currentUser();
+        Organ organ = organFacade.currentUser();
 
         if(purposeRepository.findByPurposeName(request.getPurpose()).isPresent()) {
             throw PurposeAlreadyExistException.EXCEPTION;
         }
-        
-        int purposeIndex = purposeRepository.findMaxPurposeIndexByAdminId(admin.getId()) + 1;
+
+        int purposeIndex = purposeRepository.findMaxPurposeIndexByOrganId(organ.getId()) + 1;
 
         purposeRepository.save(
                 Purpose.builder()
                         .purposeName(request.getPurpose())
                         .purposeIndex(purposeIndex)
-                        .admin(admin)
+                        .organ(organ)
                         .build()
         );
     }

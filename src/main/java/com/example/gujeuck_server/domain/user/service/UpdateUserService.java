@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
@@ -17,22 +17,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UpdateUserService {
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
     private final UserRepository userRepository;
     private final CalculateAgeService calculateAgeService;
 
     @Transactional
     public void execute(Long id, UpdateUserRequest request) {
-        Admin admin = adminFacade.currentUser();
+        Organ organ = organFacade.currentUser();
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
-        if (!admin.getId().equals(user.getAdmin().getId())) {
+        if (!organ.getId().equals(user.getOrgan().getId())) {
             throw UserAccessDeniedException.EXCEPTION;
         }
 
-        userRepository.findByUserIdAndAdminId(request.userId(), admin.getId())
+        userRepository.findByUserIdAndOrganId(request.userId(), organ.getId())
                 .filter(existUser -> !existUser.getId().equals(id))
                 .ifPresent(existUser -> {
                     throw ExistUserIdException.EXCEPTION;

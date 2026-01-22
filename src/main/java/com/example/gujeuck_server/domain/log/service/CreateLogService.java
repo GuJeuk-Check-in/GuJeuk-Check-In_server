@@ -1,8 +1,8 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 public class CreateLogService {
 
     private final LogRepository logRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
     private final PurposeFacade purposeFacade;
 
     private static final String TIME = "HH:mm";
@@ -31,7 +31,7 @@ public class CreateLogService {
     @Transactional
     public void execute(LogRequest request) {
 
-        Admin admin = adminFacade.currentUser();
+        Organ organ = organFacade.currentUser();
 
         String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
 
@@ -41,7 +41,7 @@ public class CreateLogService {
 
         String formattedDate = resolveVisitDate(request.getVisitDate());
 
-        Log log = createUseLog(request, purpose, formattedDate, visitTime, currentYear, admin);
+        Log log = createUseLog(request, purpose, formattedDate, visitTime, currentYear, organ);
         logRepository.save(log);
     }
 
@@ -69,7 +69,7 @@ public class CreateLogService {
             String date,
             String time,
             int year,
-            Admin admin
+            Organ organ
     ) {
         return Log.builder()
                 .name(request.getName())
@@ -82,7 +82,7 @@ public class CreateLogService {
                 .visitDate(date)
                 .year(year)
                 .privacyAgreed(request.isPrivacyAgreed())
-                .admin(admin)
+                .organ(organ)
                 .build();
     }
 }

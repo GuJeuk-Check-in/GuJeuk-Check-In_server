@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCustom {
 
-  Slice<Log> findAllByAdminId(Pageable pageable, Long adminId);
+  Slice<Log> findAllByOrganId(Pageable pageable, Long organId);
 
   List<Log> findAllByVisitDateStartingWith(String visitDatePrefix);
 }

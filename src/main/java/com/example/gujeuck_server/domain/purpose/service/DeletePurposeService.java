@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeAccessDeniedException;
@@ -16,16 +16,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DeletePurposeService {
     private final PurposeRepository purposeRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
     private final PurposeFacade purposeFacade;
 
     @Transactional
     public void execute(Long id) {
-        Admin admin = adminFacade.currentUser();
+        Organ organ = organFacade.currentUser();
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 
-        if (!purpose.getAdmin().getId().equals(admin.getId())) {
+        if (!purpose.getOrgan().getId().equals(organ.getId())) {
             throw PurposeAccessDeniedException.EXCEPTION;
         }
 
@@ -33,7 +33,7 @@ public class DeletePurposeService {
 
         purposeRepository.delete(purpose);
 
-        List<Purpose> purposes = purposeRepository.findAllByAdminIdAndPurposeIndexGreaterThan(admin.getId(), purposeIndex);
+        List<Purpose> purposes = purposeRepository.findAllByOrganIdAndPurposeIndexGreaterThan(organ.getId(), purposeIndex);
 
         for (Purpose p : purposes) {
             p.setPurposeIndex(p.getPurposeIndex() - 1);

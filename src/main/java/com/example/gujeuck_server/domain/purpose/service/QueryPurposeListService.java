@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.response.PurposeResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,14 +14,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class QueryPurposeListService {
     private final PurposeRepository purposeRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
 
     @Transactional(readOnly = true)
     public List<PurposeResponse> execute() {
 
-        Admin admin = adminFacade.currentUser();
+        Organ organ = organFacade.currentUser();
 
-        return purposeRepository.findAllByAdminIdOrderByPurposeIndexAsc(admin.getId()).stream()
+        return purposeRepository.findAllByOrganIdOrderByPurposeIndexAsc(organ.getId()).stream()
                 .map(PurposeResponse::from)
                 .toList();
     }

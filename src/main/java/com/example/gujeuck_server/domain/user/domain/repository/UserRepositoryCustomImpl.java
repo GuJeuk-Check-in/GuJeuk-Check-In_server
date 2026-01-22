@@ -13,10 +13,10 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Optional<User> findByUserIdAndAdminId(String userId, Long adminId) {
+    public Optional<User> findByUserIdAndOrganId(String userId, Long organId) {
         return Optional.ofNullable(queryFactory
                 .selectFrom(QUser.user)
-                .where(QUser.user.userId.eq(userId), QUser.user.admin.id.eq(adminId))
+                .where(QUser.user.userId.eq(userId), QUser.user.organ.id.eq(organId))
                 .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                 .fetchOne()
         );

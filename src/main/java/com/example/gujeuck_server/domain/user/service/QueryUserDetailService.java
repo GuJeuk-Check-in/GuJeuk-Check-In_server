@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.exception.UserAccessDeniedException;
@@ -15,16 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QueryUserDetailService {
     private final UserRepository userRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
 
     @Transactional(readOnly = true)
     public UserDetailResponse execute(Long id) {
-        Admin admin = adminFacade.currentUser();
+        Organ organ = organFacade.currentUser();
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
-        if (!user.getAdmin().getId().equals(admin.getId())) {
+        if (!user.getOrgan().getId().equals(organ.getId())) {
             throw UserAccessDeniedException.EXCEPTION;
         }
 

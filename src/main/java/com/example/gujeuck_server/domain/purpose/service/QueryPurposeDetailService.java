@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeAccessDeniedException;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
@@ -14,15 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QueryPurposeDetailService {
     private final PurposeFacade purposeFacade;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
 
     @Transactional(readOnly = true)
     public PurposeResponse execute(Long id) {
-        Admin admin = adminFacade.currentUser();
+        Organ organ = organFacade.currentUser();
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 
-        if (!purpose.getAdmin().getId().equals(admin.getId())) {
+        if (!purpose.getOrgan().getId().equals(organ.getId())) {
             throw PurposeAccessDeniedException.EXCEPTION;
         }
 

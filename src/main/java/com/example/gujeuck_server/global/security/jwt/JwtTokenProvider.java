@@ -1,10 +1,10 @@
 package com.example.gujeuck_server.global.security.jwt;
 
-import com.example.gujeuck_server.domain.admin.presentation.dto.response.TokenResponse;
-import com.example.gujeuck_server.domain.admin.exception.AdminNotFoundException;
-import com.example.gujeuck_server.domain.admin.domain.repository.AdminRepository;
-import com.example.gujeuck_server.domain.admin.domain.RefreshToken;
-import com.example.gujeuck_server.domain.admin.domain.repository.RefreshTokenRepository;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.organ.exception.OrganNotFoundException;
+import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
+import com.example.gujeuck_server.domain.organ.domain.RefreshToken;
+import com.example.gujeuck_server.domain.organ.domain.repository.RefreshTokenRepository;
 import com.example.gujeuck_server.domain.user.exception.ExpiredTokenException;
 import com.example.gujeuck_server.domain.user.exception.InvalidTokenException;
 import com.example.gujeuck_server.global.security.auth.CustomUserDetailsService;
@@ -27,7 +27,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
     private final JwtProperties jwtProperties;
-    private final AdminRepository adminRepository;
+    private final OrganRepository organRepository;
     private final CustomUserDetailsService customUserDetailsService;
     private final RefreshTokenRepository refreshTokenRepository;
 
@@ -97,8 +97,8 @@ public class JwtTokenProvider {
     }
 
     public TokenResponse receiveToken(String password) {
-        adminRepository.findByPassword(password)
-                .orElseThrow(() -> AdminNotFoundException.EXCEPTION);
+        organRepository.findByPassword(password)
+                .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
 
         return TokenResponse.builder()
                 .accessToken(createAccessToken(password))

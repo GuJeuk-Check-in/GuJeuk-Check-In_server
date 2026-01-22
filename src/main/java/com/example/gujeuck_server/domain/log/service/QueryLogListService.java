@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QueryLogListService {
     private final LogRepository logRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
 
     @Transactional(readOnly = true)
     public Slice<QueryLogListResponse> execute(Pageable p) {
-        Admin admin = adminFacade.currentUser();
+        Organ organ = organFacade.currentUser();
 
          Pageable pageable = PageRequest.of(
                 p.getPageNumber(),
@@ -29,7 +29,7 @@ public class QueryLogListService {
                         .and(Sort.by(Sort.Direction.DESC, "id"))
                 );
 
-        return logRepository.findAllByAdminId(pageable, admin.getId())
+        return logRepository.findAllByOrganId(pageable, organ.getId())
                 .map(QueryLogListResponse::from);
     }
 }
