@@ -2,7 +2,7 @@ package com.example.gujeuck_server.domain.log.service;
 
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
-import com.example.gujeuck_server.domain.log.exception.LogDateInvalidException;
+import com.example.gujeuck_server.domain.log.exception.InvalidLogDateException;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
 import lombok.RequiredArgsConstructor;
@@ -50,11 +50,11 @@ public class QueryLogListByDateService {
         String month = parts[1];
 
         if (!yearMonth.matches("\\d{4}-\\d{2}")) {
-            throw LogDateInvalidException.EXCEPTION;
+            throw InvalidLogDateException.EXCEPTION;
         }
 
         if(Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1 || Integer.parseInt(year) > now.getYear()) {
-            throw LogDateInvalidException.EXCEPTION;
+            throw InvalidLogDateException.EXCEPTION;
         }
 
         return year + "년" + month + "월";
