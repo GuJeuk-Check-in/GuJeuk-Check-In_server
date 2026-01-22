@@ -6,6 +6,7 @@ import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
+import com.example.gujeuck_server.domain.user.exception.UserAccessDeniedException;
 import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.UpdateUserRequest;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
@@ -26,6 +27,10 @@ public class UpdateUserService {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
+
+        if (!admin.getId().equals(user.getAdmin().getId())) {
+            throw UserAccessDeniedException.EXCEPTION;
+        }
 
         userRepository.findByUserIdAndAdminId(request.userId(), admin.getId())
                 .filter(existUser -> !existUser.getId().equals(id))
