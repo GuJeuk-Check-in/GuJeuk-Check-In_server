@@ -24,6 +24,12 @@ spring:
       jdbc:
         time_zone: Asia/Seoul
       ddl-auto: update
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
 jwt:
   header: Authorization
   prefix: Bearer
@@ -34,17 +40,6 @@ jwt:
   logging:
     level:
       root: DEBUG
-
-#cloud:
-#  aws:
-#    region:
-#      static: ${AWS_REGION}
-#    stack:
-#      auto: false
-#    credentials:
-#      accessKey: ${AWS_ACCESS_KEY_ID}
-#      secretKey: ${AWS_SECRET_ACCESS_KEY}
-
 
 redis:
   host: ${REDIS_HOST}
