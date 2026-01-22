@@ -1,5 +1,7 @@
 package com.example.gujeuck_server.domain.log.service;
 
+import com.example.gujeuck_server.domain.admin.domain.Admin;
+import com.example.gujeuck_server.domain.log.exception.LogAccessDeniedException;
 import com.example.gujeuck_server.domain.log.facade.LogFacade;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
@@ -19,9 +21,13 @@ public class UpdateLogService {
 
     @Transactional
     public void execute(Long logId, LogRequest request) {
-        adminFacade.currentUser();
+        Admin admin = adminFacade.currentUser();
 
         Log log = logFacade.getLogById(logId);
+
+        if (!log.getAdmin().getId().equals(admin.getId())) {
+            throw LogAccessDeniedException.EXCEPTION;
+        }
 
         Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
 
