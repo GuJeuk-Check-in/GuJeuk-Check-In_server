@@ -74,7 +74,6 @@ public class LogExcelOutPutService { // 이건 엑셀 다운로드 관련 클래
         }
     }
 
-
     private String generateExcelFileName() { // 다운로드 되는 파일 이름 정하는 메서드
         LocalDate now = LocalDate.now();
         return String.format(FILE_NAME, now.getYear(), now.getMonthValue());

@@ -13,6 +13,7 @@ import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDeta
 import com.example.gujeuck_server.domain.user.service.QueryUserDetailService;
 import com.example.gujeuck_server.domain.user.service.QueryUserListByResidenceService;
 import com.example.gujeuck_server.domain.user.service.QueryUserListService;
+import com.example.gujeuck_server.domain.user.service.UpdateUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,8 +36,9 @@ public class AdminController {
     private final ReissueService reissueService;
     private final QueryUserListService queryUserListService;
     private final QueryUserListByResidenceService queryUserListByResidenceService;
+    private final UpdateUserService updateUserService;
     private final QueryUserDetailService queryUserDetailService;
-
+  
     @GetMapping("/user/all")
     public UserSliceWithTotalResponse getAllUserList(
             @PageableDefault(size = 30, sort = {"id"}, direction = Sort.Direction.DESC)
@@ -50,6 +54,11 @@ public class AdminController {
     @GetMapping("/user/{id}")
     public UserDetailResponse getUserDetail(@PathVariable Long id) {
         return queryUserDetailService.execute(id);
+    }
+
+    @PatchMapping("/user/{id}")
+    public void updateUser(@PathVariable Long id, @RequestBody @Valid UpdateUserRequest request) {
+        updateUserService.execute(id, request);
     }
 
     @PostMapping("/login")
