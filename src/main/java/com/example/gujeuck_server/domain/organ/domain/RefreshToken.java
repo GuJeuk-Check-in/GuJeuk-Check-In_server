@@ -22,6 +22,9 @@ public class RefreshToken {
     @Indexed
     private String organName;
 
+    @Indexed
+    private String client;
+
     @TimeToLive
     private Long timeToLive;
 }
