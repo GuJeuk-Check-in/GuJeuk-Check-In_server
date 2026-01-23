@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.organ.service;
 
 import com.example.gujeuck_server.domain.organ.domain.enums.Client;
-import com.example.gujeuck_server.domain.organ.presentation.dto.request.OrganRequest;
+import com.example.gujeuck_server.domain.organ.presentation.dto.request.LoginOrganRequest;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.exception.OrganNotFoundException;
@@ -18,7 +18,7 @@ public class LoginOrganService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public TokenResponse execute(OrganRequest request) {
+    public TokenResponse execute(LoginOrganRequest request) {
 
         Organ organ = organRepository.findByOrganName(request.getOrganName())
                 .orElseThrow(() -> OrganNotFoundException.EXCEPTION);

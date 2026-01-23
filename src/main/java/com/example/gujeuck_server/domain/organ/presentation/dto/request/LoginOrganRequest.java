@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class OrganRequest {
+public class LoginOrganRequest {
 
     @NotBlank(message = "기관명을 입력해주세요.")
     private String organName;
