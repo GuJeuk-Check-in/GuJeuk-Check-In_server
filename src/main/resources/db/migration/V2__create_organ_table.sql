@@ -6,3 +6,9 @@ CREATE TABLE organ (
                        organ_name VARCHAR(255) NOT NULL,
                        password VARCHAR(100) NOT NULL
 );
+
+/*
+ organName UNIQUE 제약 조건
+ */
+ALTER TABLE organ
+    ADD CONSTRAINT uk_organ_name UNIQUE (organ_name);
