@@ -8,6 +8,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public class OrganRequest {
 
-    @NotBlank(message = "비밀번호를 입력해주세요")
+    @NotBlank(message = "기관명을 입력해주세요.")
+    private String organName;
+
+    @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
+
+    @NotBlank(message = "Client를 식별하지 못했습니다.")
+    private String client;
 }
