@@ -8,6 +8,7 @@ import com.example.gujeuck_server.domain.admin.service.CreateAdminService;
 import com.example.gujeuck_server.domain.admin.service.LogExcelOutPutService;
 import com.example.gujeuck_server.domain.admin.service.LoginAdminService;
 import com.example.gujeuck_server.domain.admin.service.ReissueService;
+import com.example.gujeuck_server.domain.user.presentation.dto.request.UpdateUserRequest;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDetailResponse;
 import com.example.gujeuck_server.domain.user.service.QueryUserDetailService;
