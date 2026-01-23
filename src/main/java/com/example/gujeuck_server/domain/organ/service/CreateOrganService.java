@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.organ.service;
 
+import com.example.gujeuck_server.domain.organ.exception.OrganAlreadyExistException;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.OrganRequest;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
@@ -17,9 +18,15 @@ public class CreateOrganService {
     @Transactional
     public void execute(OrganRequest request) {
 
-        organRepository.save(Organ.builder()
+        if (organRepository.findByOrganName(request.getOrganName()).isPresent()) {
+            throw OrganAlreadyExistException.EXCEPTION;
+        }
+
+        Organ organ = Organ.builder()
                 .organName(request.getOrganName())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .build());
+                .build();
+
+        organRepository.save(organ);
     }
 }
