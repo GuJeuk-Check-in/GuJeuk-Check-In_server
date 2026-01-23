@@ -34,7 +34,7 @@ public class JwtTokenProvider {
     private static final String CLAIM_TYPE = "type";
     private static final String ACCESS_TYPE = "access";
     private static final String REFRESH_TYPE = "refresh";
-    private static final int MILLISECONDS = 2000;
+    private static final int MILLISECONDS = 1000;
     private static final long USER_VIEW_ACCESS_EXPIRATION = 86400L; // 24시간
     private static final long ADMIN_ACCESS_EXPIRATION = 7200L; // 2시간
 
