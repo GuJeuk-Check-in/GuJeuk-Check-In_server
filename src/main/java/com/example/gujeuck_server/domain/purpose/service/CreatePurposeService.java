@@ -20,7 +20,7 @@ public class CreatePurposeService {
     public void execute(PurposeRequest request) {
         Organ organ = organFacade.currentOrgan();
 
-        if(purposeRepository.findByPurposeName(request.getPurpose()).isPresent()) {
+        if(purposeRepository.findByOrganIdAndPurposeName(organ.getId(), request.getPurpose()).isPresent()) {
             throw PurposeAlreadyExistException.EXCEPTION;
         }
 
