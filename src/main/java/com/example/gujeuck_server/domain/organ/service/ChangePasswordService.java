@@ -6,6 +6,7 @@ import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.exception.InvalidPasswordConfirmException;
 import com.example.gujeuck_server.domain.organ.exception.SameOldPasswordException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ChangePasswordService {
     private final OrganFacade organFacade;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void execute(ChangePasswordRequest request) {
@@ -23,10 +25,10 @@ public class ChangePasswordService {
             throw InvalidPasswordConfirmException.EXCEPTION;
         }
 
-        if (organ.getPassword().equals(request.getNewPassword())) {
+        if (passwordEncoder.matches(request.getNewPassword(), organ.getPassword())) {
             throw SameOldPasswordException.EXCEPTION;
         }
 
-        organ.changePassword(request.getNewPassword());
+        organ.changePassword(passwordEncoder.encode(request.getNewPassword()));
     }
 }
