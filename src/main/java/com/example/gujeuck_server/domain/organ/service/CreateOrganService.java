@@ -14,9 +14,9 @@ public class CreateOrganService {
 
     @Transactional
     public void execute(OrganRequest request) {
-
         organRepository.save(Organ.builder()
-                        .password(request.getPassword())
+                .organName(request.getOrganName())
+                .password(request.getPassword())
                 .build());
     }
 }
