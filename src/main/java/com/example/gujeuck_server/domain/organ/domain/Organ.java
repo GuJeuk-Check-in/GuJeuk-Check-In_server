@@ -17,7 +17,7 @@ public class Organ extends BaseIdEntity {
     @Column(nullable = false)
     private String organName;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 300)
     private String password;
 
     public void changePassword(String password) {
