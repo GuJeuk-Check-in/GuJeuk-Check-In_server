@@ -1,35 +1,35 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+이 파일은 Claude Code (claude.ai/code)가 이 저장소의 코드 작업 시 참고하는 가이드를 제공합니다.
 
-## Project Overview
+## 프로젝트 개요
 
-GuJeuk-Check-In Server is a Spring Boot backend for facility check-in management. It handles user registration, check-in logging, and admin operations with multi-tenant support (each admin manages their own facility).
+GuJeuk-Check-In Server는 시설 출입 관리를 위한 Spring Boot 백엔드입니다. 사용자 등록, 출입 로그 기록, 관리자 운영을 처리하며 멀티 테넌트를 지원합니다 (각 관리자가 자신의 시설을 관리).
 
-## Build & Run Commands
+## 빌드 및 실행 명령어
 
 ```bash
-# Build
+# 빌드
 ./gradlew clean build
 
-# Run application
+# 애플리케이션 실행
 ./gradlew bootRun
 
-# Run all tests
+# 모든 테스트 실행
 ./gradlew test
 
-# Run specific test
+# 특정 테스트 실행
 ./gradlew test --tests "TestClassName"
 ./gradlew test --tests "com.example.gujeuck_server.domain.admin.service.LoginServiceTest"
 
-# Generate QueryDSL Q-classes (happens automatically on compile)
+# QueryDSL Q-classes 생성 (컴파일 시 자동 생성됨)
 ./gradlew compileJava
 
-# Build JAR
+# JAR 빌드
 ./gradlew bootJar
 ```
 
-## Required Environment Variables
+## 필수 환경 변수
 
 ```
 DB_URL=jdbc:mysql://host:port/dbname
@@ -40,70 +40,70 @@ REDIS_HOST=localhost
 REDIS_PORT=6379
 ```
 
-## Architecture
+## 아키텍처
 
-### Tech Stack
+### 기술 스택
 - Java 17, Spring Boot 3.5.6
 - MySQL 8 with Spring Data JPA
-- QueryDSL 5.0.0 for complex queries
-- JWT authentication with Redis token storage
-- Apache POI for Excel export
+- QueryDSL 5.0.0 (복잡한 쿼리용)
+- JWT 인증 (Redis 토큰 저장소)
+- Apache POI (Excel 내보내기)
 
-### Domain-Driven Package Structure
+### 도메인 주도 패키지 구조
 
 ```
 src/main/java/com/example/gujeuck_server/
 ├── domain/
-│   ├── admin/          # Admin accounts, JWT auth, Excel export
-│   ├── user/           # User registration, profiles
-│   ├── purpose/        # Facility purposes/types
-│   └── log/            # Check-in records
+│   ├── admin/          # 관리자 계정, JWT 인증, Excel 내보내기
+│   ├── user/           # 사용자 등록, 프로필
+│   ├── purpose/        # 시설 목적/유형
+│   └── log/            # 출입 기록
 ├── global/
-│   ├── config/         # Security, JPA, QueryDSL configs
+│   ├── config/         # Security, JPA, QueryDSL 설정
 │   ├── security/jwt/   # JwtTokenProvider, JwtTokenFilter
-│   ├── entity/         # BaseIdEntity (common ID field)
-│   └── error/          # Global exception handling
+│   ├── entity/         # BaseIdEntity (공통 ID 필드)
+│   └── error/          # 전역 예외 처리
 └── infrastructure/
-    └── excel/          # Excel generation utilities
+    └── excel/          # Excel 생성 유틸리티
 ```
 
-### Domain Module Pattern
+### 도메인 모듈 패턴
 
-Each domain follows this structure:
-- `domain/` - JPA entities and enums
-- `domain/repository/` - Spring Data repositories + QueryDSL custom repos
-- `service/` - Single-purpose services (e.g., CreateAdminService, LoginAdminService)
-- `facade/` - Cross-domain coordination
-- `presentation/` - Controllers and DTOs
-- `exception/` - Domain-specific exceptions
+각 도메인은 다음 구조를 따릅니다:
+- `domain/` - JPA 엔티티와 enums
+- `domain/repository/` - Spring Data repositories + QueryDSL 커스텀 저장소
+- `service/` - 단일 목적 서비스 (예: CreateAdminService, LoginAdminService)
+- `facade/` - 도메인 간 조정
+- `presentation/` - 컨트롤러와 DTOs
+- `exception/` - 도메인별 예외
 
-### Key Entities and Relationships
+### 주요 엔티티 및 관계
 
-- **Admin** - Facility owner. Has many Users, Purposes, and Logs.
-- **User** - Registered visitor. Belongs to one Admin.
-- **Purpose** - Facility type/category. Belongs to one Admin.
-- **Log** - Check-in record. References User (optional for anonymous visits) and Admin.
+- **Admin** - 시설 소유자. 다수의 Users, Purposes, Logs를 가짐.
+- **User** - 등록된 방문자. 하나의 Admin에 속함.
+- **Purpose** - 시설 유형/카테고리. 하나의 Admin에 속함.
+- **Log** - 출입 기록. User(익명 방문의 경우 선택적)와 Admin을 참조.
 
 ### QueryDSL
 
-Q-classes are generated to `src/main/generated/`. Custom repository implementations use QueryDSL for complex queries:
+Q-classes는 `src/main/generated/`에 생성됩니다. 커스텀 저장소 구현체는 복잡한 쿼리를 위해 QueryDSL을 사용합니다:
 - `UserRepositoryCustom` / `UserRepositoryCustomImpl`
 - `LogRepositoryCustom` / `LogRepositoryCustomImpl`
 - `PurposeRepositoryCustom` / `PurposeRepositoryCustomImpl`
 
-## API Endpoints
+## API 엔드포인트
 
-- `/admin/**` - Admin login, password change, user management, Excel export
-- `/user/**` - User signup, login
-- `/purpose/**` - CRUD for facility purposes
-- `/log/**` - Check-in log CRUD
+- `/admin/**` - 관리자 로그인, 비밀번호 변경, 사용자 관리, Excel 내보내기
+- `/user/**` - 사용자 회원가입, 로그인
+- `/purpose/**` - 시설 목적 CRUD
+- `/log/**` - 출입 로그 CRUD
 
-All endpoints use JWT Bearer token authentication (except registration/login).
+모든 엔드포인트는 JWT Bearer 토큰 인증을 사용합니다 (회원가입/로그인 제외).
 
-## Code Conventions
+## 코드 컨벤션
 
-- Services are named by operation: `CreateXxxService`, `QueryXxxService`, `UpdateXxxService`, `DeleteXxxService`
-- Facades coordinate cross-domain logic
-- DTOs are record types in `presentation/dto/request/` and `presentation/dto/response/`
-- Exceptions extend domain-specific base exceptions
-- BaseIdEntity provides common `@Id` field via `@MappedSuperclass`
+- 서비스는 작업별로 명명: `CreateXxxService`, `QueryXxxService`, `UpdateXxxService`, `DeleteXxxService`
+- Facades는 도메인 간 로직을 조정
+- DTOs는 `presentation/dto/request/`와 `presentation/dto/response/`의 record 타입
+- 예외는 도메인별 기본 예외를 상속
+- BaseIdEntity는 `@MappedSuperclass`를 통해 공통 `@Id` 필드를 제공
