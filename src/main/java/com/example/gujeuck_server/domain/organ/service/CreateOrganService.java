@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.organ.service;
 
 import com.example.gujeuck_server.domain.organ.exception.OrganAlreadyExistException;
-import com.example.gujeuck_server.domain.organ.presentation.dto.request.OrganRequest;
+import com.example.gujeuck_server.domain.organ.presentation.dto.request.CreateOrganRequest;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class CreateOrganService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void execute(OrganRequest request) {
+    public void execute(CreateOrganRequest request) {
 
         if (organRepository.findByOrganName(request.getOrganName()).isPresent()) {
             throw OrganAlreadyExistException.EXCEPTION;

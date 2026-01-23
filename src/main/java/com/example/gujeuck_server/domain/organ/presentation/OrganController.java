@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.organ.presentation;
 
+import com.example.gujeuck_server.domain.organ.presentation.dto.request.CreateOrganRequest;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.LoginOrganRequest;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.ChangePasswordRequest;
@@ -67,7 +68,7 @@ public class OrganController {
     }
 
     @PostMapping("/create")
-    public void createOrgan(@RequestBody @Valid LoginOrganRequest request) {
+    public void createOrgan(@RequestBody @Valid CreateOrganRequest request) {
         createOrganService.execute(request);
     }
 
