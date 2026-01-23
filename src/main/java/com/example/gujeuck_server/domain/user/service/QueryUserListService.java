@@ -29,7 +29,7 @@ public class QueryUserListService {
                 Sort.by(Sort.Direction.DESC, "id")
         );
 
-        long total = userRepository.count();
+        long total = userRepository.countByOrganId(organ.getId());
 
         Slice<UserInfoResponse> slice = userRepository.findAllByOrganId(pageable, organ.getId())
                 .map(UserInfoResponse::from);

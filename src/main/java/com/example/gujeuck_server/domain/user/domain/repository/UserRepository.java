@@ -20,6 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     long countByResidenceAndOrganId(String residence, Long organId);
 
+    long countByOrganId(Long organId);
+
     long countByOrganIdAndResidenceNotIn(Long organId, List<String> residences);
 
     Optional<User> findByUserId(String userId);
