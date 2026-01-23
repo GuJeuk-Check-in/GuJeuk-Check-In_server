@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.log.presentation;
 
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.LogSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogDetailResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
 import com.example.gujeuck_server.domain.log.service.*;
@@ -21,7 +22,7 @@ public class LogController {
     private final DeleteLogService deleteLogService;
     private final UpdateLogService updateLogService;
     private final QueryLogDetailService queryLogDetailService;
-
+    private final QueryLogListByDateService queryLogListByDateService;
     @PostMapping
     public void createLog(@RequestBody @Valid LogRequest request) {
         createUseListService.execute(request);
@@ -47,5 +48,10 @@ public class LogController {
     @GetMapping("/{log-id}")
     public QueryLogDetailResponse queryLogDetail(@PathVariable("log-id") Long logId) {
         return queryLogDetailService.execute(logId);
+    }
+
+    @GetMapping("/date/{date}")
+    public LogSliceWithTotalResponse queryLogListByDate(@PathVariable("date") String date, Pageable pageable) {
+        return queryLogListByDateService.queryLogListByResidence(date, pageable);
     }
 }

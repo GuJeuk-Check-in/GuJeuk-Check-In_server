@@ -3,7 +3,7 @@ package com.example.gujeuck_server.domain.user.service;
 
 import com.example.gujeuck_server.domain.admin.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.domain.enums.Residence;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
@@ -28,7 +28,7 @@ public class QueryUserListByResidenceService {
     private static final String ETC = "기타";
 
     @Transactional(readOnly = true)
-    public SliceWithTotalResponse<UserInfoResponse> readAllUserListByResidence(String residence, Pageable p) {
+    public UserSliceWithTotalResponse readAllUserListByResidence(String residence, Pageable p) {
 
         adminFacade.currentUser();
 
@@ -50,7 +50,7 @@ public class QueryUserListByResidenceService {
             Slice<UserInfoResponse> slice = userRepository.findByResidenceNotIn(registeredResidences, pageable)
                     .map(UserInfoResponse::from);
 
-            return new SliceWithTotalResponse<>(total, slice);
+            return new UserSliceWithTotalResponse(total, slice);
         }
 
         Residence matched = Residence.fromKoreanName(data);
@@ -62,7 +62,7 @@ public class QueryUserListByResidenceService {
             Slice<UserInfoResponse> slice = userRepository.findByResidence(kr, pageable)
                     .map(UserInfoResponse::from);
 
-            return new SliceWithTotalResponse<>(total, slice);
+            return new UserSliceWithTotalResponse(total, slice);
         }
 
         throw InvalidResidenceException.EXCEPTION;

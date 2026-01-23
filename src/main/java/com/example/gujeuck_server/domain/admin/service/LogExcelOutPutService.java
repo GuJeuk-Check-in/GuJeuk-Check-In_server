@@ -41,10 +41,10 @@ public class LogExcelOutPutService { // 이건 엑셀 다운로드 관련 클래
         adminFacade.currentUser();
 
         try {
-            String visitDatePrefix = toVisitDatePrefix(yearMonth);
+            String visitDate = toVisitDate(yearMonth);
 
 
-            List<Log> logs = logRepository.findAllByVisitDateStartingWith(visitDatePrefix);
+            List<Log> logs = logRepository.findAllByVisitDateStartingWith(visitDate);
 
             List<LogExcelResponse> responses = logs.stream()
                     .map(LogExcelResponse::from)
@@ -63,7 +63,7 @@ public class LogExcelOutPutService { // 이건 엑셀 다운로드 관련 클래
             throw ExcelGenerationException.EXCEPTION;
         }
     }
-    private String toVisitDatePrefix(String yearMonth) {
+    private String toVisitDate(String yearMonth) {
         try {
             YearMonth ym = YearMonth.parse(yearMonth, YEAR_MONTH); // 문자열로 나와있는 연-월을 날짜로 파싱
 
