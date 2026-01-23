@@ -39,12 +39,12 @@ public class PurposeController {
     }
 
     @GetMapping("/{id}")
-    public PurposeResponse getPurpose(@PathVariable Long id) {
+    public PurposeResponse queryPurpose(@PathVariable Long id) {
         return queryPurposeDetailService.execute(id);
     }
 
     @GetMapping("/all")
-    public List<PurposeResponse> getAllPurpose() {
+    public List<PurposeResponse> queryAllPurpose() {
         return queryPurposeListService.execute();
     }
 

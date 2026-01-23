@@ -41,19 +41,19 @@ public class OrganController {
     private final QueryUserDetailService queryUserDetailService;
 
     @GetMapping("/user/all")
-    public SliceWithTotalResponse<UserInfoResponse> getAllUserList(
+    public SliceWithTotalResponse<UserInfoResponse> queryAllUserList(
             @PageableDefault(size = 30, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
         return queryUserListService.execute(pageable);
     }
 
     @GetMapping("/user")
-    public SliceWithTotalResponse<UserInfoResponse> getALlUserByResidenceList(@RequestParam String residence, Pageable pageable) {
+    public SliceWithTotalResponse<UserInfoResponse> queryAllUserByResidenceList(@RequestParam String residence, Pageable pageable) {
         return queryUserListByResidenceService.execute(residence, pageable);
     }
 
     @GetMapping("/user/{id}")
-    public UserDetailResponse getUserDetail(@PathVariable Long id) {
+    public UserDetailResponse queryUserDetail(@PathVariable Long id) {
         return queryUserDetailService.execute(id);
     }
 
