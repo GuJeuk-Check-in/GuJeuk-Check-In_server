@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Organ extends BaseIdEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String organName;
 
     @Column(nullable = false, length = 300)
