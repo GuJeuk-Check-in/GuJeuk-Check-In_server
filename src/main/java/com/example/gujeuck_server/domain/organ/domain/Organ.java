@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.organ.domain;
 
-import com.example.gujeuck_server.domain.organ.domain.enums.Client;
 import com.example.gujeuck_server.global.entity.BaseIdEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,10 +19,6 @@ public class Organ extends BaseIdEntity {
 
     @Column(nullable = false, length = 100)
     private String password;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Client client;
 
     public void changePassword(String password) {
         this.password = password;
