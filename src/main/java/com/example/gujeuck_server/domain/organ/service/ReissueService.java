@@ -1,5 +1,9 @@
 package com.example.gujeuck_server.domain.organ.service;
 
+import com.example.gujeuck_server.domain.organ.domain.RefreshToken;
+import com.example.gujeuck_server.domain.organ.domain.enums.Client;
+import com.example.gujeuck_server.domain.organ.domain.repository.RefreshTokenRepository;
+import com.example.gujeuck_server.domain.organ.exception.OrganNotFoundException;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
 import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +15,17 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReissueService {
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public TokenResponse execute(Authentication authentication) {
-        return jwtTokenProvider.receiveToken(authentication.getName());
+        String organName = authentication.getName();
+
+        RefreshToken refreshToken = refreshTokenRepository.findByOrganName(organName)
+                .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
+
+        Client client = Client.valueOf(refreshToken.getClient());
+
+        return jwtTokenProvider.receiveToken(organName, client);
     }
 }
