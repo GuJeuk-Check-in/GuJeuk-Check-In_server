@@ -5,6 +5,7 @@ import com.example.gujeuck_server.domain.organ.domain.enums.Client;
 import com.example.gujeuck_server.domain.organ.domain.repository.RefreshTokenRepository;
 import com.example.gujeuck_server.domain.organ.exception.OrganNotFoundException;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.user.exception.RefreshTokenNotFoundException;
 import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -22,7 +23,7 @@ public class ReissueService {
         String organName = authentication.getName();
 
         RefreshToken refreshToken = refreshTokenRepository.findByOrganName(organName)
-                .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
+                .orElseThrow(() -> RefreshTokenNotFoundException.EXCEPTION);
 
         Client client = Client.valueOf(refreshToken.getClient());
 
