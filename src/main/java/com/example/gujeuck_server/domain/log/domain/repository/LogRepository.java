@@ -11,5 +11,5 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
 
   Slice<Log> findAllByOrganId(Pageable pageable, Long organId);
 
-  List<Log> findAllByVisitDateStartingWith(String visitDatePrefix);
+  List<Log> findAllByOrganIdAndVisitDateStartingWith(Long organId, String visitDatePrefix);
 }

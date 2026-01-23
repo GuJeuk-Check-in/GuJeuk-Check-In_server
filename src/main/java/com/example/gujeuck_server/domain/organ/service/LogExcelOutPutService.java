@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.organ.service;
 
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.infrastructure.excel.exception.ExcelGenerationException;
 import com.example.gujeuck_server.infrastructure.excel.exception.InvalidDateException;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
@@ -38,13 +39,13 @@ public class LogExcelOutPutService {
             DateTimeFormatter.ofPattern("yyyy년MM월");
 
     public ResponseEntity<byte[]> execute(String yearMonth) {
-        organFacade.currentOrgan();
+        Organ organ = organFacade.currentOrgan();
 
         try {
             String visitDatePrefix = toVisitDatePrefix(yearMonth);
 
 
-            List<Log> logs = logRepository.findAllByVisitDateStartingWith(visitDatePrefix);
+            List<Log> logs = logRepository.findAllByOrganIdAndVisitDateStartingWith(organ.getId(), visitDatePrefix);
 
             List<LogExcelResponse> responses = logs.stream()
                     .map(LogExcelResponse::from)
