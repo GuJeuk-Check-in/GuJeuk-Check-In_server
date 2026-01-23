@@ -8,9 +8,11 @@ import lombok.Getter;
 public class TokenResponse {
     private String accessToken;
     private String refreshToken;
+    private String organName;
 
-    public TokenResponse(String accessToken, String refreshToken) {
+    public TokenResponse(String accessToken, String refreshToken, String organName) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.organName = organName;
     }
 }

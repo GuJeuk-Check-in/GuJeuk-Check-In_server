@@ -118,6 +118,7 @@ public class JwtTokenProvider {
         return TokenResponse.builder()
                 .accessToken(createAccessToken(organName, client))
                 .refreshToken(createRefreshToken(organName, client))
+                .organName(organName)
                 .build();
     }
 
