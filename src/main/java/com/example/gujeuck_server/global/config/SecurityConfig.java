@@ -3,6 +3,7 @@ package com.example.gujeuck_server.global.config;
 import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -25,6 +26,18 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider jwtTokenProvider;
 
+    @Value("${cors.allowed-origins.prod-url}")
+    private String prodUrl;
+
+    @Value("${cors.allowed-origins.stag-url}")
+    private String stagUrl;
+
+    @Value("${cors.allowed-origins.vercel-url}")
+    private String vercelUrl;
+
+    @Value("${cors.allowed-origins.test-url}")
+    private String testUrl;
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -38,7 +51,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/**", "/organ/**", "/purpose/**", "/log/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -51,14 +64,12 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "https://gujeuk.dsmhs.kr", "https://gu-jeuk-check-in.vercel.app", "http://localhost:5173", "https://gujeuk-stag.dsmhs.kr"
+                prodUrl, stagUrl, vercelUrl, testUrl
         ));
 
         configuration.setAllowedMethods(Arrays.asList("OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"));
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(List.of("Authorization", "RefreshToken"));
-        
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

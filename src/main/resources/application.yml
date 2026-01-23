@@ -51,3 +51,10 @@ logging:
     io.lettuce.core: DEBUG
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+
+cors:
+  allowed-origins:
+    prod-url: ${PROD_BASE_URL}
+    stag-url: ${STAG_BASE_URL}
+    vercel-url: ${VERCEL_URL}
+    test-url: ${TEST_URL}
