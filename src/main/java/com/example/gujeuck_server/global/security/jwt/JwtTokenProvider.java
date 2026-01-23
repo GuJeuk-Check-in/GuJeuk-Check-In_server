@@ -64,7 +64,7 @@ public class JwtTokenProvider {
 
         refreshTokenRepository.save(
                 RefreshToken.builder()
-                        .password(password)
+                        .organName(organName)
                         .token(refreshToken)
                         .timeToLive((jwtProperties.getRefreshExpiration()))
                         .build()

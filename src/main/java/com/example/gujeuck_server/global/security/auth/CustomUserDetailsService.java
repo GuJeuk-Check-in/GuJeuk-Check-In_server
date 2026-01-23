@@ -14,9 +14,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final OrganRepository organRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String password) {
-        Organ organ = organRepository.findByPassword(password)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+    public UserDetails loadUserByUsername(String organName) {
+
+        Organ organ = organRepository.findByOrganName(organName)
+                .orElseThrow(() -> new UsernameNotFoundException("Organ Not Found"));
 
         return new CustomUserDetails(organ);
     }

@@ -12,12 +12,12 @@ import java.util.Collections;
 public record CustomUserDetails(Organ organ) implements UserDetails {
     @Override
     public String getUsername() {
-        return organ.getPassword();
+        return organ.getOrganName();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {    //사용자의 권한 목록을 반환
-        return new ArrayList<>(Collections.singleton(new SimpleGrantedAuthority("ROLE_" + organ.getPassword())));
+        return new ArrayList<>(Collections.singleton(new SimpleGrantedAuthority("ROLE_" + organ.getClient().toString())));
     }
 
     @Override

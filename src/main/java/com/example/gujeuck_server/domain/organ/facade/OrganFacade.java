@@ -13,9 +13,9 @@ public class OrganFacade {
     private final OrganRepository organRepository;
 
     public Organ currentOrgan() {
-        String password = SecurityContextHolder.getContext().getAuthentication().getName();
+        String organName = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return organRepository.findByPassword(password)
+        return organRepository.findByOrganName(organName)
                 .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
     }
 

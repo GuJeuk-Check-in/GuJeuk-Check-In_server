@@ -20,7 +20,7 @@ public class RefreshToken {
     private String token;
 
     @Indexed
-    private String password;
+    private String organName;
 
     @TimeToLive
     private Long timeToLive;
