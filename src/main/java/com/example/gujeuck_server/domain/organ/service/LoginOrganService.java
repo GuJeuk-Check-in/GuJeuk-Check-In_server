@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.organ.service;
 
+import com.example.gujeuck_server.domain.organ.domain.enums.Client;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.OrganRequest;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
@@ -18,9 +19,12 @@ public class LoginOrganService {
 
     @Transactional
     public TokenResponse execute(OrganRequest request) {
-        Organ organ = organRepository.findByPassword(request.getPassword())
+
+        Organ organ = organRepository.findByOrganName(request.getOrganName())
                 .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
 
-        return jwtTokenProvider.receiveToken(organ.getPassword());
+        Client client = Client.valueOf(request.getClient().toUpperCase());
+
+        return jwtTokenProvider.receiveToken(organ.getOrganName(), client);
     }
 }
