@@ -7,8 +7,6 @@ import java.util.Optional;
 
 public interface OrganRepository extends JpaRepository<Organ, Long> {
 
-    Optional<Organ> findByPassword(String password);
-
     Optional<Organ> findByOrganName(String organName);
 
 }
