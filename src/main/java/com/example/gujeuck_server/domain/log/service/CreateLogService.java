@@ -38,7 +38,7 @@ public class CreateLogService {
 
         String formattedDate = resolveVisitDate(request.getVisitDate());
 
-        Log log = createUseLog(request, purpose, formattedDate, request.getVisitTime(), currentYear);
+        Log log = createUseLog(request, purpose, formattedDate, request.getVisitTime(), request.getResidence(), currentYear);
         logRepository.save(log);
     }
 
@@ -65,6 +65,7 @@ public class CreateLogService {
             Purpose purpose,
             String date,
             String time,
+            String residence,
             int year
     ) {
         return Log.builder()
@@ -76,6 +77,7 @@ public class CreateLogService {
                 .purpose(purpose.getPurposeName())
                 .visitTime(time)
                 .visitDate(date)
+                .residence(residence)
                 .year(year)
                 .privacyAgreed(request.isPrivacyAgreed())
                 .build();
