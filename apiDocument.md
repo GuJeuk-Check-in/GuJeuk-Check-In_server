@@ -60,10 +60,12 @@
 | userId | string | 생성된 사용자 ID |
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 401 | USER_EXIST | 유저가 이미 존재합니다 |
-| 400 | BAD_REQUEST | 요청 데이터 검증 실패 |
+<details>
+<summary><code>401</code> USER_EXIST - 유저가 이미 존재합니다</summary>
+</details>
+<details>
+<summary><code>400</code> BAD_REQUEST - 요청 데이터 검증 실패</summary>
+</details>
 
 ---
 
@@ -99,10 +101,12 @@
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | USER_NOT_FOUND | 해당 유저가 존재하지 않습니다 |
-| 400 | BAD_REQUEST | 요청 데이터 검증 실패 |
+<details>
+<summary><code>404</code> USER_NOT_FOUND - 해당 유저가 존재하지 않습니다</summary>
+</details>
+<details>
+<summary><code>400</code> BAD_REQUEST - 요청 데이터 검증 실패</summary>
+</details>
 
 ---
 
@@ -142,10 +146,12 @@
 | refreshToken | string | JWT Refresh Token |
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | ADMIN_NOT_FOUND | 해당 관리자 계정이 존재하지 않습니다 |
-| 401 | PASSWORD_MISMATCH | 비밀번호가 일치하지 않습니다 |
+<details>
+<summary><code>404</code> ADMIN_NOT_FOUND - 해당 관리자 계정이 존재하지 않습니다</summary>
+</details>
+<details>
+<summary><code>401</code> PASSWORD_MISMATCH - 비밀번호가 일치하지 않습니다</summary>
+</details>
 
 ---
 
@@ -178,9 +184,9 @@
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 400 | BAD_REQUEST | 요청 데이터 검증 실패 |
+<details>
+<summary><code>400</code> BAD_REQUEST - 요청 데이터 검증 실패</summary>
+</details>
 
 ---
 
@@ -214,12 +220,18 @@
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | ADMIN_NOT_FOUND | 해당 관리자 계정이 존재하지 않습니다 |
-| 401 | PASSWORD_MISMATCH | 비밀번호가 일치하지 않습니다 |
-| 401 | INVALID_PASSWORD_CONFIRM | 비밀번호 확인이 일치하지 않습니다 |
-| 400 | SAME_OLD_PASSWORD | 기존 비밀번호와 동일한 비밀번호로 변경할 수 없습니다 |
+<details>
+<summary><code>404</code> ADMIN_NOT_FOUND - 해당 관리자 계정이 존재하지 않습니다</summary>
+</details>
+<details>
+<summary><code>401</code> PASSWORD_MISMATCH - 비밀번호가 일치하지 않습니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_PASSWORD_CONFIRM - 비밀번호 확인이 일치하지 않습니다</summary>
+</details>
+<details>
+<summary><code>400</code> SAME_OLD_PASSWORD - 기존 비밀번호와 동일한 비밀번호로 변경할 수 없습니다</summary>
+</details>
 
 ---
 
@@ -246,11 +258,15 @@ Authentication: {refreshToken}
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
-| 401 | EXPIRED_TOKEN | 만료된 토큰입니다 |
-| 404 | REFRESH_TOKEN_NOT_FOUND | RefreshToken이 존재하지 않습니다 |
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
+<details>
+<summary><code>401</code> EXPIRED_TOKEN - 만료된 토큰입니다</summary>
+</details>
+<details>
+<summary><code>404</code> REFRESH_TOKEN_NOT_FOUND - RefreshToken이 존재하지 않습니다</summary>
+</details>
 
 ---
 
@@ -297,9 +313,9 @@ Authentication: {refreshToken}
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -346,10 +362,12 @@ Authentication: {refreshToken}
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 400 | INVALID_RESIDENCE | 존재하지 않는 거주지 이름입니다 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>400</code> INVALID_RESIDENCE - 존재하지 않는 거주지 이름입니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -379,10 +397,12 @@ Authentication: {refreshToken}
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | USER_NOT_FOUND | 해당 유저가 존재하지 않습니다 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>404</code> USER_NOT_FOUND - 해당 유저가 존재하지 않습니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -425,11 +445,15 @@ Authentication: {refreshToken}
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | USER_NOT_FOUND | 해당 유저가 존재하지 않습니다 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
-| 400 | BAD_REQUEST | 요청 데이터 검증 실패 |
+<details>
+<summary><code>404</code> USER_NOT_FOUND - 해당 유저가 존재하지 않습니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
+<details>
+<summary><code>400</code> BAD_REQUEST - 요청 데이터 검증 실패</summary>
+</details>
 
 ---
 
@@ -454,11 +478,15 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 507 | EXCEL_GENERATION_FAILED | 엑셀 파일 생성 중 오류가 발생했습니다 |
-| 401 | INVALID_DATE | 유효하지 않은 날짜 형식입니다 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>507</code> EXCEL_GENERATION_FAILED - 엑셀 파일 생성 중 오류가 발생했습니다</summary>
+</details>
+<details>
+<summary><code>400</code> INVALID_DATE - 유효하지 않은 날짜 형식입니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -508,11 +536,15 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 409 | DUPLICATE_LOG | 이미 해당 시간의 로그가 존재합니다 |
-| 400 | BAD_REQUEST | 요청 데이터 검증 실패 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>409</code> DUPLICATE_LOG - 이미 해당 시간의 로그가 존재합니다</summary>
+</details>
+<details>
+<summary><code>400</code> BAD_REQUEST - 요청 데이터 검증 실패</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -552,11 +584,15 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | LOG_NOT_FOUND | 존재하지 않는 이용목록입니다 |
-| 409 | DUPLICATE_LOG | 이미 해당 시간의 로그가 존재합니다 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>404</code> LOG_NOT_FOUND - 존재하지 않는 이용목록입니다</summary>
+</details>
+<details>
+<summary><code>409</code> DUPLICATE_LOG - 이미 해당 시간의 로그가 존재합니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -580,10 +616,12 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | LOG_NOT_FOUND | 존재하지 않는 이용목록입니다 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>404</code> LOG_NOT_FOUND - 존재하지 않는 이용목록입니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -623,9 +661,9 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -659,10 +697,12 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | LOG_NOT_FOUND | 존재하지 않는 이용목록입니다 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>404</code> LOG_NOT_FOUND - 존재하지 않는 이용목록입니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -694,11 +734,15 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 409 | PURPOSE_ALREADY_EXIST | 이미 존재하는 방문 목적입니다 |
-| 400 | BAD_REQUEST | 요청 데이터 검증 실패 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>409</code> PURPOSE_ALREADY_EXIST - 이미 존재하는 방문 목적입니다</summary>
+</details>
+<details>
+<summary><code>400</code> BAD_REQUEST - 요청 데이터 검증 실패</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -733,11 +777,15 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | PURPOSE_NOT_FOUND | 존재하지 않는 방문목적입니다 |
-| 409 | PURPOSE_ALREADY_EXIST | 이미 존재하는 방문 목적입니다 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>404</code> PURPOSE_NOT_FOUND - 존재하지 않는 방문목적입니다</summary>
+</details>
+<details>
+<summary><code>409</code> PURPOSE_ALREADY_EXIST - 이미 존재하는 방문 목적입니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -761,10 +809,12 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | PURPOSE_NOT_FOUND | 존재하지 않는 방문목적입니다 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>404</code> PURPOSE_NOT_FOUND - 존재하지 않는 방문목적입니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
@@ -791,9 +841,9 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | PURPOSE_NOT_FOUND | 존재하지 않는 방문목적입니다 |
+<details>
+<summary><code>404</code> PURPOSE_NOT_FOUND - 존재하지 않는 방문목적입니다</summary>
+</details>
 
 ---
 
@@ -821,9 +871,8 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| - | - | 에러 없음 |
+
+에러 없음
 
 ---
 
@@ -853,10 +902,12 @@ Body: Excel 파일 (byte[])
 ```
 
 **Error List**
-| 상태 코드 | 에러 이름 | 설명 |
-|-----------|-----------|------|
-| 404 | PURPOSE_NOT_FOUND | 존재하지 않는 방문목적입니다 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰입니다 |
+<details>
+<summary><code>404</code> PURPOSE_NOT_FOUND - 존재하지 않는 방문목적입니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
 
 ---
 
