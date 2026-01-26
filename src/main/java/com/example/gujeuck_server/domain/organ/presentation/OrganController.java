@@ -1,14 +1,11 @@
 package com.example.gujeuck_server.domain.organ.presentation;
 
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.CreateOrganRequest;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.OrganResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.LoginOrganRequest;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.ChangePasswordRequest;
-import com.example.gujeuck_server.domain.organ.service.ChangePasswordService;
-import com.example.gujeuck_server.domain.organ.service.CreateOrganService;
-import com.example.gujeuck_server.domain.organ.service.LogExcelOutPutService;
-import com.example.gujeuck_server.domain.organ.service.LoginOrganService;
-import com.example.gujeuck_server.domain.organ.service.ReissueService;
+import com.example.gujeuck_server.domain.organ.service.*;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.UpdateUserRequest;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDetailResponse;
@@ -26,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/organ")
@@ -39,6 +38,7 @@ public class OrganController {
     private final QueryUserListByResidenceService queryUserListByResidenceService;
     private final UpdateUserService updateUserService;
     private final QueryUserDetailService queryUserDetailService;
+    private final QueryOrganNameListService queryOrganNameListService;
 
     @GetMapping("/user/all")
     public SliceWithTotalResponse<UserInfoResponse> queryAllUserList(
@@ -85,5 +85,10 @@ public class OrganController {
     @PatchMapping("/re-issue")
     public TokenResponse reissue(Authentication authentication) {
         return reissueService.execute(authentication);
+    }
+
+    @GetMapping("/name")
+    public List<OrganResponse> queryOrganNameList() {
+        return queryOrganNameListService.execute();
     }
 }
