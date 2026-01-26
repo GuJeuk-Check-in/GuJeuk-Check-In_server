@@ -24,24 +24,40 @@
 **Request Body**
 ```json
 {
-  "name": "string",           // 필수, 이름
-  "gender": "MALE|FEMALE",    // 필수, 성별
-  "phone": "string",          // 필수, 전화번호
-  "maleCount": 0,             // 필수, 남자 동행인 수
-  "femaleCount": 0,           // 필수, 여자 동행인 수
-  "birthYMD": "string",       // 필수, 생년월일
-  "residence": "string",      // 필수, 거주지
-  "privacyAgreed": true,      // 필수, 개인정보 동의
-  "purpose": "string"         // 필수, 방문목적
+  "name": "string",
+  "gender": "MALE|FEMALE",
+  "phone": "string",
+  "maleCount": 0,
+  "femaleCount": 0,
+  "birthYMD": "string",
+  "residence": "string",
+  "privacyAgreed": true,
+  "purpose": "string"
 }
 ```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| name | string | O | 이름 |
+| gender | string | O | 성별 (MALE, FEMALE) |
+| phone | string | O | 전화번호 |
+| maleCount | int | O | 남자 동행인 수 |
+| femaleCount | int | O | 여자 동행인 수 |
+| birthYMD | string | O | 생년월일 |
+| residence | string | O | 거주지 |
+| privacyAgreed | boolean | O | 개인정보 동의 |
+| purpose | string | O | 방문목적 |
 
 **Response (201 Created)**
 ```json
 {
-  "userId": "string"          // 생성된 사용자 ID
+  "userId": "string"
 }
 ```
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| userId | string | 생성된 사용자 ID |
 
 **Error List**
 | 상태 코드 | 에러 이름 | 설명 |
@@ -63,12 +79,19 @@
 **Request Body**
 ```json
 {
-  "userId": "string",         // 필수, 사용자 ID
-  "purpose": "string",        // 필수, 방문목적
-  "maleCount": 0,             // 필수, 남자 동행인 수
-  "femaleCount": 0            // 필수, 여자 동행인 수
+  "userId": "string",
+  "purpose": "string",
+  "maleCount": 0,
+  "femaleCount": 0
 }
 ```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| userId | string | O | 사용자 ID |
+| purpose | string | O | 방문목적 |
+| maleCount | int | O | 남자 동행인 수 |
+| femaleCount | int | O | 여자 동행인 수 |
 
 **Response (200 OK)**
 ```
@@ -97,17 +120,26 @@
 **Request Body**
 ```json
 {
-  "password": "string"        // 필수, 비밀번호
+  "password": "string"
 }
 ```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| password | string | O | 비밀번호 |
 
 **Response (200 OK)**
 ```json
 {
-  "accessToken": "string",    // JWT Access Token
-  "refreshToken": "string"    // JWT Refresh Token
+  "accessToken": "string",
+  "refreshToken": "string"
 }
 ```
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| accessToken | string | JWT Access Token |
+| refreshToken | string | JWT Refresh Token |
 
 **Error List**
 | 상태 코드 | 에러 이름 | 설명 |
@@ -129,9 +161,13 @@
 **Request Body**
 ```json
 {
-  "password": "string"        // 필수, 비밀번호
+  "password": "string"
 }
 ```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| password | string | O | 비밀번호 |
 
 **Response (200 OK)**
 ```json
@@ -160,11 +196,17 @@
 **Request Body**
 ```json
 {
-  "oldPassword": "string",        // 필수, 기존 비밀번호
-  "newPassword": "string",        // 필수, 새 비밀번호
-  "confirmNewPassword": "string"  // 필수, 새 비밀번호 확인
+  "oldPassword": "string",
+  "newPassword": "string",
+  "confirmNewPassword": "string"
 }
 ```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| oldPassword | string | O | 기존 비밀번호 |
+| newPassword | string | O | 새 비밀번호 |
+| confirmNewPassword | string | O | 새 비밀번호 확인 |
 
 **Response (200 OK)**
 ```
@@ -361,13 +403,21 @@ Authentication: {refreshToken}
 **Request Body**
 ```json
 {
-  "name": "string",           // 필수, 최대 30자
-  "userId": "string",         // 필수, 최대 30자
-  "phone": "string",          // 필수, 최대 11자
-  "birthYMD": "string",       // 필수
-  "residence": "string"       // 필수
+  "name": "string",
+  "userId": "string",
+  "phone": "string",
+  "birthYMD": "string",
+  "residence": "string"
 }
 ```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| name | string | O | 이름 (최대 30자) |
+| userId | string | O | 사용자 ID (최대 30자) |
+| phone | string | O | 전화번호 (최대 11자) |
+| birthYMD | string | O | 생년월일 |
+| residence | string | O | 거주지 |
 
 **Response (200 OK)**
 ```
@@ -426,18 +476,31 @@ Body: Excel 파일 (byte[])
 **Request Body**
 ```json
 {
-  "name": "string",           // 필수, 최대 30자
-  "age": "TEENS|TWENTIES|THIRTIES|FORTIES|FIFTIES|SIXTIES|SEVENTIES_PLUS",  // 필수
-  "phone": "string",          // 필수, 최대 30자
-  "maleCount": 0,             // 필수
-  "femaleCount": 0,           // 필수
-  "purpose": "string",        // 필수
-  "visitDate": "string",      // 필수, 방문 날짜
-  "privacyAgreed": true,      // 필수, true여야 함
-  "visitTime": "string",      // 필수, 방문 시간
-  "residence": "string"       // 필수, 거주지
+  "name": "string",
+  "age": "TEENS|TWENTIES|THIRTIES|FORTIES|FIFTIES|SIXTIES|SEVENTIES_PLUS",
+  "phone": "string",
+  "maleCount": 0,
+  "femaleCount": 0,
+  "purpose": "string",
+  "visitDate": "string",
+  "privacyAgreed": true,
+  "visitTime": "string",
+  "residence": "string"
 }
 ```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| name | string | O | 이름 (최대 30자) |
+| age | string | O | 나이대 (Enum 참조) |
+| phone | string | O | 전화번호 (최대 30자) |
+| maleCount | int | O | 남자 동행인 수 |
+| femaleCount | int | O | 여자 동행인 수 |
+| purpose | string | O | 방문목적 |
+| visitDate | string | O | 방문 날짜 |
+| privacyAgreed | boolean | O | 개인정보 동의 (true여야 함) |
+| visitTime | string | O | 방문 시간 |
+| residence | string | O | 거주지 |
 
 **Response (201 Created)**
 ```
@@ -617,9 +680,13 @@ Body: Excel 파일 (byte[])
 **Request Body**
 ```json
 {
-  "purpose": "string"         // 필수, 1~30자
+  "purpose": "string"
 }
 ```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| purpose | string | O | 방문목적 (1~30자) |
 
 **Response (201 Created)**
 ```
@@ -652,9 +719,13 @@ Body: Excel 파일 (byte[])
 **Request Body**
 ```json
 {
-  "purpose": "string"         // 필수, 1~30자
+  "purpose": "string"
 }
 ```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| purpose | string | O | 방문목적 (1~30자) |
 
 **Response (200 OK)**
 ```
@@ -768,9 +839,13 @@ Body: Excel 파일 (byte[])
 **Request Body**
 ```json
 {
-  "purposeId": [1, 3, 2, 4]   // 새로운 순서의 ID 배열
+  "purposeId": [1, 3, 2, 4]
 }
 ```
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| purposeId | long[] | O | 새로운 순서의 ID 배열 |
 
 **Response (200 OK)**
 ```
