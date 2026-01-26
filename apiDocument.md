@@ -901,12 +901,12 @@ Body: Excel 파일 (byte[])
 
 ### 기타 에러
 | 에러 코드 | HTTP 상태 | 설명 |
-|-----------|-----------|------|
-| INVALID_RESIDENCE | 400 | 존재하지 않는 거주지 이름입니다 |
-| EXCEL_GENERATION_FAILED | 507 | 엑셀 파일 생성 중 오류가 발생했습니다 |
-| INVALID_DATE | 401 | 유효하지 않은 날짜 형식입니다 |
-| BAD_REQUEST | 400 | 잘못된 요청입니다 |
-| INTERNAL_SERVER_ERROR | 500 | 서버 내부 오류입니다 |
+|-----------|---------|------|
+| INVALID_RESIDENCE | 400     | 존재하지 않는 거주지 이름입니다 |
+| EXCEL_GENERATION_FAILED | 507     | 엑셀 파일 생성 중 오류가 발생했습니다 |
+| INVALID_DATE | 400     | 유효하지 않은 날짜 형식입니다 |
+| BAD_REQUEST | 400     | 잘못된 요청입니다 |
+| INTERNAL_SERVER_ERROR | 500     | 서버 내부 오류입니다 |
 
 ---
 
