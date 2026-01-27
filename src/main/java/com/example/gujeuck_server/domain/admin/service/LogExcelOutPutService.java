@@ -41,14 +41,10 @@ public class LogExcelOutPutService { // 이건 엑셀 다운로드 관련 클래
         adminFacade.currentUser();
 
         try {
-            String visitDatePrefix = toVisitDatePrefix(yearMonth);
+            String visitDate = toVisitDatePrefix(yearMonth);
 
 
-            List<Log> logs = logRepository.findAllByVisitDateStartingWith(visitDatePrefix);
-
-            List<LogExcelResponse> responses = logs.stream()
-                    .map(LogExcelResponse::from)
-                    .toList();
+            List<LogExcelResponse> responses = logRepository.findAllByVisitDate(visitDate);
 
             byte[] excelFile = ExcelGenerator.generateLogExcel(responses);
 

@@ -34,4 +34,10 @@ public class LogRequest {
 
     @AssertTrue(message = "개인정보 수집 및 이용 동의를 체크해주세요.")
     private boolean privacyAgreed;
+
+    @NotBlank(message = "방문 시간을 입력해주세요.")
+    private String visitTime;
+
+    @NotBlank(message = "거주지를 입력해주세요.")
+    private String residence;
 }

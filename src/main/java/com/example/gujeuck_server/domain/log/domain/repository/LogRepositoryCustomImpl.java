@@ -62,4 +62,27 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                         .fetchOne()
         );
     }
+
+    @Override
+    public List<LogExcelResponse> findAllByVisitDate(String visitDate) {
+
+        return jpaQueryFactory
+                .select(Projections.constructor(
+                        LogExcelResponse.class,
+                        qLog.visitDate,
+                        qLog.visitTime,
+                        qLog.name,
+                        qLog.age,
+                        qLog.maleCount,
+                        qLog.femaleCount,
+                        qLog.phone,
+                        qLog.purpose,
+                        qLog.residence,
+                        qLog.privacyAgreed
+                ))
+                .from(qLog)
+                .where(qLog.visitDate.startsWith(visitDate))
+                .orderBy(qLog.visitDate.asc(), qLog.visitTime.asc())
+                .fetch();
+    }
 }
