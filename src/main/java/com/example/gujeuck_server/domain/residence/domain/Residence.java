@@ -21,4 +21,8 @@ public class Residence extends BaseIdEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organ_id", nullable = false)
     private Organ organ;
+
+    public void updateResidence(String residenceName) {
+        this.residenceName = residenceName;
+    }
 }
