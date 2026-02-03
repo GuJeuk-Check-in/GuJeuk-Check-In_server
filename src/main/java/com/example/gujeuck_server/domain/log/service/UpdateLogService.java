@@ -29,7 +29,7 @@ public class UpdateLogService {
             throw LogAccessDeniedException.EXCEPTION;
         }
 
-        Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
         log.updateLog(
                 request.getName(),

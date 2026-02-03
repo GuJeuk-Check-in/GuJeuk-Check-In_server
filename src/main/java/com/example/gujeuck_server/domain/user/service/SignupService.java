@@ -49,7 +49,7 @@ public class SignupService {
 
         int currentYear = LocalDate.now().getYear();
 
-        Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
         String resolvedResidence = User.resolveResidence(request.getResidence());;
 

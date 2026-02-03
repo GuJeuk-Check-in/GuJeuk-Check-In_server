@@ -37,7 +37,7 @@ public class CreateLogService {
 
         int currentYear = LocalDate.now().getYear();
 
-        Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
         String formattedDate = resolveVisitDate(request.getVisitDate());
 
