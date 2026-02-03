@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class SignupResponse {
+public class SignUpResponse {
 
     @NotBlank
     private String userId;

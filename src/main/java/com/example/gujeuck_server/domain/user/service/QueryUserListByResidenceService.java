@@ -4,10 +4,10 @@ package com.example.gujeuck_server.domain.user.service;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.domain.enums.Residence;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +29,7 @@ public class QueryUserListByResidenceService {
     private static final String ETC = "기타";
 
     @Transactional(readOnly = true)
-    public SliceWithTotalResponse<UserInfoResponse> execute(String residence, Pageable p) {
+    public UserSliceWithTotalResponse execute(String residence, Pageable p) {
 
         Organ organ = organFacade.currentOrgan();
 

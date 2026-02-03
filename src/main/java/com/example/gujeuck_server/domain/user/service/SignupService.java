@@ -11,7 +11,7 @@ import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SignupResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
 import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
@@ -35,11 +35,11 @@ public class SignupService {
     private static final String TIME = "HH:mm";
 
     @Transactional
-    public SignupResponse execute(SignupRequest request) {
+    public SignUpResponse execute(SignupRequest request) {
 
         Organ organ = organFacade.currentOrgan();
 
-        SignupResponse signupResponse = createUserId(organ.getId(), request.getName(), request.getBirthYMD());
+        SignUpResponse signupResponse = createUserId(organ.getId(), request.getName(), request.getBirthYMD());
 
         Age age = calculateAgeService.getAge(request.getBirthYMD());
 
@@ -66,7 +66,7 @@ public class SignupService {
         return signupResponse;
     }
 
-    private SignupResponse createUserId(Long organId, String name, String birthYMD) {
+    private SignUpResponse createUserId(Long organId, String name, String birthYMD) {
 
         String userId = User.generateUserId(name, birthYMD);
 
@@ -74,7 +74,7 @@ public class SignupService {
             throw ExistUserIdException.EXCEPTION;
         }
 
-        return SignupResponse.builder()
+        return SignUpResponse.builder()
                 .userId(userId)
                 .build();
     }

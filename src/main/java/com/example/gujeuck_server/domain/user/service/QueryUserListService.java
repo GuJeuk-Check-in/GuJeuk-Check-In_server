@@ -2,9 +2,9 @@ package com.example.gujeuck_server.domain.user.service;
 
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +20,7 @@ public class QueryUserListService {
     private final OrganFacade organFacade;
 
     @Transactional(readOnly = true)
-    public SliceWithTotalResponse<UserInfoResponse> execute(Pageable p) {
+    public UserSliceWithTotalResponse execute(Pageable p) {
         Organ organ = organFacade.currentOrgan();
 
         Pageable pageable = PageRequest.of(

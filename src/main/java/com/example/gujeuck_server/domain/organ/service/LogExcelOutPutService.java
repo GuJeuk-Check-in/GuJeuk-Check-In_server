@@ -45,7 +45,7 @@ public class LogExcelOutPutService {
             String visitDate = toVisitDate(yearMonth);
 
 
-            List<Log> logs = logRepository.findAllByOrganIdAndVisitDateStartingWith(organ.getId(), visitDatePrefix);
+            List<Log> logs = logRepository.findAllByOrganIdAndVisitDateStartingWith(organ.getId(), visitDate);
 
             List<LogExcelResponse> responses = logs.stream()
                     .map(LogExcelResponse::from)
