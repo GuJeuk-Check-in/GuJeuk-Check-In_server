@@ -48,6 +48,9 @@ public enum ErrorCode {
     SAME_OLD_PASSWORD(400, "기존 비밀번호와 동일한 비밀번호로 변경할 수 없습니다."),
     ORGAN_ALREADY_EXIST(409, "이미 기관 계정이 존재합니다."),
 
+    // residence
+    RESIDENCE_ALREADY_EXIST(404, "이미 존재하는 거주지 입니다."),
+
     // general
     BAD_REQUEST(400, "프론트 탓"),
     INTERNAL_SERVER_ERROR(500, "서버 탓");
