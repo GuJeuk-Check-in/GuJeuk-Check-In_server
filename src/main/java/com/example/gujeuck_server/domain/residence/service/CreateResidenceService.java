@@ -7,8 +7,10 @@ import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRe
 import com.example.gujeuck_server.domain.residence.exception.ResidenceAlreadyException;
 import com.example.gujeuck_server.domain.residence.presentation.dto.request.ResidenceRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
+@Service
 public class CreateResidenceService {
     private final ResidenceRepository residenceRepository;
     private final OrganFacade organFacade;

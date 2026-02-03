@@ -3,12 +3,10 @@ package com.example.gujeuck_server.domain.residence.domain;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.global.entity.BaseIdEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
+@Setter
 @Getter
 @Builder
 @AllArgsConstructor
