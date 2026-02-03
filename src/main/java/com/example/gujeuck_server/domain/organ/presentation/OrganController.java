@@ -7,9 +7,8 @@ import com.example.gujeuck_server.domain.organ.presentation.dto.request.LoginOrg
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.ChangePasswordRequest;
 import com.example.gujeuck_server.domain.organ.service.*;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.UpdateUserRequest;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SliceWithTotalResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDetailResponse;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.service.QueryUserDetailService;
 import com.example.gujeuck_server.domain.user.service.QueryUserListByResidenceService;
 import com.example.gujeuck_server.domain.user.service.QueryUserListService;

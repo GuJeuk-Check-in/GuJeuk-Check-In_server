@@ -62,4 +62,16 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                         .fetchOne()
         );
     }
+
+    @Override
+    public long countByYearMonth(String yearMonth) {
+
+        return jpaQueryFactory
+                .select(qLog.count())
+                .from(qLog)
+                .where(
+                        qLog.visitDate.startsWith(yearMonth)
+                )
+                .fetchOne();
+    }
 }

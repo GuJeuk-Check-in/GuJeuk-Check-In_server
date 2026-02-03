@@ -51,7 +51,7 @@ public class QueryUserListByResidenceService {
             Slice<UserInfoResponse> slice = userRepository.findByOrganIdAndResidenceNotIn(organ.getId(), registeredResidences, pageable)
                     .map(UserInfoResponse::from);
 
-            return new SliceWithTotalResponse<>(total, slice);
+            return new UserSliceWithTotalResponse(total, slice);
         }
 
         Residence matched = Residence.fromKoreanName(data);
@@ -63,7 +63,7 @@ public class QueryUserListByResidenceService {
             Slice<UserInfoResponse> slice = userRepository.findByResidenceAndOrganId(kr, organ.getId(), pageable)
                     .map(UserInfoResponse::from);
 
-            return new SliceWithTotalResponse<>(total, slice);
+            return new UserSliceWithTotalResponse(total, slice);
         }
 
         throw InvalidResidenceException.EXCEPTION;

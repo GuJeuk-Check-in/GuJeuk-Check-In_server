@@ -34,6 +34,6 @@ public class QueryUserListService {
         Slice<UserInfoResponse> slice = userRepository.findAllByOrganId(pageable, organ.getId())
                 .map(UserInfoResponse::from);
 
-        return new SliceWithTotalResponse<>(total, slice);
+        return new UserSliceWithTotalResponse(total, slice);
     }
 }

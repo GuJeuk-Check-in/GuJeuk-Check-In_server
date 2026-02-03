@@ -42,7 +42,7 @@ public class LogExcelOutPutService {
         Organ organ = organFacade.currentOrgan();
 
         try {
-            String visitDatePrefix = toVisitDatePrefix(yearMonth);
+            String visitDate = toVisitDate(yearMonth);
 
 
             List<Log> logs = logRepository.findAllByOrganIdAndVisitDateStartingWith(organ.getId(), visitDatePrefix);
@@ -64,7 +64,7 @@ public class LogExcelOutPutService {
             throw ExcelGenerationException.EXCEPTION;
         }
     }
-    private String toVisitDatePrefix(String yearMonth) {
+    private String toVisitDate(String yearMonth) {
         try {
             YearMonth ym = YearMonth.parse(yearMonth, YEAR_MONTH);
 
