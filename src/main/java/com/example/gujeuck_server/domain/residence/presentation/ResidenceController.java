@@ -1,5 +1,7 @@
 package com.example.gujeuck_server.domain.residence.presentation;
 
+import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeMoveRequest;
+import com.example.gujeuck_server.domain.residence.presentation.dto.request.ResidenceMoveRequest;
 import com.example.gujeuck_server.domain.residence.presentation.dto.request.ResidenceRequest;
 import com.example.gujeuck_server.domain.residence.presentation.dto.response.ResidenceResponse;
 import com.example.gujeuck_server.domain.residence.service.*;
@@ -17,6 +19,7 @@ public class ResidenceController {
     private final UpdateResidenceService updateResidenceService;
     private final QueryResidenceDetailService queryResidenceDetailService;
     private final QueryResidenceListService queryResidenceListService;
+    private final MoveResidenceService moveResidenceService;
 
     @PostMapping
     public void createResidence(@RequestBody ResidenceRequest residenceRequest){
@@ -41,5 +44,10 @@ public class ResidenceController {
     @DeleteMapping("/{id}")
     public void deleteResidence(@PathVariable Long id){
         deleteResidenceService.execute(id);
+    }
+
+    @PatchMapping("/move")
+    public void movePurpose(@RequestBody ResidenceMoveRequest residenceMoveRequest) {
+        moveResidenceService.execute(residenceMoveRequest);
     }
 }
