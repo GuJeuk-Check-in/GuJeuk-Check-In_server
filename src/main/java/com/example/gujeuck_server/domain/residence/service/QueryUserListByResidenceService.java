@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.user.service;
+package com.example.gujeuck_server.domain.residence.service;
 
 
 import com.example.gujeuck_server.domain.organ.domain.Organ;
