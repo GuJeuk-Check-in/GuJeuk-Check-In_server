@@ -4,8 +4,10 @@ package com.example.gujeuck_server.domain.user.service;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
+import com.example.gujeuck_server.domain.residence.domain.Residence;
+import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRepository;
+import com.example.gujeuck_server.domain.residence.exception.ResidenceNotFoundException;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
-import com.example.gujeuck_server.domain.user.domain.enums.Residence;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -24,6 +25,7 @@ import java.util.List;
 public class QueryUserListByResidenceService {
 
     private final UserRepository userRepository;
+    private final ResidenceRepository residenceRepository;
     private final OrganFacade organFacade;
 
     private static final String ETC = "기타";
@@ -42,9 +44,7 @@ public class QueryUserListByResidenceService {
         String data = residence.trim();
 
         if (ETC.equals(data)) {
-            List<String> registeredResidences = Arrays.stream(Residence.values())
-                    .map(Residence::getKoreanName)
-                    .toList();
+            List<String> registeredResidences = residenceRepository.findAllResidenceNamesByOrganId(organ.getId());
 
             long total = userRepository.countByOrganIdAndResidenceNotIn(organ.getId(), registeredResidences);
 
@@ -54,13 +54,14 @@ public class QueryUserListByResidenceService {
             return new UserSliceWithTotalResponse(total, slice);
         }
 
-        Residence matched = Residence.fromKoreanName(data);
+        Residence matched = residenceRepository.findByResidenceNameAndOrganId(data, organ.getId())
+                .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
         if (matched != null) {
-            String kr = matched.getKoreanName();
-            long total = userRepository.countByResidenceAndOrganId(kr, organ.getId());
+            String rn = matched.getResidenceName();
+            long total = userRepository.countByResidenceAndOrganId(rn, organ.getId());
 
-            Slice<UserInfoResponse> slice = userRepository.findByResidenceAndOrganId(kr, organ.getId(), pageable)
+            Slice<UserInfoResponse> slice = userRepository.findByResidenceAndOrganId(rn, organ.getId(), pageable)
                     .map(UserInfoResponse::from);
 
             return new UserSliceWithTotalResponse(total, slice);
