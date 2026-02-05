@@ -29,9 +29,9 @@ public class QueryResidenceDetailService {
             throw ResidenceAccessDeniedException.EXCEPTION;
         }
 
-        return new ResidenceResponse(
-                residence.getId(),
-                residence.getResidenceName()
-        );
+        return ResidenceResponse.builder()
+                .id(residence.getId())
+                .residence(residence.getResidenceName())
+                .build();
     }
 }
