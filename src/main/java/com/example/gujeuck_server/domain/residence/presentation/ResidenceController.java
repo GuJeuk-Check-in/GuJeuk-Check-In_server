@@ -47,7 +47,7 @@ public class ResidenceController {
     }
 
     @PatchMapping("/move")
-    public void movePurpose(@RequestBody ResidenceMoveRequest residenceMoveRequest) {
+    public void moveResidence(@RequestBody ResidenceMoveRequest residenceMoveRequest) {
         moveResidenceService.execute(residenceMoveRequest);
     }
 }
