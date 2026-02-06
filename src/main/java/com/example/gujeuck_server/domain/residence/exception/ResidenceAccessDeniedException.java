@@ -7,6 +7,6 @@ public class ResidenceAccessDeniedException extends GujeukException {
     public static final GujeukException EXCEPTION = new ResidenceAccessDeniedException();
 
     private ResidenceAccessDeniedException() {
-        super(ErrorCode.RESIDENCE_ALREADY_EXIST);
+        super(ErrorCode.RESIDENCE_ACCESS_DENIED);
     }
 }
