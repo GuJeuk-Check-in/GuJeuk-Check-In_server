@@ -44,7 +44,7 @@ public class QueryUserListByResidenceService {
         String data = residence.trim();
 
         if (ETC.equals(data)) {
-            List<String> registeredResidences = residenceRepository.findAllResidenceNamesByOrganId(organ.getId());
+            List<String> registeredResidences = residenceRepository.findAllResidenceNameByOrganId(organ.getId());
 
             long total = userRepository.countByOrganIdAndResidenceNotIn(organ.getId(), registeredResidences);
 

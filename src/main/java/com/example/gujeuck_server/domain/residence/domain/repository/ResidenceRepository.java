@@ -13,7 +13,7 @@ public interface ResidenceRepository extends JpaRepository<Residence, Long>, Res
 
     List<Residence> findAllByOrganIdAndResidenceIndexGreaterThan(Long organId, int residenceIndex);
 
-    List<String> findAllResidenceNamesByOrganId(Long organId);
+    List<String> findAllResidenceNameByOrganId(Long organId);
 
     Optional<Residence> findByResidenceNameAndOrganId(String residenceName, Long organId);
 }
