@@ -8,6 +8,7 @@ import com.example.gujeuck_server.domain.residence.exception.ResidenceAlreadyExc
 import com.example.gujeuck_server.domain.residence.presentation.dto.request.ResidenceRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -15,6 +16,7 @@ public class CreateResidenceService {
     private final ResidenceRepository residenceRepository;
     private final OrganFacade organFacade;
 
+    @Transactional
     public void execute(ResidenceRequest residenceRequest) {
         Organ organ = organFacade.currentOrgan();
 
