@@ -10,7 +10,7 @@ import com.example.gujeuck_server.domain.user.presentation.dto.request.UpdateUse
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserDetailResponse;
 import com.example.gujeuck_server.domain.user.service.QueryUserDetailService;
-import com.example.gujeuck_server.domain.user.service.QueryUserListByResidenceService;
+import com.example.gujeuck_server.domain.residence.service.QueryUserListByResidenceService;
 import com.example.gujeuck_server.domain.user.service.QueryUserListService;
 import com.example.gujeuck_server.domain.user.service.UpdateUserService;
 import jakarta.validation.Valid;
