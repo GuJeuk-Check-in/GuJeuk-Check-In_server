@@ -4,6 +4,7 @@ import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.residence.domain.Residence;
 import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRepository;
+import com.example.gujeuck_server.domain.residence.exception.ResidenceAccessDeniedException;
 import com.example.gujeuck_server.domain.residence.exception.ResidenceNotFoundException;
 import com.example.gujeuck_server.domain.residence.presentation.dto.request.ResidenceMoveRequest;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class MoveResidenceService {
             }
 
             if(!residence.getOrgan().getId().equals(organ.getId())) {
-                throw ResidenceNotFoundException.EXCEPTION;
+                throw ResidenceAccessDeniedException.EXCEPTION;
             }
 
             residence.setResidenceIndex(i + 1);
