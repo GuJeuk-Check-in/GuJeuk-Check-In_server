@@ -1,10 +1,10 @@
-FROM eclipse-temurin:17-jre-alpine
+FROM --platform=linux/amd64 eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
 RUN addgroup -S spring && adduser -S spring -G spring
 
-COPY app.jar app.jar
+COPY build/libs/*.jar app.jar
 
 RUN chown spring:spring app.jar
 

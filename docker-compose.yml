@@ -1,0 +1,49 @@
+services:
+  app:
+    image: troy96475/gujeuk-check-in-server:latest
+    container_name: gujeuk-app
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      DB_USERNAME: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+      PROD_BASE_URL: ${PROD_BASE_URL}
+      STAG_BASE_URL: ${STAG_BASE_URL}
+      VERCEL_URL: ${VERCEL_URL}
+      TEST_URL: ${TEST_URL}
+
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+
+  mysql:
+    image: mysql:8.0
+    container_name: gujeuk-mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: Asia/Seoul
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: gujeuk-redis
+    restart: always
+
+volumes:
+  mysql-data:
