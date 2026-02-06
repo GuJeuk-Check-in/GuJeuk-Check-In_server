@@ -49,7 +49,7 @@ public enum ErrorCode {
     ORGAN_ALREADY_EXIST(409, "이미 기관 계정이 존재합니다."),
 
     // residence
-    RESIDENCE_ALREADY_EXIST(404, "이미 존재하는 거주지 입니다."),
+    RESIDENCE_ALREADY_EXIST(409, "이미 존재하는 거주지 입니다."),
     RESIDENCE_NOT_FOUND(404, "존재하지 않는 거주지 입니다."),
     RESIDENCE_ACCESS_DENIED(403, "해당 거주지에 관한 권한이 없습니다."),
 
