@@ -75,7 +75,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -e
-            cd /home/ubuntu/gujeuk
+            cd /home/ubuntu/GuJeuk-Check-In_server
             docker compose pull
             docker compose up -d --remove-orphans
             docker image prune -f
