@@ -64,6 +64,7 @@ jobs:
 
   deploy:
     needs: docker
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to EC2 via SSH
