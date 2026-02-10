@@ -1,6 +1,6 @@
 services:
   app:
-    image: troy96475/gujeuk-check-in-server:latest
+    image: troy96475/gujeuk-check-in:latest
     container_name: gujeuk-app
     ports:
       - "8080:8080"
