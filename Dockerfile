@@ -2,7 +2,8 @@ FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-RUN addgroup -S spring && adduser -S spring -G spring
+RUN groupadd --system spring \
+ && useradd --system --gid spring spring
 
 COPY build/libs/*.jar app.jar
 
