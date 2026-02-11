@@ -58,6 +58,7 @@ public class LoginUserService {
                 .visitTime(visitTime)
                 .year(currentYear)
                 .residence(user.getResidence())
+                .organ(user.getOrgan())
                 .build();
     }
 }
