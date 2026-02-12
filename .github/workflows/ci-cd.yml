@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Gujeuk CI/CD
 
 on:
   push:
@@ -12,6 +12,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -20,26 +21,18 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: gradle
 
       - name: Verify build (no test)
         run: ./gradlew build -x test
-
 
   docker:
     needs: build
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Build jar for Docker
-        run: ./gradlew build -x test
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -61,10 +54,11 @@ jobs:
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-
   deploy:
     needs: docker
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
+
     steps:
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1
@@ -74,8 +68,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -e
-            cd /home/ubuntu/GuJeuk-Check-In_server
+            cd /home/ubuntu/gujeuk
             docker compose pull
             docker compose up -d --remove-orphans
             docker image prune -f
-
