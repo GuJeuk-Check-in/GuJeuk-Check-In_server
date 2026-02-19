@@ -79,4 +79,3 @@ jobs:
             fi
 
             docker image prune -f
-
