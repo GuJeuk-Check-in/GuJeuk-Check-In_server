@@ -69,6 +69,13 @@ jobs:
           script: |
             set -e
             cd /home/ubuntu/gujeuk
-            docker compose pull
-            docker compose up -d --remove-orphans
+
+            if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+              docker compose -f docker-compose.prod.yml pull
+              docker compose -f docker-compose.prod.yml up -d --remove-orphans
+            else
+              docker compose -f docker-compose.stag.yml pull
+              docker compose -f docker-compose.stag.yml up -d --remove-orphans
+            fi
+
             docker image prune -f
