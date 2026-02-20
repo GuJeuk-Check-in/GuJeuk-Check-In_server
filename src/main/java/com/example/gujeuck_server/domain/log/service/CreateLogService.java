@@ -33,6 +33,8 @@ public class CreateLogService {
 
         Organ organ = organFacade.currentOrgan();
 
+        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
+
         int currentYear = LocalDate.now().getYear();
 
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
@@ -78,7 +80,6 @@ public class CreateLogService {
                 .purpose(purpose.getPurposeName())
                 .visitTime(time)
                 .visitDate(date)
-                .residence(residence)
                 .year(year)
                 .privacyAgreed(request.isPrivacyAgreed())
                 .organ(organ)

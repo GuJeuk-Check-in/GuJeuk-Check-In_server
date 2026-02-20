@@ -47,6 +47,10 @@ public class LogExcelOutPutService {
 
             List<Log> logs = logRepository.findAllByOrganIdAndVisitDateStartingWith(organ.getId(), visitDate);
 
+            List<LogExcelResponse> responses = logs.stream()
+                    .map(LogExcelResponse::from)
+                    .toList();
+
             byte[] excelFile = ExcelGenerator.generateLogExcel(responses);
 
             String encodedFilename = encodeFileName(generateExcelFileName());
