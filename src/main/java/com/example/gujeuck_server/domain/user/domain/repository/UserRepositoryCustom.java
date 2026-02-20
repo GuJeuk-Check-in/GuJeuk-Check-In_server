@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface UserRepositoryCustom {
 
-    Optional<User> findByUserId(String userId);
+    Optional<User> findByUserIdAndOrganId(String userId, Long organId);
 }

@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 public class PurposeFacade {
     private final PurposeRepository purposeRepository;
 
-    public Purpose getPurpose(String purpose) {
+    public Purpose getPurpose(Long organId, String purposeName) {
 
-        return purposeRepository.findByPurposeName(purpose)
+        return purposeRepository.findByOrganIdAndPurposeName(organId, purposeName)
                 .orElseThrow(() -> PurposeNotFoundException.EXCEPTION);
     }
 

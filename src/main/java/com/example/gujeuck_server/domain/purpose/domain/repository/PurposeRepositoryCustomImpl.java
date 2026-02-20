@@ -10,9 +10,10 @@ public class PurposeRepositoryCustomImpl implements PurposeRepositoryCustom {
     private final QPurpose qPurpose = QPurpose.purpose;
 
     @Override
-    public int findMaxPurposeIndex() {
+    public int findMaxPurposeIndexByOrganId(Long organId) {
         Integer max = jpaQueryFactory
                 .select(qPurpose.purposeIndex.max())
+                .where(qPurpose.organ.id.eq(organId))
                 .from(qPurpose)
                 .fetchOne();
 

@@ -1,7 +1,8 @@
 package com.example.gujeuck_server.domain.log.service;
 
+import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
@@ -21,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 public class CreateLogService {
 
     private final LogRepository logRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
     private final PurposeFacade purposeFacade;
 
     private static final String TIME = "HH:mm";
@@ -30,15 +31,15 @@ public class CreateLogService {
     @Transactional
     public void execute(LogRequest request) {
 
-        adminFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         int currentYear = LocalDate.now().getYear();
 
-        Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
         String formattedDate = resolveVisitDate(request.getVisitDate());
 
-        Log log = createUseLog(request, purpose, formattedDate, request.getVisitTime(), request.getResidence(), currentYear);
+        Log log = createUseLog(request, purpose, formattedDate, visitTime, currentYear, organ);
         logRepository.save(log);
     }
 
@@ -65,8 +66,8 @@ public class CreateLogService {
             Purpose purpose,
             String date,
             String time,
-            String residence,
-            int year
+            int year,
+            Organ organ
     ) {
         return Log.builder()
                 .name(request.getName())
@@ -80,6 +81,7 @@ public class CreateLogService {
                 .residence(residence)
                 .year(year)
                 .privacyAgreed(request.isPrivacyAgreed())
+                .organ(organ)
                 .build();
     }
 }

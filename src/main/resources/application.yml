@@ -7,9 +7,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_NAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
 
   servlet:
     multipart:
@@ -24,6 +24,13 @@ spring:
       jdbc:
         time_zone: Asia/Seoul
       ddl-auto: update
+
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: false
+
 jwt:
   header: Authorization
   prefix: Bearer
@@ -35,17 +42,6 @@ jwt:
     level:
       root: DEBUG
 
-#cloud:
-#  aws:
-#    region:
-#      static: ${AWS_REGION}
-#    stack:
-#      auto: false
-#    credentials:
-#      accessKey: ${AWS_ACCESS_KEY_ID}
-#      secretKey: ${AWS_SECRET_ACCESS_KEY}
-
-
 redis:
   host: ${REDIS_HOST}
   port: ${REDIS_PORT}
@@ -56,3 +52,10 @@ logging:
     io.lettuce.core: DEBUG
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+
+cors:
+  allowed-origins:
+    prod-url: ${PROD_BASE_URL}
+    stag-url: ${STAG_BASE_URL}
+    vercel-url: ${VERCEL_URL}
+    test-url: ${TEST_URL}

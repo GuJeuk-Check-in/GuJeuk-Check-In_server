@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.global.security.auth;
 
-import com.example.gujeuck_server.domain.admin.domain.Admin;
-import com.example.gujeuck_server.domain.admin.domain.repository.AdminRepository;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,13 +11,14 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    private final AdminRepository adminRepository;
+    private final OrganRepository organRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String password) {
-        Admin admin = adminRepository.findByPassword(password)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+    public UserDetails loadUserByUsername(String organName) {
 
-        return new CustomUserDetails(admin);
+        Organ organ = organRepository.findByOrganName(organName)
+                .orElseThrow(() -> new UsernameNotFoundException("Organ Not Found"));
+
+        return new CustomUserDetails(organ);
     }
 }

@@ -2,7 +2,7 @@ package com.example.gujeuck_server.domain.user.presentation;
 
 import com.example.gujeuck_server.domain.user.presentation.dto.request.LoginRequest;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SignupResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
 import com.example.gujeuck_server.domain.user.service.LoginUserService;
 import com.example.gujeuck_server.domain.user.service.SignupService;
 import jakarta.validation.Valid;
@@ -19,13 +19,13 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/sign-up")
-    public SignupResponse signup(@RequestBody @Valid SignupRequest request) {
-        return signupService.signup(request);
+    public SignUpResponse signup(@RequestBody @Valid SignupRequest request) {
+        return signupService.execute(request);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/login")
     public void login(@RequestBody @Valid LoginRequest request) {
-        loginUserService.login(request);
+        loginUserService.execute(request);
     }
 }

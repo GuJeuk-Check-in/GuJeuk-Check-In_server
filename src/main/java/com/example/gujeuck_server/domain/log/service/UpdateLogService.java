@@ -1,10 +1,10 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
-import com.example.gujeuck_server.domain.log.exception.DuplicateLogException;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.log.exception.LogAccessDeniedException;
 import com.example.gujeuck_server.domain.log.facade.LogFacade;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
@@ -16,19 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UpdateLogService {
     private final LogFacade logFacade;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
     private final PurposeFacade purposeFacade;
-    private final LogRepository logRepository;
 
     @Transactional
     public void execute(Long logId, LogRequest request) {
-        adminFacade.currentUser();
+        Organ organ = organFacade.currentOrgan();
 
         Log log = logFacade.getLogById(logId);
 
-        Purpose purpose = purposeFacade.getPurpose(request.getPurpose());
+        if (!log.getOrgan().getId().equals(organ.getId())) {
+            throw LogAccessDeniedException.EXCEPTION;
+        }
 
-//        validateDuplicateLog(log.getUser().getUserId(), log.getVisitDate(), log.getVisitTime());
+        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
         log.updateLog(
                 request.getName(),
@@ -40,12 +41,5 @@ public class UpdateLogService {
                 request.getVisitDate(),
                 request.isPrivacyAgreed()
         );
-    }
-
-    private void validateDuplicateLog(String userId, String visitDate, String visitTime) {
-
-        if (logRepository.findByUserIdAndVisitTime(userId, visitDate, visitTime).isPresent()) {
-            throw DuplicateLogException.EXCEPTION;
-        }
     }
 }

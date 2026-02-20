@@ -1,8 +1,10 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
+import com.example.gujeuck_server.domain.purpose.exception.PurposeAccessDeniedException;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeMoveRequest;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +19,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MovePurposeService {
     private final PurposeRepository purposeRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
 
     @Transactional
-    public void movementPurpose(PurposeMoveRequest purposeMoveRequest) {
-        adminFacade.currentUser();
+    public void execute(PurposeMoveRequest purposeMoveRequest) {
+        Organ organ = organFacade.currentOrgan();
 
         List<Long> purposesId = purposeMoveRequest.getPurposeId();
         List<Purpose> purposes = purposeRepository.findAllById(purposeMoveRequest.getPurposeId());
@@ -38,6 +40,10 @@ public class MovePurposeService {
 
             if(purpose == null) {
                 throw PurposeNotFoundException.EXCEPTION;
+            }
+
+            if (!purpose.getOrgan().getId().equals(organ.getId())) {
+                throw PurposeAccessDeniedException.EXCEPTION;
             }
 
             purpose.setPurposeIndex(i + 1);

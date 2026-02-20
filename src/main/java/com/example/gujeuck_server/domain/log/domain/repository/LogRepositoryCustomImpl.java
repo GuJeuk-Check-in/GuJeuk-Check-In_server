@@ -64,25 +64,14 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
     }
 
     @Override
-    public List<LogExcelResponse> findAllByVisitDate(String visitDate) {
+    public long countByYearMonth(String yearMonth) {
 
         return jpaQueryFactory
-                .select(Projections.constructor(
-                        LogExcelResponse.class,
-                        qLog.visitDate,
-                        qLog.visitTime,
-                        qLog.name,
-                        qLog.age,
-                        qLog.maleCount,
-                        qLog.femaleCount,
-                        qLog.phone,
-                        qLog.purpose,
-                        qLog.residence,
-                        qLog.privacyAgreed
-                ))
+                .select(qLog.count())
                 .from(qLog)
-                .where(qLog.visitDate.startsWith(visitDate))
-                .orderBy(qLog.visitDate.asc(), qLog.visitTime.asc())
-                .fetch();
+                .where(
+                        qLog.visitDate.startsWith(yearMonth)
+                )
+                .fetchOne();
     }
 }

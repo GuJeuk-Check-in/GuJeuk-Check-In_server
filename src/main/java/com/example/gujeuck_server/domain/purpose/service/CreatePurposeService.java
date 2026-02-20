@@ -1,8 +1,8 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.admin.facade.AdminFacade;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeAlreadyExistException;
-import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeRequest;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
@@ -14,22 +14,23 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CreatePurposeService {
     private final PurposeRepository purposeRepository;
-    private final AdminFacade adminFacade;
+    private final OrganFacade organFacade;
 
     @Transactional
-    public void createPurpose(PurposeRequest request) {
-        adminFacade.currentUser();
+    public void execute(PurposeRequest request) {
+        Organ organ = organFacade.currentOrgan();
 
-        if(purposeRepository.findByPurposeName(request.getPurpose()).isPresent()) {
+        if(purposeRepository.findByOrganIdAndPurposeName(organ.getId(), request.getPurpose()).isPresent()) {
             throw PurposeAlreadyExistException.EXCEPTION;
         }
-        
-        int purposeIndex = purposeRepository.findMaxPurposeIndex() + 1;
+
+        int purposeIndex = purposeRepository.findMaxPurposeIndexByOrganId(organ.getId()) + 1;
 
         purposeRepository.save(
                 Purpose.builder()
                         .purposeName(request.getPurpose())
                         .purposeIndex(purposeIndex)
+                        .organ(organ)
                         .build()
         );
     }

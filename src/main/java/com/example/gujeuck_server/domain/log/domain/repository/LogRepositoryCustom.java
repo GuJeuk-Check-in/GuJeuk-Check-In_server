@@ -11,5 +11,5 @@ public interface LogRepositoryCustom {
 
     Optional<Log> findByUserIdAndVisitTime(String userId, String visitDate, String visitTime);
 
-    List<LogExcelResponse> findAllByVisitDate(String visitDate);
+    long countByYearMonth(String yearMonth);
 }

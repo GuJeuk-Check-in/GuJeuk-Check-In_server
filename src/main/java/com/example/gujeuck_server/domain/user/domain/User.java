@@ -1,8 +1,10 @@
 package com.example.gujeuck_server.domain.user.domain;
 
+import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 import com.example.gujeuck_server.domain.user.domain.enums.Residence;
+import com.example.gujeuck_server.global.entity.BaseIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,10 +13,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class User extends BaseIdEntity {
 
     @Column(nullable = false, unique = true, length = 30)
     private String userId;
@@ -46,6 +45,10 @@ public class User {
 
     @Column(nullable = false)
     private int count;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organ_id", nullable = false)
+    private Organ organ;
 
     public void updateUser(String name, String userId, String phone, String birthYMD, String residence) {
         this.name = name;
