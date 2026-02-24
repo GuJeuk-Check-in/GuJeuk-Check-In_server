@@ -18,7 +18,7 @@ public class UpdatePurposeService {
 
     @Transactional
     public void execute(Long id, PurposeRequest purposeRequest) {
-        Organ organ = organFacade.currentOrgan();
+        organFacade.currentOrgan();
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 

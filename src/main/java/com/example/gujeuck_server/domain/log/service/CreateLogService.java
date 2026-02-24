@@ -33,7 +33,7 @@ public class CreateLogService {
 
         int currentYear = TimeProvider.nowYear();
 
-        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(1L, request.getPurpose());
 
         String formattedDate = resolveVisitDate(request.getVisitDate());
 
