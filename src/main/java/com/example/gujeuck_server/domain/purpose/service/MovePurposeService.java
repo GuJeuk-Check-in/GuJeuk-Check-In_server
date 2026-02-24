@@ -42,10 +42,6 @@ public class MovePurposeService {
                 throw PurposeNotFoundException.EXCEPTION;
             }
 
-            if (!purpose.getOrgan().getId().equals(organ.getId())) {
-                throw PurposeAccessDeniedException.EXCEPTION;
-            }
-
             purpose.setPurposeIndex(i + 1);
         }
     }

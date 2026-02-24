@@ -22,10 +22,6 @@ public class UpdatePurposeService {
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 
-        if (!purpose.getOrgan().getId().equals(organ.getId())) {
-            throw PurposeAccessDeniedException.EXCEPTION;
-        }
-
         purpose.updatePurpose(purposeRequest.getPurpose());
     }
 }
