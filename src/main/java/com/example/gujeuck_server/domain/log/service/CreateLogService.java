@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -33,15 +31,14 @@ public class CreateLogService {
 
         Organ organ = organFacade.currentOrgan();
 
-        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
-
         int currentYear = LocalDate.now().getYear();
 
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
         String formattedDate = resolveVisitDate(request.getVisitDate());
 
-        Log log = createUseLog(request, purpose, formattedDate, visitTime, currentYear, organ);
+        Log log = createUseLog(request, purpose, formattedDate, request.getVisitTime(), currentYear, organ);
+
         logRepository.save(log);
     }
 
