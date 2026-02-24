@@ -9,6 +9,7 @@ import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.global.utility.DateFormatter;
+import com.example.gujeuck_server.global.utility.TimeProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,6 @@ public class CreateLogService {
     private final OrganFacade organFacade;
     private final PurposeFacade purposeFacade;
 
-    private static final String TIME = "HH:mm";
     private static final String KOREAN_DATE_REGEX = "\\d{4}년\\d{2}월\\d{2}일";
 
     @Transactional
@@ -31,7 +31,7 @@ public class CreateLogService {
 
         Organ organ = organFacade.currentOrgan();
 
-        int currentYear = LocalDate.now().getYear();
+        int currentYear = TimeProvider.nowYear();
 
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
