@@ -111,7 +111,6 @@ public class SignupService {
                 .visitTime(visitTime)
                 .year(year)
                 .user(user)
-                .residence(residence)
                 .organ(organ)
                 .build();
     }

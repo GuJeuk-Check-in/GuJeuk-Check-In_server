@@ -43,8 +43,6 @@ public class QLog extends EntityPathBase<Log> {
 
     public final StringPath purpose = createString("purpose");
 
-    public final StringPath residence = createString("residence");
-
     public final com.example.gujeuck_server.domain.user.domain.QUser user;
 
     public final StringPath visitDate = createString("visitDate");
