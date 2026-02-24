@@ -25,4 +25,8 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
     long countByOrganIdAndResidenceNotIn(Long organId, List<String> residences);
 
     Optional<User> findByUserId(String userId);
+
+    Optional<User> findByUserIdAndOrganId(String userId, Long organId);
+
+    List<User> findAllByOrganIdOrderByIdAsc(Long organId);
 }
