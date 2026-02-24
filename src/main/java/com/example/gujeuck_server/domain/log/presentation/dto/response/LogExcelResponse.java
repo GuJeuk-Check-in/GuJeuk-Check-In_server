@@ -15,7 +15,6 @@ public record LogExcelResponse(
         int femaleCount,
         String phone,
         String purpose,
-        String residence,
         boolean privacyAgreed
 ) {
     // Log 엔티티 -> LogResponse 로 바꿔주는 정적 메서드
@@ -29,7 +28,6 @@ public record LogExcelResponse(
                 .visitTime(log.getVisitTime())
                 .purpose(log.getPurpose())
                 .age(log.getAge())
-                .residence(log.getResidence())
                 .privacyAgreed(log.isPrivacyAgreed())
                 .build();
     }

@@ -3,7 +3,6 @@ package com.example.gujeuck_server.domain.user.domain;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.enums.Gender;
-import com.example.gujeuck_server.domain.user.domain.enums.Residence;
 import com.example.gujeuck_server.global.entity.BaseIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -61,13 +60,6 @@ public class User extends BaseIdEntity {
     public static String generateUserId(String name, String birthYMD) {
         String monthDay = birthYMD.substring(5).replace("-", "");
         return name + monthDay;
-    }
-
-    public static String resolveResidence(String input) {
-
-        Residence matched = Residence.fromKoreanName(input.trim());
-
-        return matched != null ? matched.getKoreanName() : input.trim();
     }
 
     public void increaseCount() {
