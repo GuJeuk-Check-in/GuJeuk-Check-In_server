@@ -26,7 +26,7 @@ public enum ErrorCode {
 
     //excel
     EXCEL_GENERATION_FAILED(507, "엑셀 파일 생성 중 오류가 발생했습니다."),
-    INVALID_DATE(401, "유효하지 않은 날짜 형식입니다."),
+    INVALID_DATE(400, "유효하지 않은 날짜 형식입니다."),
 
     // purpose
     PURPOSE_NOT_FOUND(404, "존재하지 않는 방문목적입니다."),

@@ -74,4 +74,16 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                 )
                 .fetchOne();
     }
+
+    @Override
+    public List<Log> findAllByOrganIdAndVisitDateStartingWithOrderByDateTime(Long organId, String visitDate) {
+        return jpaQueryFactory
+                .selectFrom(qLog)
+                .where(
+                        qLog.organ.id.eq(organId),
+                        qLog.visitDate.startsWith(visitDate)
+                )
+                .orderBy(qLog.visitDate.asc(), qLog.visitTime.asc())
+                .fetch();
+    }
 }

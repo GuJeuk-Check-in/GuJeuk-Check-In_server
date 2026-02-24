@@ -7,14 +7,14 @@ import lombok.Builder;
 @Builder
 public record LogExcelResponse(
 
-        String name,
-        String phone,
-        int maleCount,
-        int femaleCount,
         String visitDate,
         String visitTime,
-        String purpose,
+        String name,
         Age age,
+        int maleCount,
+        int femaleCount,
+        String phone,
+        String purpose,
         String residence,
         boolean privacyAgreed
 ) {

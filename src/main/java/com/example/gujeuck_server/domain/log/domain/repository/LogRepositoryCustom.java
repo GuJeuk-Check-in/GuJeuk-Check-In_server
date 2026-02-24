@@ -12,4 +12,6 @@ public interface LogRepositoryCustom {
     Optional<Log> findByUserIdAndVisitTime(String userId, String visitDate, String visitTime);
 
     long countByYearMonth(String yearMonth);
+
+    List<Log> findAllByOrganIdAndVisitDateStartingWithOrderByDateTime(Long organId, String visitDate);
 }
