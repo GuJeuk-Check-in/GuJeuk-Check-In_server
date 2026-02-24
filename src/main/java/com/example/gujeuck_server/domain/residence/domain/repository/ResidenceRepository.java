@@ -16,4 +16,6 @@ public interface ResidenceRepository extends JpaRepository<Residence, Long>, Res
     List<String> findAllResidenceNameByOrganId(Long organId);
 
     Optional<Residence> findByResidenceNameAndOrganId(String residenceName, Long organId);
+
+    List<Residence> findAllByOrderByResidenceIndexAsc();
 }
