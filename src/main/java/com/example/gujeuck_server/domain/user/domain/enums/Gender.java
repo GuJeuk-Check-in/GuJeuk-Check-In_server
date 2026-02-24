@@ -1,6 +1,16 @@
 package com.example.gujeuck_server.domain.user.domain.enums;
 
 public enum Gender {
-    MAN,
-    WOMAN
+    MAN("남성"),
+    WOMAN("여성");
+
+    private final String label;
+
+    Gender(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
 }

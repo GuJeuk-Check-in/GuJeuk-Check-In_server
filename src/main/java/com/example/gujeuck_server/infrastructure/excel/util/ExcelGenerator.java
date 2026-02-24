@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.infrastructure.excel.util;
 
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
+import com.example.gujeuck_server.domain.user.presentation.dto.response.UserExcelResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -145,5 +146,90 @@ public class ExcelGenerator { // 이건 엑셀 파일 내용 관련한 클래스
         sheet.setColumnWidth(7, 6000);
         sheet.setColumnWidth(8, 6000);
         sheet.setColumnWidth(9, 5000);
+    }
+
+    // ========================= User Excel 생성 =========================
+
+    private static final String[] USER_HEADERS = {
+            "NO", "아이디", "성명", "연락처", "성별", "생년월일", "나이", "거주지", "개인정보 제공 동의 여부", "이용 횟수"
+    };
+    private static final String USER_SHEET_TITLE = "구즉 청소년 문화의집 회원 목록";
+
+    public static byte[] generateUserExcel(List<UserExcelResponse> users) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet(USER_SHEET_TITLE);
+
+            CellStyle titleStyle = createTitleStyle(workbook);
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle bodyStyle = createBodyStyle(workbook);
+
+            createUserTitleRow(sheet, titleStyle);
+            createUserHeaderRow(sheet, headerStyle);
+            createUserBodyRows(sheet, users, bodyStyle);
+            autoAdjustUserColumns(sheet);
+
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    private static void createUserTitleRow(Sheet sheet, CellStyle style) {
+        Row titleRow = sheet.createRow(0);
+        titleRow.setHeightInPoints(25);
+        Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue(USER_SHEET_TITLE);
+        titleCell.setCellStyle(style);
+
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, USER_HEADERS.length - 1));
+    }
+
+    private static void createUserHeaderRow(Sheet sheet, CellStyle style) {
+        Row headerRow = sheet.createRow(1);
+        headerRow.setHeightInPoints(20);
+
+        for (int i = 0; i < USER_HEADERS.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(USER_HEADERS[i]);
+            cell.setCellStyle(style);
+        }
+    }
+
+    private static void createUserBodyRows(Sheet sheet, List<UserExcelResponse> users, CellStyle style) {
+        int rowIdx = 2;
+        int no = 1;
+
+        for (UserExcelResponse user : users) {
+            Row row = sheet.createRow(rowIdx++);
+            row.setHeightInPoints(18);
+
+            int col = 0;
+            createCell(row, col++, no++, style);
+            createCell(row, col++, user.userId(), style);
+            createCell(row, col++, user.name(), style);
+            createCell(row, col++, user.phone(), style);
+            createCell(row, col++, user.gender().getLabel(), style);
+            createCell(row, col++, user.birthYMD(), style);
+            createCell(row, col++, user.age().getLabel(), style);
+            createCell(row, col++, user.residence(), style);
+            createCell(row, col++, user.privacyAgreed() ? "동의" : "미동의", style);
+            createCell(row, col++, user.count(), style);
+        }
+    }
+
+    private static void autoAdjustUserColumns(Sheet sheet) {
+        for (int i = 0; i < USER_HEADERS.length; i++) {
+            sheet.autoSizeColumn(i);
+
+            int width = sheet.getColumnWidth(i);
+            sheet.setColumnWidth(i, width + 1024);
+        }
+
+        sheet.setColumnWidth(1, 5000);  // 아이디
+        sheet.setColumnWidth(2, 4000);  // 성명
+        sheet.setColumnWidth(3, 6000);  // 연락처
+        sheet.setColumnWidth(5, 5000);  // 생년월일
+        sheet.setColumnWidth(7, 5000);  // 거주지
     }
 }
