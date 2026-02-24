@@ -209,7 +209,7 @@ public class ExcelGenerator { // 이건 엑셀 파일 내용 관련한 클래스
             createCell(row, col++, user.userId(), style);
             createCell(row, col++, user.name(), style);
             createCell(row, col++, user.phone(), style);
-            createCell(row, col++, user.gender().name(), style);
+            createCell(row, col++, user.gender().getLabel(), style);
             createCell(row, col++, user.birthYMD(), style);
             createCell(row, col++, user.age().getLabel(), style);
             createCell(row, col++, user.residence(), style);
