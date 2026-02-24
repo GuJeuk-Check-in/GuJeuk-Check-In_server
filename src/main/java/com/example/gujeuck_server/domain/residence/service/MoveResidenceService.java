@@ -42,10 +42,6 @@ public class MoveResidenceService {
                 throw ResidenceNotFoundException.EXCEPTION;
             }
 
-            if(!residence.getOrgan().getId().equals(organ.getId())) {
-                throw ResidenceAccessDeniedException.EXCEPTION;
-            }
-
             residence.setResidenceIndex(i + 1);
         }
     }
