@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.user.service;
 
 import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
+import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
@@ -30,14 +30,17 @@ public class SignupService {
     private final CalculateAgeService calculateAgeService;
     private final LogRepository logRepository;
     private final PurposeFacade purposeFacade;
-    private final OrganFacade organFacade;
+    private final OrganRepository organRepository;
+
+    private static final Long HARDCODED_ORGAN_ID = 1L;
 
     @Transactional
     public SignUpResponse execute(SignupRequest request) {
 
-        Organ organ = organFacade.currentOrgan();
+        Organ organ = organRepository.findById(HARDCODED_ORGAN_ID)
+                .orElseThrow(() -> new RuntimeException("Organ not found"));
 
-        SignUpResponse signupResponse = createUserId(organ.getId(), request.getName(), request.getBirthYMD());
+        SignUpResponse signupResponse = createUserId(HARDCODED_ORGAN_ID, request.getName(), request.getBirthYMD());
 
         Age age = calculateAgeService.getAge(request.getBirthYMD());
 
@@ -47,9 +50,9 @@ public class SignupService {
 
         int currentYear = TimeProvider.nowYear();
 
-        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(HARDCODED_ORGAN_ID, request.getPurpose());
 
-        String resolvedResidence = resolveResidence(request.getResidence(), organ.getId());;
+        String resolvedResidence = resolveResidence(request.getResidence(), HARDCODED_ORGAN_ID);
 
         User user = createUser(request, age, signupResponse.getUserId(), resolvedResidence, organ);
 
