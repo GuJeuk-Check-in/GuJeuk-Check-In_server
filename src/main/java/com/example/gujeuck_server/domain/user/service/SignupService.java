@@ -16,14 +16,10 @@ import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
-import com.example.gujeuck_server.global.utility.DateFormatter;
+import com.example.gujeuck_server.global.utility.TimeProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +32,6 @@ public class SignupService {
     private final PurposeFacade purposeFacade;
     private final OrganFacade organFacade;
 
-    private static final String TIME = "HH:mm";
-
     @Transactional
     public SignUpResponse execute(SignupRequest request) {
 
@@ -47,11 +41,11 @@ public class SignupService {
 
         Age age = calculateAgeService.getAge(request.getBirthYMD());
 
-        String visitDate = DateFormatter.LocalDateForm(LocalDate.now());;
+        String visitDate = TimeProvider.nowDateFormatted();
 
-        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
+        String visitTime = TimeProvider.nowTimeFormatted();
 
-        int currentYear = LocalDate.now().getYear();
+        int currentYear = TimeProvider.nowYear();
 
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 

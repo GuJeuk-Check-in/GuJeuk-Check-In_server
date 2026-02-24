@@ -6,14 +6,10 @@ import com.example.gujeuck_server.domain.user.presentation.dto.request.LoginRequ
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
-import com.example.gujeuck_server.global.utility.DateFormatter;
+import com.example.gujeuck_server.global.utility.TimeProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +17,6 @@ public class LoginUserService {
 
     private final UserRepository userRepository;
     private final LogRepository logRepository;
-
-    private static final String TIME = "HH:mm";
 
     @Transactional
     public void execute(LoginRequest request) {
@@ -32,11 +26,11 @@ public class LoginUserService {
 
         user.increaseCount();
 
-        String visitDate = DateFormatter.LocalDateForm(LocalDate.now());;
+        String visitDate = TimeProvider.nowDateFormatted();
 
-        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));;
+        String visitTime = TimeProvider.nowTimeFormatted();
 
-        int currentYear = LocalDate.now().getYear();
+        int currentYear = TimeProvider.nowYear();
 
         Log log = createUserLog(user, request, visitDate, visitTime, currentYear);
 
