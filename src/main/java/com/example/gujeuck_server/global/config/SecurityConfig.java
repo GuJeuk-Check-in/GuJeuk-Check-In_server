@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/sign-up", "/user/login", "/organ/create", "/organ/login", "/purpose/all", "/residence/all").permitAll()
+                        .requestMatchers("/user/sign-up", "/user/login", "/organ/create", "/organ/login", "/purpose/all", "/residence/all", "/organ/excel/user").permitAll()
                         .anyRequest().authenticated()
                 )
                 .with(new SecurityFilterConfig(jwtTokenProvider, objectMapper), Customizer.withDefaults())
