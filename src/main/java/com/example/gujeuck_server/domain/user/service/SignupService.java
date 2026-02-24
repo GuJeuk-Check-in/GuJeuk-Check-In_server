@@ -6,9 +6,9 @@ import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
-import com.example.gujeuck_server.domain.residence.domain.Residence;
-import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRepository;
 import com.example.gujeuck_server.domain.residence.exception.ResidenceNotFoundException;
+import com.example.gujeuck_server.domain.residence.presentation.dto.response.ResidenceResponse;
+import com.example.gujeuck_server.domain.residence.service.QueryResidenceListService;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
@@ -21,12 +21,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SignupService {
 
     private final UserRepository userRepository;
-    private final ResidenceRepository residenceRepository;
+    private final QueryResidenceListService queryResidenceListService;
     private final CalculateAgeService calculateAgeService;
     private final LogRepository logRepository;
     private final PurposeFacade purposeFacade;
@@ -52,7 +54,7 @@ public class SignupService {
 
         Purpose purpose = purposeFacade.getPurpose(HARDCODED_ORGAN_ID, request.getPurpose());
 
-        String resolvedResidence = resolveResidence(request.getResidence(), HARDCODED_ORGAN_ID);
+        String resolvedResidence = resolveResidence(request.getResidence());
 
         User user = createUser(request, age, signupResponse.getUserId(), resolvedResidence, organ);
 
@@ -112,10 +114,16 @@ public class SignupService {
                 .build();
     }
 
-    private String resolveResidence(String input, Long organId) {
-        Residence residence = residenceRepository.findByResidenceNameAndOrganId(input, organId)
-                .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
+    private String resolveResidence(String input) {
+        List<ResidenceResponse> residences = queryResidenceListService.execute();
 
-        return residence.getResidenceName();
+        boolean exists = residences.stream()
+                .anyMatch(res -> res.residence().equals(input));
+
+        if (!exists) {
+            throw ResidenceNotFoundException.EXCEPTION;
+        }
+
+        return input;
     }
 }
