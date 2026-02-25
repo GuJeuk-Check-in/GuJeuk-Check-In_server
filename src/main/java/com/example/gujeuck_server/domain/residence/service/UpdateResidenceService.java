@@ -24,9 +24,6 @@ public class UpdateResidenceService {
         Residence residence = residenceRepository.findById(id)
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
-        if (!residence.getOrgan().getId().equals(organ.getId())) {
-            throw ResidenceAccessDeniedException.EXCEPTION;
-        }
 
         residence.updateResidence(residenceRequest.getResidenceName());
     }

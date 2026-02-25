@@ -23,7 +23,7 @@ public class MovePurposeService {
 
     @Transactional
     public void execute(PurposeMoveRequest purposeMoveRequest) {
-        Organ organ = organFacade.currentOrgan();
+        organFacade.currentOrgan();
 
         List<Long> purposesId = purposeMoveRequest.getPurposeId();
         List<Purpose> purposes = purposeRepository.findAllById(purposeMoveRequest.getPurposeId());
@@ -40,10 +40,6 @@ public class MovePurposeService {
 
             if(purpose == null) {
                 throw PurposeNotFoundException.EXCEPTION;
-            }
-
-            if (!purpose.getOrgan().getId().equals(organ.getId())) {
-                throw PurposeAccessDeniedException.EXCEPTION;
             }
 
             purpose.setPurposeIndex(i + 1);

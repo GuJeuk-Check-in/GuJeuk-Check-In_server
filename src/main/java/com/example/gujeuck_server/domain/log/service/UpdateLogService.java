@@ -25,10 +25,6 @@ public class UpdateLogService {
 
         Log log = logFacade.getLogById(logId);
 
-        if (!log.getOrgan().getId().equals(organ.getId())) {
-            throw LogAccessDeniedException.EXCEPTION;
-        }
-
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
         log.updateLog(

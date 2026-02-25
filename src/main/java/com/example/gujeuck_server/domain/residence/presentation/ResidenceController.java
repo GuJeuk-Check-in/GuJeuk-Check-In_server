@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.residence.presentation;
 
-import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeMoveRequest;
 import com.example.gujeuck_server.domain.residence.presentation.dto.request.ResidenceMoveRequest;
 import com.example.gujeuck_server.domain.residence.presentation.dto.request.ResidenceRequest;
 import com.example.gujeuck_server.domain.residence.presentation.dto.response.ResidenceResponse;
@@ -26,7 +25,7 @@ public class ResidenceController {
         createResidenceService.execute(residenceRequest);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public List<ResidenceResponse> execute(){
         return queryResidenceListService.execute();
     }

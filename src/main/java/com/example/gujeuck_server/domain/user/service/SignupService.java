@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.user.service;
 
 import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
+import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
@@ -13,14 +13,10 @@ import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
-import com.example.gujeuck_server.global.utility.DateFormatter;
+import com.example.gujeuck_server.global.utility.TimeProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -30,36 +26,35 @@ public class SignupService {
     private final CalculateAgeService calculateAgeService;
     private final LogRepository logRepository;
     private final PurposeFacade purposeFacade;
-    private final OrganFacade organFacade;
+    private final OrganRepository organRepository;
 
-    private static final String TIME = "HH:mm";
+    private static final Long HARDCODED_ORGAN_ID = 1L;
 
     @Transactional
     public SignUpResponse execute(SignupRequest request) {
 
-        Organ organ = organFacade.currentOrgan();
+        Organ organ = organRepository.findById(HARDCODED_ORGAN_ID)
+                .orElseThrow(() -> new RuntimeException("Organ not found"));
 
-        SignUpResponse signupResponse = createUserId(organ.getId(), request.getName(), request.getBirthYMD());
+        SignUpResponse signupResponse = createUserId(HARDCODED_ORGAN_ID, request.getName(), request.getBirthYMD());
 
         Age age = calculateAgeService.getAge(request.getBirthYMD());
 
-        String visitDate = DateFormatter.LocalDateForm(LocalDate.now());;
+        String visitDate = TimeProvider.nowDateFormatted();
 
-        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));
+        String visitTime = TimeProvider.nowTimeFormatted();
 
-        int currentYear = LocalDate.now().getYear();
+        int currentYear = TimeProvider.nowYear();
 
-        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(HARDCODED_ORGAN_ID, request.getPurpose());
 
-        String resolvedResidence = User.resolveResidence(request.getResidence());;
-
-        User user = createUser(request, age, signupResponse.getUserId(), resolvedResidence, organ);
+        User user = createUser(request, age, signupResponse.getUserId(), request.getResidence(), organ);
 
         user.increaseCount();
 
         userRepository.save(user);
 
-        Log log = createLog(request, age, purpose, visitDate, visitTime, currentYear, resolvedResidence, user, organ);
+        Log log = createLog(request, age, purpose, visitDate, visitTime, currentYear, request.getResidence(), user, organ);
 
         logRepository.save(log);
 
@@ -107,7 +102,6 @@ public class SignupService {
                 .visitTime(visitTime)
                 .year(year)
                 .user(user)
-                .residence(residence)
                 .organ(organ)
                 .build();
     }

@@ -51,9 +51,6 @@ public class Log extends BaseIdEntity {
     @Column(nullable = false)
     private int year;
 
-    @Column(length = 30)
-    private String residence;
-
     @Column(nullable = false)
     private String visitTime;
 

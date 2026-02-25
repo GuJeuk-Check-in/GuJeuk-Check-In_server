@@ -25,10 +25,6 @@ public class DeleteResidenceService {
         Residence residence = residenceRepository.findById(id)
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
-        if (!residence.getOrgan().getId().equals(organ.getId())) {
-            throw ResidenceAlreadyException.EXCEPTION;
-        }
-
         int residenceIndex = residence.getResidenceIndex();
 
         residenceRepository.delete(residence);

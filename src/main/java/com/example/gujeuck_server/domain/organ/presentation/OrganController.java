@@ -32,6 +32,7 @@ public class OrganController {
     private final CreateOrganService createOrganService;
     private final ChangePasswordService changePasswordService;
     private final LogExcelOutPutService logExcelOutPutService;
+    private final UserExcelOutPutService userExcelOutPutService;
     private final ReissueService reissueService;
     private final QueryUserListService queryUserListService;
     private final QueryUserListByResidenceService queryUserListByResidenceService;
@@ -76,9 +77,14 @@ public class OrganController {
         changePasswordService.execute(request);
     }
 
-    @GetMapping("/excel/{yearMonth}")
-    public ResponseEntity<byte[]> exportExcel(@PathVariable String yearMonth) {
+    @GetMapping("/excel/log/{yearMonth}")
+    public ResponseEntity<byte[]> exportLogExcel(@PathVariable String yearMonth) {
         return logExcelOutPutService.execute(yearMonth);
+    }
+
+    @GetMapping("/excel/user")
+    public ResponseEntity<byte[]> exportUserExcel() {
+        return userExcelOutPutService.execute();
     }
 
     @PatchMapping("/re-issue")

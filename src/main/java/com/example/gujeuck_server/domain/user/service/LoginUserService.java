@@ -2,18 +2,15 @@ package com.example.gujeuck_server.domain.user.service;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.LoginRequest;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
-import com.example.gujeuck_server.global.utility.DateFormatter;
+import com.example.gujeuck_server.global.utility.TimeProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +18,6 @@ public class LoginUserService {
 
     private final UserRepository userRepository;
     private final LogRepository logRepository;
-
-    private static final String TIME = "HH:mm";
 
     @Transactional
     public void execute(LoginRequest request) {
@@ -32,32 +27,38 @@ public class LoginUserService {
 
         user.increaseCount();
 
-        String visitDate = DateFormatter.LocalDateForm(LocalDate.now());;
+        String visitDate = TimeProvider.nowDateFormatted();
 
-        String visitTime = LocalTime.now().format(DateTimeFormatter.ofPattern(TIME));;
+        String visitTime = TimeProvider.nowTimeFormatted();
 
-        int currentYear = LocalDate.now().getYear();
+        int currentYear = TimeProvider.nowYear();
 
-        Log log = createUserLog(user, request, visitDate, visitTime, currentYear);
-
-        logRepository.save(log);
+        if(request.getFemaleCount() == 0 && request.getMaleCount() == 0 && user.getGender() == Gender.MAN) {
+            Log log = createUserLog(user, request, visitDate, visitTime, currentYear, 1, 0);
+            logRepository.save(log);
+        } else if (request.getFemaleCount() == 0 && request.getMaleCount() == 0 && user.getGender() == Gender.WOMAN) {
+            Log log = createUserLog(user, request, visitDate, visitTime, currentYear, 0, 1);
+            logRepository.save(log);
+        } else{
+            Log log = createUserLog(user, request, visitDate, visitTime, currentYear, 0, 0);
+            logRepository.save(log);
+        }
     }
 
-    private Log createUserLog(User user, LoginRequest request, String visitDate, String visitTime, int currentYear) {
+    private Log createUserLog(User user, LoginRequest request, String visitDate, String visitTime, int currentYear, int man, int woman) {
 
         return Log.builder()
                 .user(user)
                 .name(user.getName())
                 .age(user.getAge())
                 .phone(user.getPhone())
-                .maleCount(request.getMaleCount())
-                .femaleCount(request.getFemaleCount())
+                .maleCount(request.getMaleCount() + man)
+                .femaleCount(request.getFemaleCount() + woman)
                 .privacyAgreed(user.isPrivacyAgreed())
                 .purpose(request.getPurpose())
                 .visitDate(visitDate)
                 .visitTime(visitTime)
                 .year(currentYear)
-                .residence(user.getResidence())
                 .organ(user.getOrgan())
                 .build();
     }

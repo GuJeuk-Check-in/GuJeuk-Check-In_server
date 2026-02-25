@@ -25,10 +25,6 @@ public class DeletePurposeService {
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 
-        if (!purpose.getOrgan().getId().equals(organ.getId())) {
-            throw PurposeAccessDeniedException.EXCEPTION;
-        }
-
         int purposeIndex = purpose.getPurposeIndex();
 
         purposeRepository.delete(purpose);
