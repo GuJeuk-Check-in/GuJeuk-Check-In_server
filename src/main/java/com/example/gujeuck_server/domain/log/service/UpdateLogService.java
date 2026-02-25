@@ -6,7 +6,6 @@ import com.example.gujeuck_server.domain.log.facade.LogFacade;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.log.domain.Log;
-import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,15 +24,13 @@ public class UpdateLogService {
 
         Log log = logFacade.getLogById(logId);
 
-        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
-
         log.updateLog(
                 request.getName(),
                 request.getAge(),
                 request.getPhone(),
                 request.getMaleCount(),
                 request.getFemaleCount(),
-                purpose.getPurposeName(),
+                request.getPurpose(),
                 request.getVisitDate(),
                 request.isPrivacyAgreed()
         );
