@@ -15,6 +15,7 @@ public record QueryLogDetailResponse(
         int femaleCount,
         String purpose,
         String visitDate,
+        String visitTime,
         boolean privacyAgreed
 ) {
     public QueryLogDetailResponse(Log log) {
@@ -27,6 +28,7 @@ public record QueryLogDetailResponse(
                 log.getFemaleCount(),
                 log.getPurpose(),
                 log.getVisitDate(),
+                log.getVisitTime(),
                 log.isPrivacyAgreed()
         );
     }
