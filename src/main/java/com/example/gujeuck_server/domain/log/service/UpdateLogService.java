@@ -29,6 +29,7 @@ public class UpdateLogService {
                 request.getFemaleCount(),
                 request.getPurpose(),
                 request.getVisitDate(),
+                request.getVisitTime(),
                 request.isPrivacyAgreed()
         );
     }
