@@ -4,7 +4,6 @@ import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
-import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
@@ -46,15 +45,13 @@ public class SignupService {
 
         int currentYear = TimeProvider.nowYear();
 
-        Purpose purpose = purposeFacade.getPurpose(HARDCODED_ORGAN_ID, request.getPurpose());
-
         User user = createUser(request, age, signupResponse.getUserId(), request.getResidence(), organ);
 
         user.increaseCount();
 
         userRepository.save(user);
 
-        Log log = createLog(request, age, purpose, visitDate, visitTime, currentYear, request.getResidence(), user, organ);
+        Log log = createLog(request, age, request.getPurpose(), visitDate, visitTime, currentYear, request.getResidence(), user, organ);
 
         logRepository.save(log);
 
@@ -89,14 +86,14 @@ public class SignupService {
                 .build();
     }
 
-    private Log createLog(SignupRequest request, Age age, Purpose purpose, String visitDate, String visitTime, int year, String residence, User user, Organ organ) {
+    private Log createLog(SignupRequest request, Age age, String purpose, String visitDate, String visitTime, int year, String residence, User user, Organ organ) {
         return Log.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
                 .age(age)
                 .maleCount(request.getMaleCount())
                 .femaleCount(request.getFemaleCount())
-                .purpose(purpose.getPurposeName())
+                .purpose(purpose)
                 .privacyAgreed(request.isPrivacyAgreed())
                 .visitDate(visitDate)
                 .visitTime(visitTime)
