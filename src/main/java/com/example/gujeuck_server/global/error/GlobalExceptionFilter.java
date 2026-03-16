@@ -33,7 +33,8 @@ public class GlobalExceptionFilter extends OncePerRequestFilter {
             writerErrorResponse(response, errorCode.getStatusCode(), ErrorResponse.of(errorCode, errorCode.getErrorMessage()));
         } catch (Exception e){
             e.printStackTrace();
-            writerErrorResponse(response, response.getStatus(), ErrorResponse.of(response.getStatus(),e.getMessage()));
+            ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+            writerErrorResponse(response, errorCode.getStatusCode(), ErrorResponse.of(errorCode, e.getMessage()));
         }
     }
 
