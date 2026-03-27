@@ -40,6 +40,14 @@ public class UpdateUserService {
 
         Age age = calculateAgeService.getAge(request.birthYMD());
 
-        user.updateUser(request.name(), request.userId(), request.phone(), request.birthYMD(), request.residence());
+        user.updateUser(
+                request.name(),
+                request.userId(),
+                request.phone(),
+                request.birthYMD(),
+                request.residence(),
+                request.gender(),
+                age
+        );
     }
 }
