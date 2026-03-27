@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.user.presentation.dto.request;
 
 import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record UpdateUserRequest(
@@ -17,7 +18,7 @@ public record UpdateUserRequest(
         @Size(max = 11, message = "전화번호는 11자리 이상으로 입력할 수 없습니다.")
         String phone,
 
-        @NotBlank(message = "성별을 선택해주세요.")
+        @NotNull(message = "성별을 선택해주세요.")
         Gender gender,
 
         @NotBlank(message = "생년월일을 입력해주세요.")
