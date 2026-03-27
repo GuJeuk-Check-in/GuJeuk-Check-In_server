@@ -49,12 +49,14 @@ public class User extends BaseIdEntity {
     @JoinColumn(name = "organ_id", nullable = false)
     private Organ organ;
 
-    public void updateUser(String name, String userId, String phone, String birthYMD, String residence) {
+    public void updateUser(String name, String userId, String phone, String birthYMD, String residence, Gender gender, Age age) {
         this.name = name;
         this.userId = userId;
         this.phone = phone;
         this.birthYMD = birthYMD;
         this.residence = residence;
+        this.gender = gender;
+        this.age = age;
     }
 
     public static String generateUserId(String name, String birthYMD) {
