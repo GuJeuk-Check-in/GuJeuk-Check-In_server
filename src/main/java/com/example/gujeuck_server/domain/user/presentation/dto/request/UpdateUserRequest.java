@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.user.presentation.dto.request;
 
-import com.example.gujeuck_server.domain.residence.domain.Residence;
 import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -25,6 +24,6 @@ public record UpdateUserRequest(
         String birthYMD,
 
         @NotBlank(message = "거주지를 선택해주세요.")
-        Residence residence
+        String residence
 ) {
 }
