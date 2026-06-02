@@ -1,0 +1,20 @@
+Backup date: 2026-06-02
+Project: projectsilmoo
+App: gujeuk-check-in-server
+
+Saved locally:
+- gujeuk-check-in-server.prod.env
+
+Not completed:
+- MySQL dump
+- Redis dump
+
+Observed issue:
+- `xquare addon tunnel` opens a local TCP port successfully.
+- `nc` can connect to the port.
+- MySQL and Redis clients stall or lose the connection during initial protocol communication, so no usable dump file is produced.
+
+Checked prod resources:
+- MySQL addon: mysql
+- Redis addon: redis
+- App DB env: DB_URL=jdbc:mysql://mysql:3306/gujeuk_prod?serverTimezone=Asia/Seoul
