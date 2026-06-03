@@ -64,7 +64,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                prodUrl, stagUrl, vercelUrl, testUrl, "https://gujeuk-check-in-fe.pages.dev"
+                prodUrl, stagUrl, vercelUrl, testUrl, "https://gujeuk-check-in-fe.pages.dev/", "https://gujeuk-check-in-fe.pages.dev/"
         ));
 
         configuration.setAllowedMethods(Arrays.asList("OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"));
