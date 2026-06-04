@@ -79,51 +79,63 @@ jobs:
   deploy-stag:
     needs: docker
     if: github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, gujeuk-home-server]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Copy STAG compose file to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: docker-compose.stag.yml
-          target: /home/${{ secrets.EC2_USER }}/stag-gujeuk-check-in-server
+      - name: Sync STAG compose file
+        run: |
+          set -e
+          mkdir -p /home/ubuntu/stag-gujeuk-check-in-server
+          cp docker-compose.stag.yml /home/ubuntu/stag-gujeuk-check-in-server/docker-compose.stag.yml
 
-      - name: Deploy STAG to EC2
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            set -e
-            mkdir -p /home/${{ secrets.EC2_USER }}/stag-gujeuk-check-in-server
-            cd /home/${{ secrets.EC2_USER }}/stag-gujeuk-check-in-server
+      - name: Deploy STAG
+        run: |
+          set -e
+          cd /home/ubuntu/stag-gujeuk-check-in-server
 
-            cat > .env.stag <<EOF
-            APP_IMAGE=${{ env.IMAGE_NAME }}:develop
-            APP_PORT=${{ secrets.STAG_APP_PORT }}
-            DB_URL=jdbc:mysql://stag-mysql:3306/${{ secrets.STAG_MYSQL_DATABASE }}?serverTimezone=Asia/Seoul
-            JAVA_OPTS=${{ secrets.STAG_JAVA_OPTS }}
-            JWT_SECRET_KEY=${{ secrets.STAG_JWT_SECRET_KEY }}
-            MYSQL_DATABASE=${{ secrets.STAG_MYSQL_DATABASE }}
-            MYSQL_PASSWORD=${{ secrets.STAG_MYSQL_PASSWORD }}
-            MYSQL_ROOT_PASSWORD=${{ secrets.STAG_MYSQL_ROOT_PASSWORD }}
-            MYSQL_USER=${{ secrets.STAG_MYSQL_USER }}
-            PROD_BASE_URL=${{ secrets.PROD_BASE_URL }}
-            REDIS_HOST=stag-redis
-            REDIS_PORT=6379
-            STAG_BASE_URL=${{ secrets.STAG_BASE_URL }}
-            TEST_URL=${{ secrets.TEST_URL }}
-            VERCEL_URL=${{ secrets.VERCEL_URL }}
-            EOF
+          cat > .env.stag <<EOF
+          APP_IMAGE=${{ env.IMAGE_NAME }}:develop
+          APP_PORT=${{ secrets.STAG_APP_PORT }}
+          DB_URL=jdbc:mysql://stag-mysql:3306/${{ secrets.STAG_MYSQL_DATABASE }}?serverTimezone=Asia/Seoul
+          JAVA_OPTS=${{ secrets.STAG_JAVA_OPTS }}
+          JWT_SECRET_KEY=${{ secrets.STAG_JWT_SECRET_KEY }}
+          MYSQL_DATABASE=${{ secrets.STAG_MYSQL_DATABASE }}
+          MYSQL_PASSWORD=${{ secrets.STAG_MYSQL_PASSWORD }}
+          MYSQL_ROOT_PASSWORD=${{ secrets.STAG_MYSQL_ROOT_PASSWORD }}
+          MYSQL_USER=${{ secrets.STAG_MYSQL_USER }}
+          PROD_BASE_URL=${{ secrets.PROD_BASE_URL }}
+          REDIS_HOST=stag-redis
+          REDIS_PORT=6379
+          STAG_BASE_URL=${{ secrets.STAG_BASE_URL }}
+          TEST_URL=${{ secrets.TEST_URL }}
+          VERCEL_URL=${{ secrets.VERCEL_URL }}
+          EOF
 
-            docker pull ${{ env.IMAGE_NAME }}:develop
+          docker pull ${{ env.IMAGE_NAME }}:develop
 
-            docker compose -f docker-compose.stag.yml up -d --force-recreate
+          docker compose --env-file .env.stag -f docker-compose.stag.yml up -d --force-recreate
 
-            docker image prune -f
+          docker image prune -f
+
+      - name: Health check STAG
+        run: |
+          set -e
+          for attempt in {1..30}; do
+            if curl -fsS http://localhost:8081/purpose/all >/dev/null; then
+              echo "local staging health check passed"
+              break
+            fi
+
+            if [ "$attempt" -eq 30 ]; then
+              echo "local staging health check failed"
+              docker logs --tail=200 gujeuk-stag-app
+              exit 1
+            fi
+
+            sleep 2
+          done
+
+          curl -fsS https://api-stag.taisu.site/purpose/all >/dev/null
+          echo "public staging health check passed"
