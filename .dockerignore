@@ -1,0 +1,16 @@
+.git
+.gradle
+build
+out
+bin
+src/main/generated
+.idea
+.vscode
+*.iml
+*.iws
+*.ipr
+*.log
+.env
+.env.*
+!.env.example
+HELP.md
