@@ -139,14 +139,14 @@ jobs:
             exit 0
           fi
 
-          STATUS="success"
+          STATUS="성공"
           COLOR=3066993
-          TITLE="Gujeuk CI/CD succeeded"
+          TITLE="구즉 CI/CD 배포 성공"
 
           if [ "$BUILD_RESULT" != "success" ] || { [ "$DEPLOY_RESULT" != "success" ] && [ "$DEPLOY_RESULT" != "skipped" ]; }; then
-            STATUS="failure"
+            STATUS="실패"
             COLOR=15158332
-            TITLE="Gujeuk CI/CD failed"
+            TITLE="🚨 긴급: 구즉 CI/CD 배포 실패"
           fi
 
           export STATUS COLOR TITLE
@@ -157,34 +157,51 @@ jobs:
 
           sha = os.environ["SHA"]
           deploy_result = os.environ["DEPLOY_RESULT"]
-          if deploy_result == "skipped":
-              deploy_result = "skipped (non-main branch or PR)"
+          deploy_result_ko = {
+              "success": "성공",
+              "failure": "실패",
+              "cancelled": "취소됨",
+              "skipped": "건너뜀(main 브랜치가 아니거나 PR)",
+          }.get(deploy_result, deploy_result)
+          build_result_ko = {
+              "success": "성공",
+              "failure": "실패",
+              "cancelled": "취소됨",
+              "skipped": "건너뜀",
+          }.get(os.environ["BUILD_RESULT"], os.environ["BUILD_RESULT"])
+
+          description = (
+              "구즉 온프레미스 서버 배포가 정상 완료되었습니다."
+              if os.environ["STATUS"] == "성공"
+              else "구즉 온프레미스 서버 배포에 문제가 발생했습니다. 즉시 GitHub Actions 로그를 확인해주세요."
+          )
 
           payload = {
-              "username": "Gujeuk CI/CD",
+              "username": "구즉 CI/CD",
               "embeds": [
                   {
                       "title": os.environ["TITLE"],
+                      "description": description,
                       "url": os.environ["RUN_URL"],
                       "color": int(os.environ["COLOR"]),
                       "fields": [
-                          {"name": "status", "value": os.environ["STATUS"], "inline": True},
-                          {"name": "branch", "value": os.environ["REF_NAME"], "inline": True},
-                          {"name": "event", "value": os.environ["EVENT_NAME"], "inline": True},
-                          {"name": "build", "value": os.environ["BUILD_RESULT"], "inline": True},
-                          {"name": "deploy", "value": deploy_result, "inline": True},
-                          {"name": "actor", "value": os.environ["ACTOR"], "inline": True},
-                          {"name": "commit", "value": sha[:7], "inline": True},
-                          {"name": "repository", "value": os.environ["REPOSITORY"], "inline": True},
+                          {"name": "상태", "value": os.environ["STATUS"], "inline": True},
+                          {"name": "브랜치", "value": os.environ["REF_NAME"], "inline": True},
+                          {"name": "이벤트", "value": os.environ["EVENT_NAME"], "inline": True},
+                          {"name": "빌드", "value": build_result_ko, "inline": True},
+                          {"name": "배포", "value": deploy_result_ko, "inline": True},
+                          {"name": "실행자", "value": os.environ["ACTOR"], "inline": True},
+                          {"name": "커밋", "value": sha[:7], "inline": True},
+                          {"name": "저장소", "value": os.environ["REPOSITORY"], "inline": True},
                       ],
                   }
               ],
           }
 
-          print(json.dumps(payload))
+          print(json.dumps(payload, ensure_ascii=False))
           PY
 
           curl -fsS \
-            -H "Content-Type: application/json" \
+            -H "Content-Type: application/json; charset=utf-8" \
             -d @/tmp/discord-payload.json \
             "$DISCORD_WEBHOOK_URL"
