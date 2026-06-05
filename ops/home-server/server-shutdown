@@ -120,18 +120,19 @@ notify_shutdown() {
 
   if [ "$SECONDS_TO_WAKE" -gt 0 ]; then
     message="$(cat <<MSG
-구즉 온프레미스 서버가 예약 종료됩니다.
+구즉 온프레미스 서버가 지금 꺼집니다.
+${HOURS_INPUT}시간 뒤 자동으로 다시 켜집니다.
 
 서버: ${hostname_value}
 IP: ${ip_value:-unknown}
-꺼져 있는 시간: ${HOURS_INPUT}시간
+종료 유지 시간: ${HOURS_INPUT}시간
 예약 부팅 시간: ${WAKE_AT}
 
-RTC 예약 부팅 후 API와 CI/CD runner가 자동으로 복구됩니다.
+예약 부팅 후 API, Cloudflare Tunnel, CI/CD runner가 자동으로 복구됩니다.
 MSG
 )"
     /home/ubuntu/bin/discord-notify \
-      '구즉 홈서버 예약 종료' \
+      "구즉 홈서버 종료 예정 · ${HOURS_INPUT}시간 뒤 자동 부팅" \
       "$message" \
       16753920 || true
   else
