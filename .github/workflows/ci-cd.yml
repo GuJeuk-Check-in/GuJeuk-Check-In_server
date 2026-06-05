@@ -83,6 +83,18 @@ jobs:
           install -m 0755 \
             ops/home-server/watch-cloudflared.sh \
             /home/ubuntu/bin/watch-cloudflared.sh
+          install -m 0755 \
+            ops/home-server/server-shutdown \
+            /home/ubuntu/bin/server-shutdown
+          install -m 0755 \
+            ops/home-server/gujeuk-rtcwake \
+            /home/ubuntu/bin/gujeuk-rtcwake
+          install -m 0755 \
+            ops/home-server/install-shutdown-nopasswd.sh \
+            /home/ubuntu/bin/install-shutdown-nopasswd.sh
+          ln -sfn \
+            /home/ubuntu/bin/server-shutdown \
+            /home/ubuntu/bin/shutdown
 
       - name: Build application image
         run: |
