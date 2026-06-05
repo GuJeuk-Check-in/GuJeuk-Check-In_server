@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ADMIN_COMMAND=/usr/local/sbin/gujeuk-wifi-admin
+
+show_usage() {
+  cat <<'USAGE'
+usage:
+  wifi             scan, select, and connect
+  wifi list        show available Wi-Fi networks
+  wifi status      show the current Wi-Fi connection
+USAGE
+}
+
+run_admin() {
+  if [ ! -x "$ADMIN_COMMAND" ]; then
+    echo "Wi-Fi command is not installed."
+    echo "Run: sudo /home/ubuntu/bin/install-wifi-command.sh"
+    exit 1
+  fi
+
+  if ! sudo -n "$ADMIN_COMMAND" "$@"; then
+    echo "Wi-Fi permission is not configured."
+    echo "Run: sudo /home/ubuntu/bin/install-wifi-command.sh"
+    exit 1
+  fi
+}
+
+scan_networks() {
+  local output
+  output="$(run_admin scan)"
+
+  if [ -z "$output" ]; then
+    echo "No Wi-Fi networks found."
+    exit 1
+  fi
+
+  printf '%s\n' "$output"
+}
+
+show_networks() {
+  local line
+  local signal
+  local security
+  local ssid
+  local index=1
+
+  while IFS=$'\t' read -r signal security ssid; do
+    [ -n "$ssid" ] || continue
+    printf '%2d) %-32s  %4s dBm  %s\n' "$index" "$ssid" "$signal" "$security"
+    index=$((index + 1))
+  done
+}
+
+connect_network() {
+  local scan_output
+  local choice
+  local selected
+  local signal
+  local security
+  local ssid
+  local password=""
+  local ssid_base64
+  local password_base64
+
+  echo "Current connection:"
+  run_admin status
+  echo
+  echo "Scanning Wi-Fi networks..."
+
+  scan_output="$(scan_networks)"
+  mapfile -t networks <<<"$scan_output"
+
+  echo
+  printf '%s\n' "$scan_output" | show_networks
+  echo
+  read -r -p "Select a network number (q to cancel): " choice
+
+  if [ "$choice" = "q" ] || [ "$choice" = "Q" ] || [ -z "$choice" ]; then
+    echo "Cancelled."
+    exit 0
+  fi
+
+  if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt "${#networks[@]}" ]; then
+    echo "Invalid network number."
+    exit 1
+  fi
+
+  selected="${networks[$((choice - 1))]}"
+  IFS=$'\t' read -r signal security ssid <<<"$selected"
+
+  if [ "$security" = "LOCKED" ]; then
+    read -r -s -p "Password for $ssid: " password
+    echo
+    if [ "${#password}" -lt 8 ]; then
+      echo "Password must contain at least 8 characters."
+      exit 1
+    fi
+  fi
+
+  echo
+  echo "Connecting to: $ssid"
+  echo "The SSH session may disconnect for a short time."
+
+  ssid_base64="$(printf '%s' "$ssid" | base64 -w 0)"
+  password_base64="$(printf '%s' "$password" | base64 -w 0)"
+  printf '%s\n%s\n' "$ssid_base64" "$password_base64" |
+    sudo -n "$ADMIN_COMMAND" connect
+
+  echo
+  echo "Connection change scheduled."
+  echo "Wait about 20 seconds, then reconnect with: ssh gujeuk-home"
+}
+
+case "${1:-connect}" in
+  connect)
+    connect_network
+    ;;
+  list)
+    scan_networks | show_networks
+    ;;
+  status)
+    run_admin status
+    ;;
+  help | -h | --help)
+    show_usage
+    ;;
+  *)
+    show_usage
+    exit 1
+    ;;
+esac
