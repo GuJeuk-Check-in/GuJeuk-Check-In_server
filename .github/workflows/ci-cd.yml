@@ -110,45 +110,6 @@ jobs:
           cd /home/ubuntu/git/gujeuk-check-in-server
           docker compose up -d app
 
-      - name: Recover Cloudflare tunnel if needed
-        run: |
-          set -euo pipefail
-
-          if curl -fsS --max-time 10 https://api.taisu.site/purpose/all >/dev/null 2>&1; then
-            echo "Cloudflare tunnel is healthy"
-            exit 0
-          fi
-
-          echo "Public API is unavailable; restarting Cloudflare tunnel"
-          pkill -u ubuntu -f '/usr/local/bin/cloudflared --config /home/ubuntu/.cloudflared/config.yml tunnel run' >/dev/null 2>&1 || true
-          pkill -u ubuntu -f '/home/ubuntu/bin/cloudflared-supervisor.sh' >/dev/null 2>&1 || true
-
-          for attempt in {1..15}; do
-            if ! pgrep -u ubuntu -f '/usr/local/bin/cloudflared --config /home/ubuntu/.cloudflared/config.yml tunnel run' >/dev/null &&
-              ! pgrep -u ubuntu -f '/home/ubuntu/bin/cloudflared-supervisor.sh' >/dev/null; then
-              break
-            fi
-            sleep 1
-          done
-
-          pkill -KILL -u ubuntu -f '/usr/local/bin/cloudflared --config /home/ubuntu/.cloudflared/config.yml tunnel run' >/dev/null 2>&1 || true
-          pkill -KILL -u ubuntu -f '/home/ubuntu/bin/cloudflared-supervisor.sh' >/dev/null 2>&1 || true
-          sleep 1
-
-          /home/ubuntu/bin/start-cloudflared.sh
-
-          for attempt in {1..30}; do
-            if curl -fsS --max-time 10 https://api.taisu.site/purpose/all >/dev/null 2>&1; then
-              echo "Cloudflare tunnel recovery passed"
-              exit 0
-            fi
-            sleep 2
-          done
-
-          echo "Cloudflare tunnel recovery failed"
-          tail -n 100 /home/ubuntu/.cloudflared/cloudflared.log || true
-          exit 1
-
       - name: Health check
         run: |
           set -euo pipefail
