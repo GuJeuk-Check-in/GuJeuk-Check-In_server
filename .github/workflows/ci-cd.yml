@@ -113,16 +113,15 @@ jobs:
         if: always()
         run: docker image prune -f
 
-  notify-discord:
-    name: Notify Discord
+  notify-home-discord:
+    name: Notify Home Discord
     needs: [build, deploy-home]
-    if: always()
-    runs-on: ubuntu-latest
+    if: ${{ always() && github.event_name != 'pull_request' }}
+    runs-on: [self-hosted, gujeuk-home-server]
 
     steps:
-      - name: Send Discord notification
+      - name: Send Korean Discord notification
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           BUILD_RESULT: ${{ needs.build.result }}
           DEPLOY_RESULT: ${{ needs.deploy-home.result }}
           REPOSITORY: ${{ github.repository }}
@@ -134,74 +133,59 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [ -z "${DISCORD_WEBHOOK_URL:-}" ]; then
-            echo "DISCORD_WEBHOOK_URL secret is not set; skipping Discord notification."
+          if [ ! -x /home/ubuntu/bin/discord-notify ]; then
+            echo "/home/ubuntu/bin/discord-notify is not installed; skipping Discord notification."
             exit 0
           fi
 
-          STATUS="성공"
-          COLOR=3066993
-          TITLE="구즉 CI/CD 배포 성공"
-
-          if [ "$BUILD_RESULT" != "success" ] || { [ "$DEPLOY_RESULT" != "success" ] && [ "$DEPLOY_RESULT" != "skipped" ]; }; then
-            STATUS="실패"
-            COLOR=15158332
-            TITLE="🚨 긴급: 구즉 CI/CD 배포 실패"
-          fi
-
-          export STATUS COLOR TITLE
-
-          python3 - <<'PY' > /tmp/discord-payload.json
-          import json
-          import os
-
-          sha = os.environ["SHA"]
-          deploy_result = os.environ["DEPLOY_RESULT"]
-          deploy_result_ko = {
-              "success": "성공",
-              "failure": "실패",
-              "cancelled": "취소됨",
-              "skipped": "건너뜀(main 브랜치가 아니거나 PR)",
-          }.get(deploy_result, deploy_result)
-          build_result_ko = {
-              "success": "성공",
-              "failure": "실패",
-              "cancelled": "취소됨",
-              "skipped": "건너뜀",
-          }.get(os.environ["BUILD_RESULT"], os.environ["BUILD_RESULT"])
-
-          description = (
-              "구즉 온프레미스 서버 배포가 정상 완료되었습니다."
-              if os.environ["STATUS"] == "성공"
-              else "구즉 온프레미스 서버 배포에 문제가 발생했습니다. 즉시 GitHub Actions 로그를 확인해주세요."
-          )
-
-          payload = {
-              "username": "구즉 CI/CD",
-              "embeds": [
-                  {
-                      "title": os.environ["TITLE"],
-                      "description": description,
-                      "url": os.environ["RUN_URL"],
-                      "color": int(os.environ["COLOR"]),
-                      "fields": [
-                          {"name": "상태", "value": os.environ["STATUS"], "inline": True},
-                          {"name": "브랜치", "value": os.environ["REF_NAME"], "inline": True},
-                          {"name": "이벤트", "value": os.environ["EVENT_NAME"], "inline": True},
-                          {"name": "빌드", "value": build_result_ko, "inline": True},
-                          {"name": "배포", "value": deploy_result_ko, "inline": True},
-                          {"name": "실행자", "value": os.environ["ACTOR"], "inline": True},
-                          {"name": "커밋", "value": sha[:7], "inline": True},
-                          {"name": "저장소", "value": os.environ["REPOSITORY"], "inline": True},
-                      ],
-                  }
-              ],
+          translate_result() {
+            case "$1" in
+              success) echo "성공" ;;
+              failure) echo "실패" ;;
+              cancelled) echo "취소됨" ;;
+              skipped) echo "건너뜀" ;;
+              *) echo "$1" ;;
+            esac
           }
 
-          print(json.dumps(payload, ensure_ascii=False))
-          PY
+          BUILD_RESULT_KO="$(translate_result "$BUILD_RESULT")"
+          DEPLOY_RESULT_KO="$(translate_result "$DEPLOY_RESULT")"
+          COMMIT_SHORT="${SHA:0:7}"
 
-          curl -fsS \
-            -H "Content-Type: application/json; charset=utf-8" \
-            -d @/tmp/discord-payload.json \
-            "$DISCORD_WEBHOOK_URL"
+          if [ "$BUILD_RESULT" != "success" ]; then
+            TITLE="🚨 긴급: 구즉 CI 빌드 실패"
+            COLOR=15158332
+            REFLECT_RESULT="실패"
+            SUMMARY="커밋이 홈서버에 반영되지 않았습니다. 빌드 단계에서 실패했습니다."
+          elif [ "$REF_NAME" = "main" ] && [ "$EVENT_NAME" = "push" ] && [ "$DEPLOY_RESULT" = "success" ]; then
+            TITLE="구즉 CI/CD 커밋 반영 완료"
+            COLOR=3066993
+            REFLECT_RESULT="완료"
+            SUMMARY="커밋이 홈서버에 정상 반영되었습니다."
+          elif [ "$REF_NAME" = "main" ] && [ "$EVENT_NAME" = "push" ]; then
+            TITLE="🚨 긴급: 구즉 CI/CD 커밋 반영 실패"
+            COLOR=15158332
+            REFLECT_RESULT="실패"
+            SUMMARY="빌드는 성공했지만 홈서버 배포 중 문제가 발생해 커밋이 반영되지 않았습니다."
+          else
+            TITLE="구즉 CI 검사 완료"
+            COLOR=3447003
+            REFLECT_RESULT="배포 대상 아님"
+            SUMMARY="CI 빌드는 통과했지만 main 브랜치 push가 아니어서 홈서버 반영은 진행하지 않았습니다."
+          fi
+
+          MESSAGE="$(cat <<MSG
+          $SUMMARY
+
+          커밋 반영: $REFLECT_RESULT
+          브랜치: $REF_NAME
+          커밋: $COMMIT_SHORT
+          실행자: $ACTOR
+          빌드: $BUILD_RESULT_KO
+          배포: $DEPLOY_RESULT_KO
+          저장소: $REPOSITORY
+          Actions: $RUN_URL
+          MSG
+          )"
+
+          /home/ubuntu/bin/discord-notify "$TITLE" "$MESSAGE" "$COLOR" || true
