@@ -112,3 +112,79 @@ jobs:
       - name: Prune unused Docker images
         if: always()
         run: docker image prune -f
+
+  notify-discord:
+    name: Notify Discord
+    needs: [build, deploy-home]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          DEPLOY_RESULT: ${{ needs.deploy-home.result }}
+          REPOSITORY: ${{ github.repository }}
+          REF_NAME: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${DISCORD_WEBHOOK_URL:-}" ]; then
+            echo "DISCORD_WEBHOOK_URL secret is not set; skipping Discord notification."
+            exit 0
+          fi
+
+          STATUS="success"
+          COLOR=3066993
+          TITLE="Gujeuk CI/CD succeeded"
+
+          if [ "$BUILD_RESULT" != "success" ] || { [ "$DEPLOY_RESULT" != "success" ] && [ "$DEPLOY_RESULT" != "skipped" ]; }; then
+            STATUS="failure"
+            COLOR=15158332
+            TITLE="Gujeuk CI/CD failed"
+          fi
+
+          export STATUS COLOR TITLE
+
+          python3 - <<'PY' > /tmp/discord-payload.json
+          import json
+          import os
+
+          sha = os.environ["SHA"]
+          deploy_result = os.environ["DEPLOY_RESULT"]
+          if deploy_result == "skipped":
+              deploy_result = "skipped (non-main branch or PR)"
+
+          payload = {
+              "username": "Gujeuk CI/CD",
+              "embeds": [
+                  {
+                      "title": os.environ["TITLE"],
+                      "url": os.environ["RUN_URL"],
+                      "color": int(os.environ["COLOR"]),
+                      "fields": [
+                          {"name": "status", "value": os.environ["STATUS"], "inline": True},
+                          {"name": "branch", "value": os.environ["REF_NAME"], "inline": True},
+                          {"name": "event", "value": os.environ["EVENT_NAME"], "inline": True},
+                          {"name": "build", "value": os.environ["BUILD_RESULT"], "inline": True},
+                          {"name": "deploy", "value": deploy_result, "inline": True},
+                          {"name": "actor", "value": os.environ["ACTOR"], "inline": True},
+                          {"name": "commit", "value": sha[:7], "inline": True},
+                          {"name": "repository", "value": os.environ["REPOSITORY"], "inline": True},
+                      ],
+                  }
+              ],
+          }
+
+          print(json.dumps(payload))
+          PY
+
+          curl -fsS \
+            -H "Content-Type: application/json" \
+            -d @/tmp/discord-payload.json \
+            "$DISCORD_WEBHOOK_URL"
