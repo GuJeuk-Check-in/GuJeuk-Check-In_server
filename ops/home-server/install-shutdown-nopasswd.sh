@@ -11,7 +11,7 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-for file in server-shutdown gujeuk-rtcwake; do
+for file in server-shutdown gujeuk-rtcwake notify-server-resumed; do
   if [ ! -f "$SOURCE_DIR/$file" ]; then
     echo "Missing file: $SOURCE_DIR/$file" >&2
     exit 1
@@ -32,6 +32,16 @@ else
     "$SERVER_SHUTDOWN_TARGET"
 fi
 
+RESUME_NOTIFIER_TARGET="/home/$TARGET_USER/bin/notify-server-resumed"
+if [ "$(readlink -f "$SOURCE_DIR/notify-server-resumed")" = "$(readlink -f "$RESUME_NOTIFIER_TARGET")" ]; then
+  chown "$TARGET_USER:$TARGET_USER" "$RESUME_NOTIFIER_TARGET"
+  chmod 0755 "$RESUME_NOTIFIER_TARGET"
+else
+  install -o "$TARGET_USER" -g "$TARGET_USER" -m 0755 \
+    "$SOURCE_DIR/notify-server-resumed" \
+    "$RESUME_NOTIFIER_TARGET"
+fi
+
 ln -sf "$SERVER_SHUTDOWN_TARGET" "/home/$TARGET_USER/bin/shutdown"
 ln -sf "$SERVER_SHUTDOWN_TARGET" /shutdown
 
@@ -42,8 +52,8 @@ EOF
 chmod 0440 "$SUDOERS_FILE"
 visudo -cf "$SUDOERS_FILE"
 
-echo 'Scheduled shutdown command installed.'
-echo 'Testing RTC wake scheduling without powering off...'
+echo 'Scheduled low-power sleep command installed.'
+echo 'Testing RTC wake scheduling without entering sleep...'
 sudo -u "$TARGET_USER" sudo -n /usr/local/sbin/gujeuk-rtcwake check 120
 echo 'RTC dry-run passed.'
 echo 'Use: shutdown'

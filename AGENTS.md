@@ -28,6 +28,8 @@
 
 - 운영 Wi-Fi를 커스텀 `wifi` 명령으로 변경하지 않습니다. 기존 Netplan과 충돌하여 원격 접속과 API가 끊긴 이력이 있습니다.
 - `rtcwake -m off` 기반 예약 종료·자동 부팅을 사용하지 않습니다. Samsung 550XED에서 실제 자동 부팅에 실패했습니다.
+- `rtcwake -m mem`의 `deep` 모드는 정상 resume 대신 콜드 부팅이 발생했으므로 사용하지 않습니다.
+- 예약 복귀가 필요하면 실제 검증된 `/usr/local/sbin/gujeuk-rtcwake schedule <seconds>`의 `freeze` 모드만 사용합니다. `shutdown`에 `0`을 입력하면 완전 종료되며 자동 복귀하지 않습니다.
 - 원격 전원 작업은 완전 종료보다 `reboot`를 우선합니다.
 - CI/CD 배포 과정에서 cloudflared를 직접 시작하거나 종료하지 않습니다.
 - `502`, `530/1033`, `000` 장애를 구분하여 진단합니다.

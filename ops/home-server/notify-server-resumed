@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+NOTIFIER=/home/ubuntu/bin/discord-notify
+LOG_DIR=/home/ubuntu/.config/gujeuk-monitor
+LOG_FILE="$LOG_DIR/resume-notify.log"
+LOCAL_URL=http://localhost:8080/purpose/all
+PUBLIC_URL=https://api.taisu.site/purpose/all
+TUNNEL_WATCHDOG=/home/ubuntu/bin/watch-cloudflared.sh
+MAX_ATTEMPTS=30
+WAIT_SECONDS=10
+IS_TEST=false
+
+if [ "${1:-}" = "--test" ]; then
+  IS_TEST=true
+  MAX_ATTEMPTS=1
+  WAIT_SECONDS=0
+fi
+
+mkdir -p "$LOG_DIR"
+
+log() {
+  printf '%s %s\n' \
+    "$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S KST')" \
+    "$*" >>"$LOG_FILE"
+}
+
+http_status() {
+  local url="$1"
+  local timeout="$2"
+  local code
+
+  code="$(curl -sS --max-time "$timeout" -o /dev/null -w '%{http_code}' "$url" 2>/dev/null || true)"
+  printf '%s\n' "${code:-000}"
+}
+
+local_code=000
+public_code=000
+
+for ((attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1)); do
+  local_code="$(http_status "$LOCAL_URL" 5)"
+  public_code="$(http_status "$PUBLIC_URL" 10)"
+  log "attempt=$attempt local=$local_code public=$public_code"
+
+  if [ "$local_code" = "200" ] && [ "$public_code" = "200" ]; then
+    break
+  fi
+
+  if [ "$local_code" = "200" ] &&
+    [ "$public_code" != "200" ] &&
+    [ -x "$TUNNEL_WATCHDOG" ]; then
+    "$TUNNEL_WATCHDOG" >/dev/null 2>&1 || true
+  fi
+
+  if [ "$attempt" -lt "$MAX_ATTEMPTS" ]; then
+    sleep "$WAIT_SECONDS"
+  fi
+done
+
+hostname_value="$(hostname)"
+ip_value="$(hostname -I 2>/dev/null | awk '{print $1}')"
+battery_value="$(cat /sys/class/power_supply/BAT1/capacity 2>/dev/null || echo unknown)"
+ssid_value="$(
+  iw dev wlo1 link 2>/dev/null |
+    awk -F': ' '/^[[:space:]]*SSID:/ { print $2; exit }'
+)"
+
+if [ "$IS_TEST" = true ]; then
+  title='구즉 홈서버 예약 절전 복귀 알림 테스트'
+  prefix='예약 절전 복귀 알림 설정이 정상적으로 적용되었습니다.'
+else
+  title='구즉 홈서버 예약 절전 복귀 완료'
+  prefix='구즉 온프레미스 서버가 예약된 절전에서 정상적으로 복귀했습니다.'
+fi
+
+message="$(cat <<MSG
+${prefix}
+
+서버: ${hostname_value}
+IP: ${ip_value:-unknown}
+Wi-Fi: ${ssid_value:-unknown}
+배터리: ${battery_value}%
+복귀 확인 시간: $(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S KST')
+
+점검 결과:
+local-api HTTP ${local_code}
+public-api HTTP ${public_code}
+MSG
+)"
+
+if [ ! -x "$NOTIFIER" ]; then
+  log "discord notifier is missing"
+  exit 1
+fi
+
+for attempt in {1..5}; do
+  if "$NOTIFIER" "$title" "$message" 5763719; then
+    log "notification sent title=[$title]"
+    exit 0
+  fi
+
+  log "notification failed attempt=$attempt"
+  sleep 10
+done
+
+exit 1

@@ -92,6 +92,9 @@ jobs:
           install -m 0755 \
             ops/home-server/install-shutdown-nopasswd.sh \
             /home/ubuntu/bin/install-shutdown-nopasswd.sh
+          install -m 0755 \
+            ops/home-server/notify-server-resumed \
+            /home/ubuntu/bin/notify-server-resumed
           ln -sfn \
             /home/ubuntu/bin/server-shutdown \
             /home/ubuntu/bin/shutdown

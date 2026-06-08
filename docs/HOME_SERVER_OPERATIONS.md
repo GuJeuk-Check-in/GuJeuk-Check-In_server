@@ -1,6 +1,6 @@
 # 구즉 홈서버 구축·배포·운영 문서
 
-> 기준일: 2026-06-05
+> 기준일: 2026-06-08
 > 대상 저장소: `GuJeuk-Check-in/GuJeuk-Check-In_server`
 > 홈서버: Samsung 550XED / Ubuntu Server / 사용자 `ubuntu`
 
@@ -65,9 +65,11 @@ flowchart LR
 - `develop` 브랜치는 저장소 기본 브랜치이며 별도의 과거 CI/CD 구조를 가지고 있다.
 - Wi-Fi 자동 변경 기능은 Netplan 충돌 사고가 있어 **현재 사용 금지**다.
 - `rtcwake -m off` 예약 자동 부팅은 Samsung 550XED에서 실제 복귀에 실패했다. **현재 사용 금지**다.
+- `rtcwake -m mem`의 `deep` 모드는 정상 resume 대신 콜드 부팅이 발생했다. **현재 사용 금지**다.
+- 예약 복귀는 실제 검증된 `rtcwake -m freeze` 방식으로 동작한다.
 - 완전 종료된 서버를 외부 소프트웨어만으로 다시 켤 수는 없다.
 
-문서 작성 직전 마지막 전원 테스트에서는 RTC 예약 시각이 지나도 서버가 부팅되지 않았다. 따라서 현재 서버가 꺼져 있다면 물리적으로 전원을 켜야 한다.
+2026-06-08 KST 확인 시 운영 API와 Cloudflare SSH는 정상이며, 60초 `freeze` 절전 테스트에서 같은 Boot ID로 자동 복귀했다.
 
 ---
 
@@ -777,7 +779,7 @@ public-api   정상 HTTP 200
 | `health` | 컨테이너와 API 점검 |
 | `monitor-status` | Discord 모니터 상태 |
 | `runner-status` | GitHub Runner 상태 |
-| `shutdown` | 종료 명령 |
+| `shutdown` | 예약 절전 또는 완전 종료 명령 |
 
 ### Slash command
 
@@ -957,9 +959,9 @@ ssh gujeuk-home 'sudo shutdown -h now'
 - 스마트 플러그
 - 원격 전원 버튼 장치
 
-### RTC 예약 부팅 실험
+### RTC 예약 복귀
 
-`rtcwake -m off -s <seconds>` 기반 예약 종료 명령을 구현했다.
+처음에는 `rtcwake -m off -s <seconds>` 기반 예약 종료 명령을 구현했다.
 
 예상 사용 방식:
 
@@ -981,9 +983,27 @@ Continue: yes
 결론:
 
 - 이 장비에서 `rtcwake -m off` 완전 종료 복귀는 검증 실패
-- `shutdown` 예약 자동 부팅 기능은 현재 사용 금지
-- 서버를 다시 켜려면 전원 버튼 조작이 필요
-- 추후에는 `rtcwake -m mem` 절전 복귀를 별도로 테스트할 수 있음
+- 커널은 RTC가 S4까지 깨울 수 있다고 보고하며 S5 기상을 보장하지 않음
+- `rtcwake -m mem` + `deep`은 예약 기상 시 정상 resume 대신 콜드 부팅 발생
+- 최종적으로 `rtcwake -m freeze`를 적용
+- 60초 테스트에서 Boot ID 유지, `PM: suspend entry (s2idle)`와 `PM: suspend exit` 확인
+- 공개 API는 복귀 후 약 29초 내 HTTP 200 복구
+
+현재 `shutdown` 동작:
+
+- Hours `0`보다 큰 값: 저전력 `freeze` 절전 후 예약 복귀
+- Hours `0`: 완전 종료, 자동 복귀 없음
+- 절전 중 API와 SSH는 중단됨
+- 복귀 후 Cloudflare Tunnel 재연결에 수십 초가 걸릴 수 있음
+- 예약 절전 작업은 검증된 `nohup` 분리 프로세스로 실행되어 SSH 세션 종료와 무관하게 동작
+- 복귀 후 `notify-server-resumed`가 local/public API를 최대 5분간 확인
+- API 상태와 서버·Wi-Fi·배터리 정보를 포함한 Discord 복귀 완료 알림 전송
+
+복귀 알림 테스트:
+
+```bash
+/home/ubuntu/bin/notify-server-resumed --test
+```
 
 ---
 
@@ -1057,11 +1077,14 @@ curl -I https://api.taisu.site/purpose/all
 원인:
 
 - OS에서는 RTC alarm 설정이 가능했으나 펌웨어가 S5 완전 종료 복귀를 수행하지 않음
+- 커널 로그가 `rtc_cmos: RTC can wake from S4`로 이 장비의 RTC 기상 한계를 표시
+- `deep` 절전은 ACPI resume 문제로 콜드 부팅 발생
 
 교훈:
 
 - `rtcwake --dry-run` 성공은 실제 전원 복귀 성공을 보장하지 않음
 - 전원 관련 기능은 짧은 실제 테스트 후 운영에 사용해야 함
+- 이 장비에서는 검증된 `freeze` 모드만 예약 복귀에 사용
 
 ---
 
@@ -1189,9 +1212,10 @@ chmod 600 /home/ubuntu/.config/gujeuk-monitor/discord-webhook-url
    - 홈서버가 완전히 꺼져도 장애를 감지할 수 있어야 함
 
 2. **전원 복구 방식 확정**
-   - BIOS AC 자동 부팅 확인
+   - 현재 예약 복귀는 `freeze` 모드로 운영
+   - 완전 종료 복구가 필요하면 BIOS AC 자동 부팅 확인
    - 유선 Wake-on-LAN 검토
-   - 하드웨어 사용이 불가하면 완전 종료하지 않는 운영 정책 채택
+   - 하드웨어 사용이 불가하면 예약 작업에서 완전 종료하지 않기
 
 3. **Wi-Fi 운영 정책 확정**
    - 운영 중 원격 Wi-Fi 변경 금지
@@ -1245,12 +1269,13 @@ chmod 600 /home/ubuntu/.config/gujeuk-monitor/discord-webhook-url
 ## 18. 운영 원칙
 
 1. 운영 중 Wi-Fi를 원격으로 바꾸지 않는다.
-2. 완전 종료 후 자동 부팅 기능을 신뢰하지 않는다.
-3. 서버를 끄기보다 `reboot`를 우선 사용한다.
-4. 배포 중 Tunnel 프로세스를 직접 조작하지 않는다.
-5. DB 복원 전 반드시 백업한다.
-6. 비밀 값은 Git과 문서에 남기지 않는다.
-7. `health` 결과에서 local/public을 구분해 판단한다.
-8. `502`, `530`, `000`을 같은 장애로 취급하지 않는다.
-9. 홈서버 외부에서 별도 uptime monitoring을 운영한다.
-10. 운영 브랜치와 기본 브랜치를 하나로 통일한다.
+2. 완전 종료 후 RTC 자동 부팅 기능을 사용하지 않는다.
+3. 예약 복귀는 검증된 `freeze` 모드만 사용한다.
+4. 서버를 완전히 끄기보다 `reboot` 또는 예약 절전을 우선 사용한다.
+5. 배포 중 Tunnel 프로세스를 직접 조작하지 않는다.
+6. DB 복원 전 반드시 백업한다.
+7. 비밀 값은 Git과 문서에 남기지 않는다.
+8. `health` 결과에서 local/public을 구분해 판단한다.
+9. `502`, `530`, `000`을 같은 장애로 취급하지 않는다.
+10. 홈서버 외부에서 별도 uptime monitoring을 운영한다.
+11. 운영 브랜치와 기본 브랜치를 하나로 통일한다.

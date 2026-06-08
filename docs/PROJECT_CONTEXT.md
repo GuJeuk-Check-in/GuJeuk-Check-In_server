@@ -1,6 +1,6 @@
 # GuJeuk 프로젝트 현재 상황
 
-> 최종 갱신: 2026-06-06 KST
+> 최종 갱신: 2026-06-08 KST
 > 목적: 새로운 Codex 대화에서도 현재 서비스·배포·운영 상황을 빠르게 파악하기 위한 기준 문서
 
 ## 1. 문서 사용 방법
@@ -186,23 +186,31 @@ Discord 알림:
 
 ## 8. 현재 라이브 상태
 
-2026-06-06 KST 확인 결과:
+2026-06-08 KST 확인 결과:
 
 ```text
-https://api.taisu.site/purpose/all -> HTTP 530
-ssh gujeuk-home                    -> Cloudflare WebSocket handshake 실패
+https://api.taisu.site/purpose/all -> HTTP 200
+ssh gujeuk-home                    -> 정상 접속
+운영·스테이징 Docker 컨테이너      -> 모두 실행 중
 ```
 
-직전 상황:
+RTC 예약 복귀 수정 결과:
 
-- `rtcwake -m off`로 30분 뒤 자동 부팅을 예약하고 서버를 종료했다.
-- 예약 시간이 지나도 API, Cloudflare SSH, LAN IP가 복구되지 않았다.
+- 기존 `rtcwake -m off`는 RTC 알람은 설정됐지만 S5 완전 종료에서 펌웨어가 깨우지 못했다.
+- 커널은 `rtc_cmos: RTC can wake from S4`로 보고하며 S5 기상을 보장하지 않는다.
+- `rtcwake -m mem` + `deep`은 예약 시각에 기상했지만 정상 resume 대신 콜드 부팅이 발생했다.
+- 최종적으로 `rtcwake -m freeze`를 적용했다.
+- 60초 실제 테스트에서 Boot ID가 유지됐고 커널 로그에 `PM: suspend entry (s2idle)`와 `PM: suspend exit`가 기록됐다.
+- 공개 API는 복귀 후 약 29초 안에 HTTP 200으로 정상화됐다.
 
-현재 판단:
+현재 동작:
 
-- Samsung 550XED가 완전 종료 상태의 RTC 자동 부팅을 지원하지 않거나 펌웨어에서 비활성화되어 있다.
-- 서버가 아직 꺼져 있을 가능성이 높다.
-- 원격 작업을 시작하기 전에 물리적으로 전원을 켜고 상태를 다시 확인해야 한다.
+- `shutdown`에 `0`보다 큰 시간을 입력하면 완전 종료가 아니라 저전력 `freeze` 절전에 들어간다.
+- 지정 시간이 지나면 같은 부팅 세션으로 자동 복귀한다.
+- `shutdown`에 `0`을 입력하면 완전히 종료되며 자동 복귀하지 않는다.
+- 절전 중에는 API와 SSH가 중단되고 복귀 후 Tunnel 재연결까지 수십 초가 걸릴 수 있다.
+- 예약 절전은 `nohup` 분리 작업으로 실행되어 SSH가 끊겨도 유지된다.
+- 복귀 후 local/public API를 최대 5분간 확인한 뒤 Discord에 한국어 복귀 완료 알림을 전송한다.
 
 이 상태는 변할 수 있으므로 다음 작업 전 반드시 다시 확인한다.
 
@@ -234,20 +242,28 @@ networkctl status wlo1 --no-pager
 - 복구 경로 확보
 - Cloudflare SSH만 믿고 원격 변경하지 않기
 
-### RTC 자동 부팅 사용 금지
+### RTC 예약 복귀
 
-다음 방식은 실제 자동 부팅에 실패했다.
+다음 방식은 사용하지 않는다.
 
 ```bash
 rtcwake -m off
+rtcwake -m mem
 ```
 
 현재 정책:
 
-- 예약 자동 부팅을 전제로 `shutdown`하지 않는다.
-- 원격에서는 `reboot`를 우선한다.
+- S5 완전 종료 후 RTC 자동 부팅은 이 장비에서 지원되지 않는다.
+- `deep` 절전은 콜드 부팅을 일으켰으므로 사용하지 않는다.
+- 예약 복귀는 설치된 `freeze` 모드 명령만 사용한다.
+- 장시간 완전 종료가 필요하면 자동 복귀를 기대하지 않는다.
 - 완전 종료 후 자동 부팅이 필요하면 BIOS AC Power Recovery, 유선 Wake-on-LAN 또는 별도 하드웨어를 검토한다.
-- `rtcwake -m mem`은 별도 실제 테스트 전까지 운영에 사용하지 않는다.
+
+```bash
+shutdown
+# Hours에 0보다 큰 값: freeze 절전 후 예약 복귀
+# Hours에 0: 완전 종료, 자동 복귀 없음
+```
 
 ### Cloudflare Tunnel
 
