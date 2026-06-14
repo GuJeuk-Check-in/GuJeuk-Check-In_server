@@ -1,6 +1,6 @@
 # GuJeuk 프로젝트 현재 상황
 
-> 최종 갱신: 2026-06-08 KST
+> 최종 갱신: 2026-06-14 KST
 > 목적: 새로운 Codex 대화에서도 현재 서비스·배포·운영 상황을 빠르게 파악하기 위한 기준 문서
 
 ## 1. 문서 사용 방법
@@ -20,6 +20,7 @@ GuJeuk-Check-In Server는 시설 출입 관리용 Spring Boot 백엔드다.
 - 이용자 등록·조회·수정
 - 방문 목적과 거주지 분류
 - 출입 로그 생성·조회·수정
+- 운영자별 월간·연간 누계 방문 실적 통계
 - 관리자 Excel 내보내기
 - 운영자별 데이터 분리를 적용한 멀티 테넌트 구조
 
@@ -48,10 +49,10 @@ GuJeuk-Check-in/GuJeuk-Check-In_server
 /Users/bagtaesu/Desktop/git/GuJeuk-Check-In_server
 ```
 
-현재 인프라 작업 브랜치:
+현재 기능 작업 브랜치:
 
 ```text
-main
+feature/#73-month-hwp-file
 ```
 
 GitHub 기본 브랜치:
@@ -226,17 +227,32 @@ Discord 알림:
 
 ## 8. 현재 라이브 상태
 
-2026-06-09 KST 확인 결과:
+2026-06-14 KST 배포 후 실제 확인 결과:
 
 ```text
 https://api.taisu.site/purpose/all -> HTTP 200
+https://api.taisu.site/residence/all -> HTTP 200
+GET /organ/statistics/visits         -> Access Token 인증 후 HTTP 200
+통계 API 토큰 없음                   -> HTTP 403
+통계 API 미래 연월                   -> HTTP 400
 https://monitor.taisu.site/api/health -> HTTP 200
 ssh gujeuk-home                    -> 정상 접속
-운영·스테이징 Docker 컨테이너      -> 모두 실행 중
-모니터링 Docker 컨테이너 8개       -> 모두 실행 중
-Prometheus HTTP probe              -> 모두 성공
-Grafana Prometheus/Loki datasource -> 모두 정상
+gujeuk-app                         -> 실행 중, 재시작 0회
+gujeuk-mysql                       -> healthy, 재시작 0회
+gujeuk-redis                       -> healthy, 재시작 0회
 ```
+
+월별 방문 통계 API:
+
+```text
+GET /organ/statistics/visits?year={year}&month={month}
+Authorization: Bearer {accessToken}
+```
+
+- 인증된 운영자의 데이터만 조회한다.
+- `monthly`는 선택 월, `cumulative`는 선택 연도 1월 1일부터 선택 월 말일까지 집계한다.
+- 청소년은 `AGE_9_13`, `AGE_14_16`, `AGE_17_19`, `AGE_20_24`, 기타는 `BABY`, `ADULT`로 분류한다.
+- 상세 요청·응답 JSON은 `apiDocument.md`를 기준으로 한다.
 
 RTC 예약 복귀 수정 결과:
 
