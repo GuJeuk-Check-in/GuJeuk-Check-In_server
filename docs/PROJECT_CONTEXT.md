@@ -81,6 +81,7 @@ Ubuntu Server
 
 ```text
 /home/ubuntu/git/gujeuk-check-in-server
+/home/ubuntu/git/monitoring
 ```
 
 Docker 서비스:
@@ -91,12 +92,28 @@ Docker 서비스:
 | MySQL | `gujeuk-mysql` | 운영 데이터베이스 |
 | Redis | `gujeuk-redis` | JWT 토큰 저장 |
 
+통합 모니터링은 별도 Compose 프로젝트 `gujeuk-monitoring`으로 실행한다.
+
+| 서비스 | 컨테이너 | 역할 |
+|---|---|---|
+| Grafana | `monitoring-grafana` | 대시보드와 로그 조회, localhost 3000 |
+| Prometheus | `monitoring-prometheus` | 메트릭과 경보 규칙 |
+| Loki | `monitoring-loki` | Docker와 systemd 로그 저장 |
+| Alloy | `monitoring-alloy` | Docker 및 journal 로그 수집 |
+| node_exporter | `monitoring-node-exporter` | 호스트 CPU·메모리·디스크·네트워크 |
+| cAdvisor | `monitoring-cadvisor` | 컨테이너별 자원 사용량 |
+| blackbox_exporter | `monitoring-blackbox-exporter` | 로컬·공개 URL HTTP probe |
+| home-metrics | `monitoring-home-metrics` | 배터리, AC, Compose 상태 |
+
 외부 주소:
 
 | 용도 | 주소 |
 |---|---|
 | 운영 API | `https://api.taisu.site` |
 | 스테이징 API 라우트 | `https://api-stag.taisu.site` |
+| Focus Mate | `https://focus.taisu.site` |
+| GuJeuk Prototype | `https://prototype.taisu.site` |
+| 통합 모니터링 | `https://monitor.taisu.site` |
 | Cloudflare SSH | `ssh.taisu.site` |
 
 Cloudflare ingress:
@@ -104,6 +121,9 @@ Cloudflare ingress:
 ```text
 api.taisu.site      -> http://localhost:8080
 api-stag.taisu.site -> http://localhost:8081
+focus.taisu.site    -> http://localhost:8787
+prototype.taisu.site -> http://localhost:8788
+monitor.taisu.site  -> http://localhost:3000
 ssh.taisu.site      -> ssh://localhost:22
 ```
 
@@ -161,6 +181,25 @@ label: gujeuk-home-server
 
 ## 7. 모니터링과 Discord
 
+Grafana 통합 모니터링:
+
+- 배포 경로: `/home/ubuntu/git/monitoring`
+- 외부 주소: `https://monitor.taisu.site`
+- 호스트 CPU, 메모리, 디스크, 네트워크, 배터리와 AC 상태
+- 모든 Docker Compose 프로젝트와 컨테이너 상태
+- 로컬·공개 URL의 HTTP 상태와 응답 시간
+- Docker 로그와 systemd journal 검색
+- Prometheus 경보 상태
+- Grafana 외 Prometheus, Loki, Alloy 포트는 localhost에만 바인딩
+
+기본 대시보드:
+
+- `홈서버 전체 현황`
+- `프로젝트와 컨테이너`
+- `통합 로그와 컨테이너`
+
+`홈서버 전체 현황`과 `통합 로그와 컨테이너`에는 모든 Docker 컨테이너의 실행 상태, Healthcheck, 재시작 횟수, CPU와 메모리 사용량이 표시된다. 로그 검색 기본값은 전체 로그를 의미하는 정규식 `.*`이며 raw 값으로 Loki에 전달한다.
+
 홈서버 로컬 모니터는 다음을 검사한다.
 
 - `gujeuk-app`
@@ -182,16 +221,21 @@ Discord 알림:
 한계:
 
 - 홈서버 자체가 꺼지거나 인터넷이 끊기면 로컬 모니터도 알림을 보낼 수 없다.
+- Grafana도 같은 홈서버에서 실행되므로 완전한 외부 uptime monitor를 대체하지 않는다.
 - 외부 장애 감지를 위해 UptimeRobot, Better Stack 또는 별도 클라우드 모니터가 필요하다.
 
 ## 8. 현재 라이브 상태
 
-2026-06-08 KST 확인 결과:
+2026-06-09 KST 확인 결과:
 
 ```text
 https://api.taisu.site/purpose/all -> HTTP 200
+https://monitor.taisu.site/api/health -> HTTP 200
 ssh gujeuk-home                    -> 정상 접속
 운영·스테이징 Docker 컨테이너      -> 모두 실행 중
+모니터링 Docker 컨테이너 8개       -> 모두 실행 중
+Prometheus HTTP probe              -> 모두 성공
+Grafana Prometheus/Loki datasource -> 모두 정상
 ```
 
 RTC 예약 복귀 수정 결과:
@@ -396,18 +440,43 @@ tail -n 100 /home/ubuntu/.cloudflared/cloudflared.log
 tail -n 100 /home/ubuntu/.cloudflared/watchdog.log
 ```
 
-## 15. 다음 우선 작업
+통합 모니터링:
 
-1. 홈서버를 물리적으로 켠 뒤 API·SSH·Docker 상태 재확인
-2. Git에 추적된 운영 secret 제거와 credential rotation
-3. `main`과 `develop` CI/CD 정책 통합
-4. 홈서버 외부 uptime monitor 도입
-5. 정기 DB 백업과 외부 저장소 복제
-6. 서버 전용 스크립트를 저장소로 이전
-7. 실패한 Wi-Fi·RTC 기능을 운영 명령에서 제거하거나 명확히 비활성화
+```bash
+cd /home/ubuntu/git/monitoring
+./scripts/verify.sh
+docker compose ps
+docker compose logs --tail=200 grafana prometheus loki alloy
+```
+
+## 15. 운영 프론트와 사용자 API 상태
+
+2026-06-10 KST 실제 확인 결과:
+
+- `https://api.taisu.site/purpose/all`은 HTTP 200이며 운영 방문 목적 12개를 반환한다.
+- `https://api.taisu.site/residence/all`은 HTTP 200이다.
+- `https://gujeuk.dsmhs.kr` Origin의 CORS preflight와 API 응답 헤더는 정상이다.
+- 빈 회원가입 요청과 잘못된 성별 enum 요청은 HTTP 400으로 응답하도록 수정·배포했다.
+- 존재하지 않는 사용자 로그인은 HTTP 404로 정상 응답한다.
+- 같은 사용자가 같은 분에 다시 체크인하면 DB 제약조건의 500 대신 HTTP 409를 반환하도록 수정했다.
+- `https://gujeuk.dsmhs.kr` 프론트 주소는 점검 시 HTTP 503으로 정상 서비스되지 않았다.
+- Cloudflare Pages 배포본은 `/` 라우트가 없어 흰 화면이며 관리자 화면만 포함한다.
+- 현재 프론트 저장소에는 `/user/sign-up`, `/user/login` 사용자 체크인 화면과 API 호출 구현이 없다.
+
+따라서 방문 목적 API 장애와 프론트 서비스 장애를 구분해야 한다. 현재 방문 목적 API는 정상이고, 사용자 회원가입·로그인 절차가 브라우저에서 제공되지 않는 주원인은 잘못되거나 불완전한 프론트 배포다.
+
+## 16. 다음 우선 작업
+
+1. 사용자 체크인 전용 프론트의 회원가입·로그인 화면과 API 연동 복구
+2. `https://gujeuk.dsmhs.kr` 배포 대상과 DNS·호스팅 상태 복구
+3. 프론트 루트 경로에 명시적인 시작 화면 또는 redirect 추가
+4. Git에 추적된 운영 secret 제거와 credential rotation
+5. `main`과 `develop` CI/CD 정책 통합
+6. 홈서버 외부 uptime monitor 도입
+7. 정기 DB 백업과 외부 저장소 복제
 8. CI에서 테스트를 다시 활성화할 수 있는 환경 구성
 
-## 16. 문서 갱신 규칙
+## 17. 문서 갱신 규칙
 
 다음 변경이 발생하면 이 문서를 함께 갱신한다.
 

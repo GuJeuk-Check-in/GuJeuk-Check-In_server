@@ -1,6 +1,6 @@
 # 구즉 홈서버 구축·배포·운영 문서
 
-> 기준일: 2026-06-08
+> 기준일: 2026-06-09
 > 대상 저장소: `GuJeuk-Check-in/GuJeuk-Check-In_server`
 > 홈서버: Samsung 550XED / Ubuntu Server / 사용자 `ubuntu`
 
@@ -21,6 +21,13 @@
 - `Self-hosted Runner`
 - `Discord Webhook`
 - `Cron Watchdog`
+- `Grafana`
+- `Prometheus`
+- `Loki`
+- `Grafana Alloy`
+- `node_exporter`
+- `cAdvisor`
+- `blackbox_exporter`
 - `Database Restore`
 - `CORS`
 - `Remote SSH`
@@ -42,6 +49,10 @@ flowchart LR
         API --> Redis["gujeuk-redis<br/>Redis 7.2"]
         Runner["GitHub Self-hosted Runner"] --> Compose["Docker Compose"]
         Compose --> API
+        Monitor["Grafana :3000"] --> Metrics["Prometheus"]
+        Monitor --> Logs["Loki"]
+        Metrics --> Exporters["node_exporter / cAdvisor / blackbox"]
+        Logs --> Collector["Alloy"]
     end
 
     GitHub["GitHub main push"] --> Actions["GitHub Actions Build"]
@@ -55,6 +66,9 @@ flowchart LR
 |---|---|---|
 | 운영 API | `https://api.taisu.site` | `http://localhost:8080` |
 | 스테이징 API 라우트 | `https://api-stag.taisu.site` | `http://localhost:8081` |
+| Focus Mate | `https://focus.taisu.site` | `http://localhost:8787` |
+| GuJeuk Prototype | `https://prototype.taisu.site` | `http://localhost:8788` |
+| 통합 모니터링 | `https://monitor.taisu.site` | `http://localhost:3000` |
 | 원격 SSH | `ssh.taisu.site` | `ssh://localhost:22` |
 
 ### 중요 상태
@@ -69,7 +83,7 @@ flowchart LR
 - 예약 복귀는 실제 검증된 `rtcwake -m freeze` 방식으로 동작한다.
 - 완전 종료된 서버를 외부 소프트웨어만으로 다시 켤 수는 없다.
 
-2026-06-08 KST 확인 시 운영 API와 Cloudflare SSH는 정상이며, 60초 `freeze` 절전 테스트에서 같은 Boot ID로 자동 복귀했다.
+2026-06-09 KST 확인 시 운영 API, Cloudflare SSH와 통합 모니터링은 정상이다. 모니터링 스택의 내부 endpoint, Prometheus target과 HTTP probe, 사용자 정의 메트릭, Loki 로그 수집이 모두 검증됐다.
 
 ---
 
@@ -80,6 +94,7 @@ flowchart LR
 | 용도 | 경로 |
 |---|---|
 | 배포 코드 | `/home/ubuntu/git/gujeuk-check-in-server` |
+| 통합 모니터링 | `/home/ubuntu/git/monitoring` |
 | 운영 명령 스크립트 | `/home/ubuntu/bin` |
 | GitHub Runner | `/home/ubuntu/actions-runner/gujeuk-check-in-server` |
 | Cloudflare 설정 | `/home/ubuntu/.cloudflared` |
@@ -445,6 +460,12 @@ ingress:
     service: http://localhost:8080
   - hostname: api-stag.taisu.site
     service: http://localhost:8081
+  - hostname: focus.taisu.site
+    service: http://localhost:8787
+  - hostname: prototype.taisu.site
+    service: http://localhost:8788
+  - hostname: monitor.taisu.site
+    service: http://localhost:3000
   - hostname: ssh.taisu.site
     service: ssh://localhost:22
   - service: http_status:404
@@ -460,7 +481,7 @@ ingress:
 
 1. 가비아에서 구매한 `taisu.site`의 네임서버를 Cloudflare 네임서버로 변경
 2. Cloudflare에서 Tunnel 생성
-3. `api`, `api-stag`, `ssh` hostname을 Tunnel route로 연결
+3. `api`, `api-stag`, `focus`, `prototype`, `monitor`, `ssh` hostname을 Tunnel route로 연결
 4. 공인 IP 직접 A 레코드 의존 제거
 
 현재 Tunnel은 로컬 설정 파일로 관리된다. Cloudflare 대시보드에 `locally managed`로 표시되는 경우 route를 대시보드에서 수정할 수 없으며 홈서버의 `config.yml`과 `cloudflared tunnel route dns` 명령으로 관리한다.
@@ -722,6 +743,97 @@ Discord Webhook은 메시지 발송만 지원한다. Discord 채팅에서 `/stat
 - 배터리 정상 → 10% 이하
 - 배터리 부족 → 복구
 
+### Grafana 통합 모니터링
+
+별도 프로젝트 경로:
+
+```text
+/home/ubuntu/git/monitoring
+```
+
+구성:
+
+| 도구 | 수집·제공 항목 |
+|---|---|
+| Grafana | 웹 대시보드, 로그 검색, 활성 경보 |
+| Prometheus | 15초 단위 메트릭 저장과 경보 평가 |
+| node_exporter | 호스트 CPU, 메모리, 디스크, 네트워크 |
+| cAdvisor | 컨테이너별 CPU, 메모리, 네트워크 |
+| blackbox_exporter | 로컬 서비스와 공개 HTTPS URL probe |
+| Loki | 로그 저장과 LogQL 검색 |
+| Alloy | Docker socket과 systemd journal 로그 전송 |
+| home-metrics | 배터리, AC, 컨테이너와 Compose 프로젝트 상태 |
+
+기본 대시보드:
+
+- `홈서버 전체 현황`
+- `프로젝트와 컨테이너`
+- `통합 로그와 컨테이너`
+
+컨테이너 상세 표시:
+
+- 실행 또는 중지 상태
+- Docker Healthcheck
+- 누적 재시작 횟수
+- 컨테이너별 현재 CPU
+- 컨테이너별 현재 메모리
+- 프로젝트와 컨테이너 필터
+- Docker 로그와 systemd journal
+
+로그 검색 변수는 정규식 raw 값으로 Loki에 전달한다. `${search:regex}`를 사용하면 기본값 `.*`가 문자 그대로 이스케이프되어 `No data`가 발생하므로 사용하지 않는다.
+
+점검 대상:
+
+- 운영 API: 로컬 컨테이너와 `https://api.taisu.site`
+- 스테이징 API: 로컬 컨테이너와 `https://api-stag.taisu.site`
+- Focus Mate: 로컬 컨테이너와 `https://focus.taisu.site`
+- GuJeuk Prototype: 로컬 컨테이너와 `https://prototype.taisu.site`
+- Grafana: 로컬 endpoint와 `https://monitor.taisu.site`
+
+보관 정책:
+
+- Prometheus: 기본 30일 또는 8GB 중 먼저 도달한 한도
+- Loki: 기본 14일
+- Grafana 설정과 수집 데이터: Docker named volume
+
+보안:
+
+- Grafana만 Cloudflare Tunnel로 외부 공개
+- Grafana 익명 접근과 회원가입 비활성화
+- Prometheus, Loki, Alloy는 `127.0.0.1`에만 바인딩
+- `.env`의 Grafana credential은 권한 `600`으로 관리
+- Docker socket 마운트는 호스트 제어 권한에 준하므로 신뢰하는 이미지에만 허용
+
+배포와 검증:
+
+```bash
+cd /home/ubuntu/git/monitoring
+docker compose up -d
+./scripts/verify.sh
+```
+
+전체 검증은 다음을 확인한다.
+
+- Compose와 Prometheus·Alloy 설정 문법
+- Grafana, Prometheus, Loki, Alloy readiness
+- Prometheus scrape target
+- 모든 로컬·공개 HTTP probe
+- 배터리와 Docker 사용자 정의 메트릭
+- Loki 라벨과 로그 수집
+
+2026-06-09 실제 확인 결과:
+
+- 모니터링 컨테이너 8개 실행
+- 모든 HTTP probe 성공
+- 배터리와 AC 상태 수집
+- Docker 및 journal 로그 조회
+- Grafana의 Prometheus와 Loki datasource health 정상
+
+한계:
+
+- 이 스택도 홈서버에서 실행되므로 홈서버 완전 종료나 전체 인터넷 단절을 외부로 알릴 수 없다.
+- 완전한 외부 장애 감지는 별도 SaaS 또는 클라우드 실행 monitor가 필요하다.
+
 ### 중요한 한계
 
 홈서버 자체가 완전히 꺼지거나 인터넷이 끊기면:
@@ -780,6 +892,15 @@ public-api   정상 HTTP 200
 | `monitor-status` | Discord 모니터 상태 |
 | `runner-status` | GitHub Runner 상태 |
 | `shutdown` | 예약 절전 또는 완전 종료 명령 |
+
+통합 모니터링 확인:
+
+```bash
+cd /home/ubuntu/git/monitoring
+./scripts/verify.sh
+docker compose ps
+docker compose logs --tail=200 grafana prometheus loki alloy
+```
 
 ### Slash command
 
@@ -1279,3 +1400,48 @@ chmod 600 /home/ubuntu/.config/gujeuk-monitor/discord-webhook-url
 9. `502`, `530`, `000`을 같은 장애로 취급하지 않는다.
 10. 홈서버 외부에서 별도 uptime monitoring을 운영한다.
 11. 운영 브랜치와 기본 브랜치를 하나로 통일한다.
+
+---
+
+## 19. 2026-06-10 운영 회원가입·로그인 장애 진단
+
+### 재현 결과
+
+| 대상 | 결과 |
+|---|---|
+| `GET https://api.taisu.site/purpose/all` | HTTP 200 |
+| `GET https://api.taisu.site/residence/all` | HTTP 200 |
+| 빈 `POST /user/sign-up` | 수정 전 HTTP 500, 수정 후 HTTP 400 |
+| 잘못된 성별 `MALE` 회원가입 | 수정 전 HTTP 500, 수정 후 HTTP 400 |
+| 존재하지 않는 사용자 `POST /user/login` | HTTP 404 |
+| `https://gujeuk.dsmhs.kr` | 점검 시 HTTP 503 |
+| Pages 배포본 `/` | React Router route 부재로 흰 화면 |
+
+회원가입의 성별 값은 `MALE`, `FEMALE`이 아니라 `MAN`, `WOMAN`이다.
+
+### 확인된 원인
+
+1. `spring-boot-starter-validation`이 `compileOnly`여서 운영 JAR에 validation 구현체가 포함되지 않았다.
+2. `maleCount`, `femaleCount`, `privacyAgreed`가 primitive 타입이라 `@NotNull`이 동작하지 않았다.
+3. 잘못된 enum JSON이 공통 500 처리로 들어갔다.
+4. 같은 사용자의 `user_id + visit_date + visit_time`은 유일해야 하지만 시간 정밀도가 분 단위여서 같은 분 재요청이 DB 500으로 노출됐다.
+5. 운영 프론트 도메인이 정상 호스팅되지 않고 있다.
+6. Pages에 배포된 프론트는 관리자용이며 사용자 회원가입·로그인 UI와 API 호출 코드가 없다.
+
+### 적용한 조치
+
+- validation 의존성을 runtime JAR에 포함
+- 회원가입·로그인 동행인 수를 nullable wrapper와 0 이상 제약으로 변경
+- 회원가입 개인정보 동의를 필수화
+- 이름·전화번호 길이와 생년월일 형식 검증 추가
+- 읽을 수 없는 JSON과 잘못된 날짜를 HTTP 400으로 처리
+- 같은 분 중복 체크인을 HTTP 409 `DUPLICATE_LOG`로 처리
+- Docker build에서 Gradle wrapper를 다시 다운로드하지 않고 빌드 이미지의 Gradle을 사용
+- 홈서버에서 앱 이미지를 재빌드하고 `gujeuk-app`을 재배포
+
+### 남은 작업
+
+- 사용자 체크인 전용 프론트 구현 또는 올바른 저장소·빌드 복구
+- `https://gujeuk.dsmhs.kr` DNS와 실제 호스팅 대상 복구
+- 프론트 `/` route 또는 시작 redirect 추가
+- 프론트 요청의 성별 enum을 `MAN`, `WOMAN`으로 통일
