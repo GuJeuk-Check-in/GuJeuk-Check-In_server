@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
+import com.example.gujeuck_server.domain.log.domain.VisitStatisticsCount;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface LogRepositoryCustom {
     long countByYearMonth(String yearMonth);
 
     List<Log> findAllByOrganIdAndVisitDateStartingWithOrderByDateTime(Long organId, String visitDate);
+
+    VisitStatisticsCount summarizeVisits(Long organId, String startVisitDate, String endVisitDate);
 }

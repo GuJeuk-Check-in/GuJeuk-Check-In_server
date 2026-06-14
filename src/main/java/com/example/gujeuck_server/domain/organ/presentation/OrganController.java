@@ -3,6 +3,7 @@ package com.example.gujeuck_server.domain.organ.presentation;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.CreateOrganRequest;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.OrganResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.VisitStatisticsResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.LoginOrganRequest;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.ChangePasswordRequest;
 import com.example.gujeuck_server.domain.organ.service.*;
@@ -39,6 +40,7 @@ public class OrganController {
     private final UpdateUserService updateUserService;
     private final QueryUserDetailService queryUserDetailService;
     private final QueryOrganNameListService queryOrganNameListService;
+    private final QueryVisitStatisticsService queryVisitStatisticsService;
 
     @GetMapping("/user/all")
     public UserSliceWithTotalResponse queryAllUserList(
@@ -95,5 +97,13 @@ public class OrganController {
     @GetMapping("/name")
     public List<OrganResponse> queryOrganNameList() {
         return queryOrganNameListService.execute();
+    }
+
+    @GetMapping("/statistics/visits")
+    public VisitStatisticsResponse queryVisitStatistics(
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+        return queryVisitStatisticsService.execute(year, month);
     }
 }

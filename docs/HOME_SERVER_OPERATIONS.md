@@ -1445,3 +1445,55 @@ chmod 600 /home/ubuntu/.config/gujeuk-monitor/discord-webhook-url
 - `https://gujeuk.dsmhs.kr` DNS와 실제 호스팅 대상 복구
 - 프론트 `/` route 또는 시작 redirect 추가
 - 프론트 요청의 성별 enum을 `MAN`, `WOMAN`으로 통일
+
+---
+
+## 20. 2026-06-14 월별 방문 실적 통계 API
+
+### API
+
+```text
+GET /organ/statistics/visits?year={year}&month={month}
+Authorization: Bearer {accessToken}
+```
+
+- 인증된 운영자의 방문 기록만 집계한다.
+- 월간 통계와 선택 연도 1월부터 선택 월까지의 누계를 함께 반환한다.
+- 이용자 수는 각 방문 기록의 `maleCount + femaleCount` 합계다.
+- 청소년은 `AGE_9_13`, `AGE_14_16`, `AGE_17_19`, `AGE_20_24`다.
+- 기타는 `BABY`, `ADULT`다.
+- 미래 연월과 유효하지 않은 연월은 HTTP 400 `INVALID_LOG_DATE`로 처리한다.
+
+### 배포 절차
+
+```bash
+cd /home/ubuntu/git/gujeuk-check-in-server
+docker compose build app
+docker compose up -d app
+docker compose ps
+```
+
+### 점검 절차
+
+1. `gujeuk-app`, `gujeuk-mysql`, `gujeuk-redis` 상태 확인
+2. 로컬 공개 API인 `http://localhost:8080/purpose/all` HTTP 200 확인
+3. Cloudflare 경로인 `https://api.taisu.site/purpose/all` HTTP 200 확인
+4. 유효한 Access Token으로 월별 방문 통계 API의 로컬·공개 응답 확인
+5. 토큰이 없을 때 인증 실패, 미래 연월일 때 HTTP 400 확인
+
+API 명세의 요청·응답 JSON은 `apiDocument.md`에 기록한다.
+
+### 2026-06-14 배포 확인 결과
+
+```text
+로컬 통계 API       -> HTTP 200
+공개 통계 API       -> HTTP 200
+로컬·공개 응답 비교 -> 동일
+토큰 없는 요청      -> HTTP 403
+미래 연월 요청      -> HTTP 400
+purpose API         -> 로컬·공개 HTTP 200
+residence API       -> 로컬·공개 HTTP 200
+Pages CORS preflight -> HTTP 200
+```
+
+미래 연월 검증 중 발생한 `InvalidLogDateException` 로그는 의도한 HTTP 400 검증 결과다.
