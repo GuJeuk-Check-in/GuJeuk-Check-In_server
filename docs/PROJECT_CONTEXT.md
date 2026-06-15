@@ -1,6 +1,6 @@
 # GuJeuk 프로젝트 현재 상황
 
-> 최종 갱신: 2026-06-14 KST
+> 최종 갱신: 2026-06-15 KST
 > 목적: 새로운 Codex 대화에서도 현재 서비스·배포·운영 상황을 빠르게 파악하기 위한 기준 문서
 
 ## 1. 문서 사용 방법
@@ -49,7 +49,7 @@ GuJeuk-Check-in/GuJeuk-Check-In_server
 /Users/bagtaesu/Desktop/git/GuJeuk-Check-In_server
 ```
 
-현재 기능 작업 브랜치:
+현재 기능 작업 브랜치 예시:
 
 ```text
 feature/#73-month-hwp-file
@@ -63,10 +63,10 @@ develop
 
 주의:
 
-- `main`과 `develop`의 CI/CD 구성이 서로 다르다.
-- 최신 홈서버 운영 자동화는 주로 `main`에 있다.
-- `develop`에는 Docker Hub, EC2 운영 배포, 홈서버 스테이징 배포 구조가 별도로 남아 있다.
-- 브랜치 정책을 통합하기 전에는 한 브랜치의 설정을 다른 브랜치에도 당연히 적용된 것으로 가정하지 않는다.
+- 권장 흐름은 `feature/* -> develop -> main`이다.
+- `develop` push는 홈서버 스테이징 스택으로 자동 배포된다.
+- `main` push는 홈서버 운영 스택으로 자동 배포된다.
+- `develop -> main` 머지 전 스테이징 검증을 끝낸다.
 
 ## 4. 운영 인프라
 
@@ -82,6 +82,7 @@ Ubuntu Server
 
 ```text
 /home/ubuntu/git/gujeuk-check-in-server
+/home/ubuntu/git/gujeuk-check-in-server-stag
 /home/ubuntu/git/monitoring
 ```
 
@@ -155,17 +156,31 @@ ssh gujeuk-home
 
 ## 6. CI/CD
 
-`main` push 기준 흐름:
+브랜치별 자동 배포:
 
-1. GitHub-hosted runner에서 JDK 17 설정
-2. `./gradlew clean build -x test`
-3. 홈서버 self-hosted runner가 checkout
-4. `/home/ubuntu/git/gujeuk-check-in-server`에 `rsync`
-5. 서버의 `.env`, 백업, import 파일 보존
-6. `docker compose build app`
-7. `docker compose up -d app`
+```text
+feature/* -> PR -> develop -> 스테이징 배포
+develop   -> 검증 -> PR -> main -> 운영 배포
+```
+
+CI/CD 흐름:
+
+1. GitHub-hosted runner에서 JDK 17 검증 빌드 실행
+2. GitHub-hosted runner에서 배포용 Docker 이미지 생성
+3. 이미지를 artifact tar로 업로드
+4. 홈서버 self-hosted runner가 artifact를 다운로드
+5. 브랜치에 따라 운영 또는 스테이징 배포 디렉터리에 소스 `rsync`
+6. 홈서버는 `docker load`로 이미지만 적재
+7. `deploy-stack.sh`가 MySQL/Redis 준비 상태 확인 후 앱만 재기동
 8. 로컬 API와 공개 API health check
 9. Discord에 한국어 성공·실패 메시지 전송
+
+브랜치별 배포 대상:
+
+| 브랜치 | 배포 경로 | 공개 주소 | 포트 |
+|---|---|---|---|
+| `develop` | `/home/ubuntu/git/gujeuk-check-in-server-stag` | `https://api-stag.taisu.site` | `8081` |
+| `main` | `/home/ubuntu/git/gujeuk-check-in-server` | `https://api.taisu.site` | `8080` |
 
 Self-hosted runner:
 
@@ -176,7 +191,10 @@ label: gujeuk-home-server
 
 중요:
 
-- 배포 중 앱이 교체되면서 몇 초간 `502`가 발생할 수 있다.
+- 이전 구조는 홈서버에서 직접 `docker compose build app`를 수행해 CPU와 메모리를 오래 점유했다.
+- 그 결과 배포 중 홈서버가 느려지거나 API 응답이 불안정해질 수 있었다.
+- 현재 구조는 빌드를 GitHub-hosted runner로 옮겨 홈서버는 이미지 적재와 앱 재기동만 담당한다.
+- 앱 컨테이너를 교체하는 수초 동안은 짧은 연결 재시도가 발생할 수 있다.
 - CI/CD에서 cloudflared를 재시작하면 GitHub Runner가 자식 프로세스를 정리하면서 `530`과 SSH 단절이 발생할 수 있다.
 - 따라서 CI/CD는 앱만 배포하고 Cloudflare Tunnel 생명주기를 직접 제어하지 않는다.
 

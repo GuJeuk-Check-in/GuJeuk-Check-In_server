@@ -1,6 +1,6 @@
 # 구즉 홈서버 구축·배포·운영 문서
 
-> 기준일: 2026-06-09
+> 기준일: 2026-06-15
 > 대상 저장소: `GuJeuk-Check-in/GuJeuk-Check-In_server`
 > 홈서버: Samsung 550XED / Ubuntu Server / 사용자 `ubuntu`
 
@@ -74,9 +74,10 @@ flowchart LR
 ### 중요 상태
 
 - 운영 API는 Docker Compose 단일 스택으로 구성되어 있다.
+- 운영과 스테이징은 서로 다른 디렉터리와 Compose 스택으로 분리되어 있다.
 - HTTPS는 Nginx나 Certbot이 아니라 Cloudflare가 외부 구간에서 처리한다.
-- `main` 브랜치 push 시 홈서버에 자동 배포한다.
-- `develop` 브랜치는 저장소 기본 브랜치이며 별도의 과거 CI/CD 구조를 가지고 있다.
+- `develop` 브랜치 push 시 스테이징 API가 `8081`로 자동 배포된다.
+- `main` 브랜치 push 시 운영 API가 `8080`으로 자동 배포된다.
 - Wi-Fi 자동 변경 기능은 Netplan 충돌 사고가 있어 **현재 사용 금지**다.
 - `rtcwake -m off` 예약 자동 부팅은 Samsung 550XED에서 실제 복귀에 실패했다. **현재 사용 금지**다.
 - `rtcwake -m mem`의 `deep` 모드는 정상 resume 대신 콜드 부팅이 발생했다. **현재 사용 금지**다.
@@ -94,6 +95,7 @@ flowchart LR
 | 용도 | 경로 |
 |---|---|
 | 배포 코드 | `/home/ubuntu/git/gujeuk-check-in-server` |
+| 스테이징 코드 | `/home/ubuntu/git/gujeuk-check-in-server-stag` |
 | 통합 모니터링 | `/home/ubuntu/git/monitoring` |
 | 운영 명령 스크립트 | `/home/ubuntu/bin` |
 | GitHub Runner | `/home/ubuntu/actions-runner/gujeuk-check-in-server` |
@@ -182,6 +184,12 @@ Git으로 관리:
 - cron, sudoers, logind, cloudflared ingress의 설치 스크립트 작성
 - 최종적으로 Ansible 또는 단일 bootstrap script로 재현 가능하게 구성
 
+### 스테이징 환경 파일
+
+- 예시 파일: `.env.stag.example`
+- 실제 서버 파일: `/home/ubuntu/git/gujeuk-check-in-server-stag/.env`
+- 스테이징은 운영과 다른 DB, Redis, 컨테이너 이름, Docker volume 이름을 사용한다.
+
 ---
 
 ## 3. Docker 기반 애플리케이션 배포
@@ -241,9 +249,18 @@ cd /home/ubuntu/git/gujeuk-check-in-server
 
 docker compose ps
 docker compose up -d
-docker compose build app
 docker compose up -d app
 docker compose logs --tail=200 app
+```
+
+스테이징:
+
+```bash
+cd /home/ubuntu/git/gujeuk-check-in-server-stag
+
+docker compose --env-file .env ps
+docker compose --env-file .env up -d
+docker compose --env-file .env logs --tail=200 app
 ```
 
 ### 환경 변수
@@ -266,6 +283,12 @@ docker compose logs --tail=200 app
 | `TEST_URL` | 로컬 개발 CORS origin 목록 |
 | `JAVA_OPTS` | JVM 메모리 옵션 |
 | `APP_PORT` | 호스트에 노출할 애플리케이션 포트 |
+| `APP_IMAGE` | 배포할 Docker 이미지 태그 |
+| `APP_CONTAINER_NAME` | 앱 컨테이너 이름 |
+| `MYSQL_CONTAINER_NAME` | MySQL 컨테이너 이름 |
+| `REDIS_CONTAINER_NAME` | Redis 컨테이너 이름 |
+| `MYSQL_VOLUME_NAME` | MySQL 볼륨 이름 |
+| `REDIS_VOLUME_NAME` | Redis 볼륨 이름 |
 
 CI/CD의 `rsync`는 `.env`를 제외하여 서버의 운영 비밀 값이 삭제되지 않도록 구성했다.
 
@@ -1497,3 +1520,59 @@ Pages CORS preflight -> HTTP 200
 ```
 
 미래 연월 검증 중 발생한 `InvalidLogDateException` 로그는 의도한 HTTP 400 검증 결과다.
+
+---
+
+## 21. 2026-06-15 CI/CD 재구성
+
+### 변경 목적
+
+- `feature/* -> develop -> main` 흐름으로 브랜치 역할을 분리
+- 홈서버에서 직접 이미지를 빌드하던 구조를 제거
+- 배포 중 홈서버 멈춤과 API 불안정을 줄임
+
+### 이전 문제
+
+이전 workflow는 `main` push 시 홈서버 self-hosted runner에서 다음을 직접 수행했다.
+
+1. 소스 `rsync`
+2. `docker compose build app`
+3. `docker compose up -d app`
+
+문제점:
+
+- 저사양 홈서버에서 이미지 빌드가 수분 동안 CPU와 메모리를 점유
+- 배포 중 API 응답 지연 또는 일시 장애 가능성 증가
+- `develop`과 `main`의 역할이 모호했고 스테이징 자동배포가 실제로 정리되어 있지 않았음
+
+### 현재 구조
+
+1. `feature/*`에서 작업
+2. PR을 `develop`으로 머지
+3. `develop` push 시 GitHub-hosted runner가 이미지 생성
+4. 홈서버가 해당 이미지를 받아 `/home/ubuntu/git/gujeuk-check-in-server-stag`에 배포
+5. `https://api-stag.taisu.site`에서 검증
+6. `develop -> main` PR 머지
+7. `main` push 시 같은 방식으로 운영 `/home/ubuntu/git/gujeuk-check-in-server`에 배포
+
+### 구현 상세
+
+- Workflow: `.github/workflows/ci-cd.yml`
+- 배포 스크립트: `ops/home-server/deploy-stack.sh`
+- GitHub-hosted runner가 Docker 이미지를 artifact tar로 생성
+- 홈서버는 `docker load`만 수행하고 이미지 빌드는 하지 않음
+- 배포 스크립트가 MySQL/Redis의 `healthy` 상태를 확인한 뒤 앱만 재기동
+- 스테이징은 별도 `.env`, DB, Redis, 컨테이너 이름, volume을 사용
+
+### 2026-06-15 실제 검증
+
+```text
+staging local  http://localhost:8081/purpose/all   -> HTTP 200
+staging public https://api-stag.taisu.site/purpose/all -> HTTP 200
+prod public    https://api.taisu.site/purpose/all  -> 기존 정상 유지
+```
+
+### 남은 한계
+
+- 앱 컨테이너를 교체하는 짧은 순간에는 수초 단위 재시도가 발생할 수 있다.
+- 완전 무중단이 필요하면 reverse proxy 기반 blue-green 또는 rolling 구조가 추가로 필요하다.
