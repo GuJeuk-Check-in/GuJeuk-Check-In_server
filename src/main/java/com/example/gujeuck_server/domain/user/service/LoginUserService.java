@@ -3,11 +3,10 @@ package com.example.gujeuck_server.domain.user.service;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.exception.DuplicateLogException;
-import com.example.gujeuck_server.domain.user.domain.enums.Gender;
-import com.example.gujeuck_server.domain.user.presentation.dto.request.LoginRequest;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
+import com.example.gujeuck_server.domain.user.presentation.dto.request.LoginRequest;
 import com.example.gujeuck_server.global.utility.TimeProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,9 +27,7 @@ public class LoginUserService {
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
         String visitDate = TimeProvider.nowDateFormatted();
-
         String visitTime = TimeProvider.nowTimeFormatted();
-
         int currentYear = TimeProvider.nowYear();
 
         if (logRepository.findByUserIdAndVisitTime(user.getUserId(), visitDate, visitTime).isPresent()) {
@@ -39,16 +36,8 @@ public class LoginUserService {
 
         user.increaseCount();
 
-        if(request.getFemaleCount() == 0 && request.getMaleCount() == 0 && user.getGender() == Gender.MAN) {
-            Log log = createUserLog(user, request, visitDate, visitTime, currentYear, 1, 0);
-            saveLog(log);
-        } else if (request.getFemaleCount() == 0 && request.getMaleCount() == 0 && user.getGender() == Gender.WOMAN) {
-            Log log = createUserLog(user, request, visitDate, visitTime, currentYear, 0, 1);
-            saveLog(log);
-        } else{
-            Log log = createUserLog(user, request, visitDate, visitTime, currentYear, 0, 0);
-            saveLog(log);
-        }
+        Log log = createUserLog(user, request, visitDate, visitTime, currentYear);
+        saveLog(log);
     }
 
     private void saveLog(Log log) {
@@ -59,15 +48,14 @@ public class LoginUserService {
         }
     }
 
-    private Log createUserLog(User user, LoginRequest request, String visitDate, String visitTime, int currentYear, int man, int woman) {
-
+    private Log createUserLog(User user, LoginRequest request, String visitDate, String visitTime, int currentYear) {
         return Log.builder()
                 .user(user)
                 .name(user.getName())
                 .age(user.getAge())
                 .phone(user.getPhone())
-                .maleCount(request.getMaleCount() + man)
-                .femaleCount(request.getFemaleCount() + woman)
+                .maleCount(request.getMaleCount())
+                .femaleCount(request.getFemaleCount())
                 .privacyAgreed(user.isPrivacyAgreed())
                 .purpose(request.getPurpose())
                 .visitDate(visitDate)
