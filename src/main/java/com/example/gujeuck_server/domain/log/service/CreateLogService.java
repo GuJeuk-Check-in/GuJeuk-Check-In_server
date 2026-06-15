@@ -8,13 +8,10 @@ import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
-import com.example.gujeuck_server.global.utility.DateFormatter;
 import com.example.gujeuck_server.global.utility.TimeProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -23,21 +20,19 @@ public class CreateLogService {
     private final LogRepository logRepository;
     private final PurposeFacade purposeFacade;
 
-    private static final String KOREAN_DATE_REGEX = "\\d{4}년\\d{2}월\\d{2}일";
-
     @Transactional
     public void execute(Organ organ, LogRequest request) {
         int currentYear = TimeProvider.nowYear();
-        String formattedDate = resolveVisitDate(request.getVisitDate());
+        String visitDate = request.getVisitDate().trim();
         String name = request.getName().trim();
         String purposeName = request.getPurpose().trim();
         String visitTime = request.getVisitTime().trim();
 
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), purposeName);
 
-        validateDuplicateLog(organ.getId(), name, request.getAge(), purpose.getPurposeName(), formattedDate, visitTime);
+        validateDuplicateLog(organ.getId(), name, request.getAge(), purpose.getPurposeName(), visitDate, visitTime);
 
-        Log log = createUseLog(request, name, purpose, formattedDate, visitTime, currentYear, organ);
+        Log log = createUseLog(request, name, purpose, visitDate, visitTime, currentYear, organ);
 
         logRepository.save(log);
     }
@@ -60,18 +55,6 @@ public class CreateLogService {
         )) {
             throw DuplicateLogException.EXCEPTION;
         }
-    }
-
-    private String resolveVisitDate(String requestDate) {
-        if (requestDate == null || requestDate.isBlank()) {
-            return DateFormatter.LocalDateForm(LocalDate.now());
-        }
-
-        if (requestDate.matches(KOREAN_DATE_REGEX)) {
-            return requestDate;
-        }
-
-        return DateFormatter.LocalDateForm(LocalDate.parse(requestDate));
     }
 
     private Log createUseLog(
