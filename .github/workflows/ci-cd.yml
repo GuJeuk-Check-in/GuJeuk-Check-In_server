@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build
+  verify:
+    name: Verify
     runs-on: ubuntu-latest
 
     steps:
@@ -36,10 +36,56 @@ jobs:
       - name: Verify build
         run: ./gradlew clean build -x test
 
+  package-image:
+    name: Package Deployment Image
+    needs: verify
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_name: ${{ steps.meta.outputs.artifact_name }}
+      image_ref: ${{ steps.meta.outputs.image_ref }}
+      deploy_target: ${{ steps.meta.outputs.deploy_target }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set deployment metadata
+        id: meta
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            DEPLOY_TARGET="prod"
+            IMAGE_REF="gujeuk-check-in-server:prod-${GITHUB_SHA}"
+          else
+            DEPLOY_TARGET="stag"
+            IMAGE_REF="gujeuk-check-in-server:stag-${GITHUB_SHA}"
+          fi
+
+          ARTIFACT_NAME="gujeuk-image-${DEPLOY_TARGET}-${GITHUB_SHA}"
+
+          echo "deploy_target=${DEPLOY_TARGET}" >> "$GITHUB_OUTPUT"
+          echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=${ARTIFACT_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Build deployment image
+        run: docker build -t "${{ steps.meta.outputs.image_ref }}" .
+
+      - name: Save deployment image
+        run: docker save -o gujeuk-image.tar "${{ steps.meta.outputs.image_ref }}"
+
+      - name: Upload deployment image
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.artifact_name }}
+          path: gujeuk-image.tar
+          retention-days: 3
+
   deploy-home:
     name: Deploy Home Server
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [verify, package-image]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: [self-hosted, gujeuk-home-server]
     timeout-minutes: 30
 
@@ -47,11 +93,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Download deployment image
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.package-image.outputs.artifact_name }}
+
+      - name: Set deployment target
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            echo "DEPLOY_DIR=/home/ubuntu/git/gujeuk-check-in-server" >> "$GITHUB_ENV"
+            echo "PUBLIC_HEALTH_URL=https://api.taisu.site/purpose/all" >> "$GITHUB_ENV"
+          else
+            echo "DEPLOY_DIR=/home/ubuntu/git/gujeuk-check-in-server-stag" >> "$GITHUB_ENV"
+            echo "PUBLIC_HEALTH_URL=https://api-stag.taisu.site/purpose/all" >> "$GITHUB_ENV"
+          fi
+
       - name: Sync source to deployment directory
         run: |
           set -euo pipefail
 
-          DEPLOY_DIR=/home/ubuntu/git/gujeuk-check-in-server
           mkdir -p "$DEPLOY_DIR"
 
           rsync -a --delete \
@@ -68,7 +130,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          DEPLOY_DIR=/home/ubuntu/git/gujeuk-check-in-server
           test -f "$DEPLOY_DIR/.env"
           docker --version
           docker compose version
@@ -95,45 +156,28 @@ jobs:
           install -m 0755 \
             ops/home-server/notify-server-resumed \
             /home/ubuntu/bin/notify-server-resumed
+          install -m 0755 \
+            ops/home-server/deploy-stack.sh \
+            /home/ubuntu/bin/deploy-stack.sh
           ln -sfn \
             /home/ubuntu/bin/server-shutdown \
             /home/ubuntu/bin/shutdown
 
-      - name: Build application image
+      - name: Load deployment image
         run: |
           set -euo pipefail
 
-          cd /home/ubuntu/git/gujeuk-check-in-server
-          docker compose build app
+          docker load -i gujeuk-image.tar
 
       - name: Deploy application
         run: |
           set -euo pipefail
 
-          cd /home/ubuntu/git/gujeuk-check-in-server
-          docker compose up -d app
-
-      - name: Health check
-        run: |
-          set -euo pipefail
-
-          for attempt in {1..30}; do
-            if curl -fsS http://localhost:8080/purpose/all >/dev/null; then
-              echo "local health check passed"
-              break
-            fi
-
-            if [ "$attempt" -eq 30 ]; then
-              echo "local health check failed"
-              docker compose -f /home/ubuntu/git/gujeuk-check-in-server/docker-compose.yml logs --tail=200 app
-              exit 1
-            fi
-
-            sleep 2
-          done
-
-          curl -fsS https://api.taisu.site/purpose/all >/dev/null
-          echo "public health check passed"
+          /home/ubuntu/bin/deploy-stack.sh \
+            "$DEPLOY_DIR" \
+            "$DEPLOY_DIR/.env" \
+            "${{ needs.package-image.outputs.image_ref }}" \
+            "$PUBLIC_HEALTH_URL"
 
       - name: Prune unused Docker images
         if: always()
@@ -141,14 +185,15 @@ jobs:
 
   notify-home-discord:
     name: Notify Home Discord
-    needs: [build, deploy-home]
+    needs: [verify, package-image, deploy-home]
     if: ${{ always() && github.event_name != 'pull_request' }}
     runs-on: [self-hosted, gujeuk-home-server]
 
     steps:
       - name: Send Korean Discord notification
         env:
-          BUILD_RESULT: ${{ needs.build.result }}
+          VERIFY_RESULT: ${{ needs.verify.result }}
+          PACKAGE_RESULT: ${{ needs.package-image.result }}
           DEPLOY_RESULT: ${{ needs.deploy-home.result }}
           REPOSITORY: ${{ github.repository }}
           REF_NAME: ${{ github.ref_name }}
@@ -174,30 +219,46 @@ jobs:
             esac
           }
 
-          BUILD_RESULT_KO="$(translate_result "$BUILD_RESULT")"
+          VERIFY_RESULT_KO="$(translate_result "$VERIFY_RESULT")"
+          PACKAGE_RESULT_KO="$(translate_result "$PACKAGE_RESULT")"
           DEPLOY_RESULT_KO="$(translate_result "$DEPLOY_RESULT")"
           COMMIT_SHORT="${SHA:0:7}"
 
-          if [ "$BUILD_RESULT" != "success" ]; then
+          if [ "$VERIFY_RESULT" != "success" ]; then
             TITLE="🚨 긴급: 구즉 CI 빌드 실패"
             COLOR=15158332
             REFLECT_RESULT="실패"
-            SUMMARY="커밋이 홈서버에 반영되지 않았습니다. 빌드 단계에서 실패했습니다."
-          elif [ "$REF_NAME" = "main" ] && [ "$EVENT_NAME" = "push" ] && [ "$DEPLOY_RESULT" = "success" ]; then
-            TITLE="구즉 CI/CD 커밋 반영 완료"
-            COLOR=3066993
-            REFLECT_RESULT="완료"
-            SUMMARY="커밋이 홈서버에 정상 반영되었습니다."
-          elif [ "$REF_NAME" = "main" ] && [ "$EVENT_NAME" = "push" ]; then
-            TITLE="🚨 긴급: 구즉 CI/CD 커밋 반영 실패"
+            SUMMARY="커밋이 서버에 반영되지 않았습니다. 검증 단계에서 실패했습니다."
+          elif [ "$PACKAGE_RESULT" != "success" ]; then
+            TITLE="🚨 긴급: 구즉 배포 이미지 생성 실패"
             COLOR=15158332
             REFLECT_RESULT="실패"
-            SUMMARY="빌드는 성공했지만 홈서버 배포 중 문제가 발생해 커밋이 반영되지 않았습니다."
+            SUMMARY="검증은 통과했지만 배포 이미지 생성에 실패했습니다."
+          elif [ "$REF_NAME" = "main" ] && [ "$EVENT_NAME" = "push" ] && [ "$DEPLOY_RESULT" = "success" ]; then
+            TITLE="구즉 운영 배포 완료"
+            COLOR=3066993
+            REFLECT_RESULT="완료"
+            SUMMARY="main 브랜치 커밋이 운영 서버에 정상 반영되었습니다."
+          elif [ "$REF_NAME" = "develop" ] && [ "$EVENT_NAME" = "push" ] && [ "$DEPLOY_RESULT" = "success" ]; then
+            TITLE="구즉 스테이징 배포 완료"
+            COLOR=3447003
+            REFLECT_RESULT="완료"
+            SUMMARY="develop 브랜치 커밋이 스테이징 서버에 정상 반영되었습니다."
+          elif [ "$REF_NAME" = "main" ] && [ "$EVENT_NAME" = "push" ]; then
+            TITLE="🚨 긴급: 구즉 운영 배포 실패"
+            COLOR=15158332
+            REFLECT_RESULT="실패"
+            SUMMARY="운영 서버 배포 중 문제가 발생했습니다."
+          elif [ "$REF_NAME" = "develop" ] && [ "$EVENT_NAME" = "push" ]; then
+            TITLE="🚨 긴급: 구즉 스테이징 배포 실패"
+            COLOR=15158332
+            REFLECT_RESULT="실패"
+            SUMMARY="스테이징 서버 배포 중 문제가 발생했습니다."
           else
             TITLE="구즉 CI 검사 완료"
             COLOR=3447003
             REFLECT_RESULT="배포 대상 아님"
-            SUMMARY="CI 빌드는 통과했지만 main 브랜치 push가 아니어서 홈서버 반영은 진행하지 않았습니다."
+            SUMMARY="검증은 통과했지만 배포 대상 브랜치 push가 아니어서 서버 반영은 진행하지 않았습니다."
           fi
 
           MESSAGE="$(cat <<MSG
@@ -207,7 +268,8 @@ jobs:
           브랜치: $REF_NAME
           커밋: $COMMIT_SHORT
           실행자: $ACTOR
-          빌드: $BUILD_RESULT_KO
+          검증: $VERIFY_RESULT_KO
+          이미지 생성: $PACKAGE_RESULT_KO
           배포: $DEPLOY_RESULT_KO
           저장소: $REPOSITORY
           Actions: $RUN_URL
