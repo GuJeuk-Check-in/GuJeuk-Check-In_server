@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,9 +64,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
-                prodUrl, stagUrl, vercelUrl, testUrl
-        ));
+        configuration.setAllowedOrigins(allowedOrigins());
 
         configuration.setAllowedMethods(Arrays.asList("OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"));
         configuration.addAllowedHeader("*");
@@ -75,5 +74,36 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
+    }
+
+    private List<String> allowedOrigins() {
+        List<String> origins = new ArrayList<>();
+
+        addOrigins(origins, prodUrl);
+        addOrigins(origins, stagUrl);
+        addOrigins(origins, vercelUrl);
+        addOrigins(origins, testUrl);
+
+        return origins;
+    }
+
+    private void addOrigins(List<String> origins, String originValues) {
+        if (originValues == null) {
+            return;
+        }
+
+        Arrays.stream(originValues.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .map(this::removeTrailingSlash)
+                .forEach(origins::add);
+    }
+
+    private String removeTrailingSlash(String origin) {
+        while (origin.endsWith("/")) {
+            origin = origin.substring(0, origin.length() - 1);
+        }
+
+        return origin;
     }
 }

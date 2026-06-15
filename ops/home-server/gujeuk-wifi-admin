@@ -1,0 +1,188 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+INTERFACE=wlo1
+CONFIG_FILE=/etc/netplan/99-gujeuk-wifi.yaml
+TARGET_FILE=/run/gujeuk-wifi-target
+LOG_FILE=/var/log/gujeuk-wifi.log
+
+require_root() {
+  if [ "$EUID" -ne 0 ]; then
+    echo "This command must run as root." >&2
+    exit 1
+  fi
+}
+
+current_ssid() {
+  iw dev "$INTERFACE" link |
+    awk -F': ' '/^[[:space:]]*SSID:/ { print $2; exit }'
+}
+
+scan_networks() {
+  wpa_cli -i "$INTERFACE" scan >/dev/null
+  sleep 3
+
+  wpa_cli -i "$INTERFACE" scan_results |
+    awk -F'\t' '
+      NR > 1 && $5 != "" {
+        security = ($4 ~ /(WPA|WEP)/) ? "LOCKED" : "OPEN"
+        print $3 "\t" security "\t" $5
+      }
+    ' |
+    sort -t $'\t' -k1,1nr |
+    awk -F'\t' '!seen[$3]++'
+}
+
+show_status() {
+  local ssid
+  local address
+
+  ssid="$(current_ssid)"
+  address="$(ip -4 -o addr show dev "$INTERFACE" |
+    awk '{ print $4; exit }')"
+
+  printf 'SSID: %s\n' "${ssid:-not connected}"
+  printf 'IP: %s\n' "${address:-not assigned}"
+}
+
+save_network() {
+  local ssid_base64
+  local password_base64
+  local payload_file
+  local backup_file=""
+
+  IFS= read -r ssid_base64
+  IFS= read -r password_base64
+
+  payload_file="$(mktemp)"
+  chmod 600 "$payload_file"
+  printf '%s\n%s\n' "$ssid_base64" "$password_base64" >"$payload_file"
+
+  if [ -f "$CONFIG_FILE" ]; then
+    backup_file="${CONFIG_FILE}.backup"
+    cp "$CONFIG_FILE" "$backup_file"
+  fi
+
+  python3 - "$CONFIG_FILE" "$payload_file" <<'PY'
+import base64
+import json
+import os
+import sys
+import tempfile
+
+config_path, payload_path = sys.argv[1:3]
+with open(payload_path, encoding="utf-8") as payload:
+    ssid_encoded = payload.readline().strip()
+    password_encoded = payload.readline().strip()
+
+ssid = base64.b64decode(ssid_encoded).decode("utf-8")
+password = base64.b64decode(password_encoded).decode("utf-8")
+
+if not ssid or len(ssid.encode("utf-8")) > 32:
+    raise SystemExit("Invalid SSID.")
+if "\n" in ssid or "\r" in ssid:
+    raise SystemExit("Invalid SSID.")
+if password and not 8 <= len(password) <= 63:
+    raise SystemExit("Invalid WPA password length.")
+
+data = {
+    "network": {
+        "version": 2,
+        "wifis": {
+            "wlo1": {
+                "dhcp4": True,
+                "optional": True,
+                "access-points": {},
+            }
+        },
+    }
+}
+
+if os.path.exists(config_path):
+    with open(config_path, encoding="utf-8") as current:
+        data = json.load(current)
+
+wifi = data.setdefault("network", {}).setdefault("wifis", {}).setdefault("wlo1", {})
+wifi["dhcp4"] = True
+wifi["optional"] = True
+access_points = wifi.setdefault("access-points", {})
+access_points[ssid] = {"password": password} if password else {}
+
+directory = os.path.dirname(config_path)
+fd, temporary_path = tempfile.mkstemp(dir=directory, prefix=".99-gujeuk-wifi.", text=True)
+try:
+    with os.fdopen(fd, "w", encoding="utf-8") as output:
+        json.dump(data, output, ensure_ascii=False, indent=2)
+        output.write("\n")
+    os.chmod(temporary_path, 0o600)
+    os.replace(temporary_path, config_path)
+finally:
+    if os.path.exists(temporary_path):
+        os.unlink(temporary_path)
+PY
+
+  rm -f "$payload_file"
+
+  if ! netplan generate; then
+    if [ -n "$backup_file" ] && [ -f "$backup_file" ]; then
+      mv "$backup_file" "$CONFIG_FILE"
+    else
+      rm -f "$CONFIG_FILE"
+    fi
+    echo "Netplan validation failed. Previous settings restored." >&2
+    exit 1
+  fi
+
+  rm -f "$backup_file"
+  printf '%s\n' "$ssid_base64" >"$TARGET_FILE"
+  chmod 600 "$TARGET_FILE"
+
+  nohup "$0" apply >"$LOG_FILE" 2>&1 </dev/null &
+  echo "Saved Wi-Fi settings. Applying in 2 seconds."
+}
+
+apply_network() {
+  local ssid
+  local network_id
+
+  sleep 2
+  netplan apply
+  sleep 4
+
+  if [ ! -f "$TARGET_FILE" ]; then
+    exit 0
+  fi
+
+  ssid="$(base64 -d "$TARGET_FILE")"
+  network_id="$(wpa_cli -i "$INTERFACE" list_networks |
+    awk -F'\t' -v target="$ssid" 'NR > 1 && $2 == target { print $1; exit }')"
+
+  if [ -n "$network_id" ]; then
+    wpa_cli -i "$INTERFACE" select_network "$network_id"
+  fi
+
+  rm -f "$TARGET_FILE"
+  sleep 8
+  show_status
+}
+
+require_root
+
+case "${1:-}" in
+  scan)
+    scan_networks
+    ;;
+  status)
+    show_status
+    ;;
+  connect)
+    save_network
+    ;;
+  apply)
+    apply_network
+    ;;
+  *)
+    echo "Allowed actions: scan, status, connect" >&2
+    exit 1
+    ;;
+esac

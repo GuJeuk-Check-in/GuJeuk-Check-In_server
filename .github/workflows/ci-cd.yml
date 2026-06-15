@@ -2,140 +2,278 @@ name: Gujeuk CI/CD
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
+  workflow_dispatch:
 
-env:
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/gujeuk-check-in
+permissions:
+  contents: read
+
+concurrency:
+  group: gujeuk-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  build:
+  verify:
+    name: Verify
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: temurin
           cache: gradle
 
-      - name: Verify build (no test)
-        run: ./gradlew build -x test
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
 
-  docker:
-    needs: build
-    if: github.event_name == 'push'
+      - name: Verify build
+        run: ./gradlew clean build -x test
+
+  package-image:
+    name: Package Deployment Image
+    needs: verify
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
+    outputs:
+      artifact_name: ${{ steps.meta.outputs.artifact_name }}
+      image_ref: ${{ steps.meta.outputs.image_ref }}
+      deploy_target: ${{ steps.meta.outputs.deploy_target }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Set deployment metadata
+        id: meta
+        run: |
+          set -euo pipefail
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            DEPLOY_TARGET="prod"
+            IMAGE_REF="gujeuk-check-in-server:prod-${GITHUB_SHA}"
+          else
+            DEPLOY_TARGET="stag"
+            IMAGE_REF="gujeuk-check-in-server:stag-${GITHUB_SHA}"
+          fi
+
+          ARTIFACT_NAME="gujeuk-image-${DEPLOY_TARGET}-${GITHUB_SHA}"
+
+          echo "deploy_target=${DEPLOY_TARGET}" >> "$GITHUB_OUTPUT"
+          echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=${ARTIFACT_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Build deployment image
+        run: docker build -t "${{ steps.meta.outputs.image_ref }}" .
+
+      - name: Save deployment image
+        run: docker save -o gujeuk-image.tar "${{ steps.meta.outputs.image_ref }}"
+
+      - name: Upload deployment image
+        uses: actions/upload-artifact@v4
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          name: ${{ steps.meta.outputs.artifact_name }}
+          path: gujeuk-image.tar
+          retention-days: 3
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          platforms: linux/amd64
-          tags: |
-            ${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-            ${{ env.IMAGE_NAME }}:${{ github.sha }}
-
-  deploy-prod:
-    needs: docker
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+  deploy-home:
+    name: Deploy Home Server
+    needs: [verify, package-image]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: [self-hosted, gujeuk-home-server]
+    timeout-minutes: 30
 
     steps:
-      - name: Deploy PROD to EC2
-        uses: appleboy/ssh-action@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download deployment image
+        uses: actions/download-artifact@v4
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            set -e
-            cd /home/ubuntu/gujeuk
+          name: ${{ needs.package-image.outputs.artifact_name }}
 
-            docker pull ${{ env.IMAGE_NAME }}:main
+      - name: Set deployment target
+        run: |
+          set -euo pipefail
 
-            docker compose up -d prod-app --no-deps --force-recreate
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            echo "DEPLOY_DIR=/home/ubuntu/git/gujeuk-check-in-server" >> "$GITHUB_ENV"
+            echo "PUBLIC_HEALTH_URL=https://api.taisu.site/purpose/all" >> "$GITHUB_ENV"
+          else
+            echo "DEPLOY_DIR=/home/ubuntu/git/gujeuk-check-in-server-stag" >> "$GITHUB_ENV"
+            echo "PUBLIC_HEALTH_URL=https://api-stag.taisu.site/purpose/all" >> "$GITHUB_ENV"
+          fi
 
-            docker image prune -f
+      - name: Sync source to deployment directory
+        run: |
+          set -euo pipefail
 
-  deploy-stag:
-    needs: docker
-    if: github.ref == 'refs/heads/develop'
+          mkdir -p "$DEPLOY_DIR"
+
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.env' \
+            --exclude='.env.backup.*' \
+            --exclude='backups/' \
+            --exclude='imports/' \
+            --exclude='build/' \
+            --exclude='.gradle/' \
+            ./ "$DEPLOY_DIR"/
+
+      - name: Validate deployment environment
+        run: |
+          set -euo pipefail
+
+          test -f "$DEPLOY_DIR/.env"
+          docker --version
+          docker compose version
+
+      - name: Install home server recovery scripts
+        run: |
+          set -euo pipefail
+
+          install -m 0755 \
+            ops/home-server/start-cloudflared.sh \
+            /home/ubuntu/bin/start-cloudflared.sh
+          install -m 0755 \
+            ops/home-server/watch-cloudflared.sh \
+            /home/ubuntu/bin/watch-cloudflared.sh
+          install -m 0755 \
+            ops/home-server/server-shutdown \
+            /home/ubuntu/bin/server-shutdown
+          install -m 0755 \
+            ops/home-server/gujeuk-rtcwake \
+            /home/ubuntu/bin/gujeuk-rtcwake
+          install -m 0755 \
+            ops/home-server/install-shutdown-nopasswd.sh \
+            /home/ubuntu/bin/install-shutdown-nopasswd.sh
+          install -m 0755 \
+            ops/home-server/notify-server-resumed \
+            /home/ubuntu/bin/notify-server-resumed
+          install -m 0755 \
+            ops/home-server/deploy-stack.sh \
+            /home/ubuntu/bin/deploy-stack.sh
+          ln -sfn \
+            /home/ubuntu/bin/server-shutdown \
+            /home/ubuntu/bin/shutdown
+
+      - name: Load deployment image
+        run: |
+          set -euo pipefail
+
+          docker load -i gujeuk-image.tar
+
+      - name: Deploy application
+        run: |
+          set -euo pipefail
+
+          /home/ubuntu/bin/deploy-stack.sh \
+            "$DEPLOY_DIR" \
+            "$DEPLOY_DIR/.env" \
+            "${{ needs.package-image.outputs.image_ref }}" \
+            "$PUBLIC_HEALTH_URL"
+
+      - name: Prune unused Docker images
+        if: always()
+        run: docker image prune -f
+
+  notify-home-discord:
+    name: Notify Home Discord
+    needs: [verify, package-image, deploy-home]
+    if: ${{ always() && github.event_name != 'pull_request' }}
     runs-on: [self-hosted, gujeuk-home-server]
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Sync STAG compose file
+      - name: Send Korean Discord notification
+        env:
+          VERIFY_RESULT: ${{ needs.verify.result }}
+          PACKAGE_RESULT: ${{ needs.package-image.result }}
+          DEPLOY_RESULT: ${{ needs.deploy-home.result }}
+          REPOSITORY: ${{ github.repository }}
+          REF_NAME: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          set -e
-          mkdir -p /home/ubuntu/stag-gujeuk-check-in-server
-          cp docker-compose.stag.yml /home/ubuntu/stag-gujeuk-check-in-server/docker-compose.stag.yml
+          set -euo pipefail
 
-      - name: Deploy STAG
-        run: |
-          set -e
-          cd /home/ubuntu/stag-gujeuk-check-in-server
+          if [ ! -x /home/ubuntu/bin/discord-notify ]; then
+            echo "/home/ubuntu/bin/discord-notify is not installed; skipping Discord notification."
+            exit 0
+          fi
 
-          cat > .env.stag <<EOF
-          APP_IMAGE=${{ env.IMAGE_NAME }}:develop
-          APP_PORT=${{ secrets.STAG_APP_PORT }}
-          DB_URL=jdbc:mysql://stag-mysql:3306/${{ secrets.STAG_MYSQL_DATABASE }}?serverTimezone=Asia/Seoul
-          JAVA_OPTS=${{ secrets.STAG_JAVA_OPTS }}
-          JWT_SECRET_KEY=${{ secrets.STAG_JWT_SECRET_KEY }}
-          MYSQL_DATABASE=${{ secrets.STAG_MYSQL_DATABASE }}
-          MYSQL_PASSWORD=${{ secrets.STAG_MYSQL_PASSWORD }}
-          MYSQL_ROOT_PASSWORD=${{ secrets.STAG_MYSQL_ROOT_PASSWORD }}
-          MYSQL_USER=${{ secrets.STAG_MYSQL_USER }}
-          PROD_BASE_URL=${{ secrets.PROD_BASE_URL }}
-          REDIS_HOST=stag-redis
-          REDIS_PORT=6379
-          STAG_BASE_URL=${{ secrets.STAG_BASE_URL }}
-          TEST_URL=${{ secrets.TEST_URL }}
-          VERCEL_URL=${{ secrets.VERCEL_URL }}
-          EOF
+          translate_result() {
+            case "$1" in
+              success) echo "성공" ;;
+              failure) echo "실패" ;;
+              cancelled) echo "취소됨" ;;
+              skipped) echo "건너뜀" ;;
+              *) echo "$1" ;;
+            esac
+          }
 
-          docker pull ${{ env.IMAGE_NAME }}:develop
+          VERIFY_RESULT_KO="$(translate_result "$VERIFY_RESULT")"
+          PACKAGE_RESULT_KO="$(translate_result "$PACKAGE_RESULT")"
+          DEPLOY_RESULT_KO="$(translate_result "$DEPLOY_RESULT")"
+          COMMIT_SHORT="${SHA:0:7}"
 
-          docker compose --env-file .env.stag -f docker-compose.stag.yml up -d --force-recreate
+          if [ "$VERIFY_RESULT" != "success" ]; then
+            TITLE="🚨 긴급: 구즉 CI 빌드 실패"
+            COLOR=15158332
+            REFLECT_RESULT="실패"
+            SUMMARY="커밋이 서버에 반영되지 않았습니다. 검증 단계에서 실패했습니다."
+          elif [ "$PACKAGE_RESULT" != "success" ]; then
+            TITLE="🚨 긴급: 구즉 배포 이미지 생성 실패"
+            COLOR=15158332
+            REFLECT_RESULT="실패"
+            SUMMARY="검증은 통과했지만 배포 이미지 생성에 실패했습니다."
+          elif [ "$REF_NAME" = "main" ] && [ "$EVENT_NAME" = "push" ] && [ "$DEPLOY_RESULT" = "success" ]; then
+            TITLE="구즉 운영 배포 완료"
+            COLOR=3066993
+            REFLECT_RESULT="완료"
+            SUMMARY="main 브랜치 커밋이 운영 서버에 정상 반영되었습니다."
+          elif [ "$REF_NAME" = "develop" ] && [ "$EVENT_NAME" = "push" ] && [ "$DEPLOY_RESULT" = "success" ]; then
+            TITLE="구즉 스테이징 배포 완료"
+            COLOR=3447003
+            REFLECT_RESULT="완료"
+            SUMMARY="develop 브랜치 커밋이 스테이징 서버에 정상 반영되었습니다."
+          elif [ "$REF_NAME" = "main" ] && [ "$EVENT_NAME" = "push" ]; then
+            TITLE="🚨 긴급: 구즉 운영 배포 실패"
+            COLOR=15158332
+            REFLECT_RESULT="실패"
+            SUMMARY="운영 서버 배포 중 문제가 발생했습니다."
+          elif [ "$REF_NAME" = "develop" ] && [ "$EVENT_NAME" = "push" ]; then
+            TITLE="🚨 긴급: 구즉 스테이징 배포 실패"
+            COLOR=15158332
+            REFLECT_RESULT="실패"
+            SUMMARY="스테이징 서버 배포 중 문제가 발생했습니다."
+          else
+            TITLE="구즉 CI 검사 완료"
+            COLOR=3447003
+            REFLECT_RESULT="배포 대상 아님"
+            SUMMARY="검증은 통과했지만 배포 대상 브랜치 push가 아니어서 서버 반영은 진행하지 않았습니다."
+          fi
 
-          docker image prune -f
+          MESSAGE="$(cat <<MSG
+          $SUMMARY
 
-      - name: Health check STAG
-        run: |
-          set -e
-          for attempt in {1..30}; do
-            if curl -fsS http://localhost:8081/purpose/all >/dev/null; then
-              echo "local staging health check passed"
-              break
-            fi
+          커밋 반영: $REFLECT_RESULT
+          브랜치: $REF_NAME
+          커밋: $COMMIT_SHORT
+          실행자: $ACTOR
+          검증: $VERIFY_RESULT_KO
+          이미지 생성: $PACKAGE_RESULT_KO
+          배포: $DEPLOY_RESULT_KO
+          저장소: $REPOSITORY
+          Actions: $RUN_URL
+          MSG
+          )"
 
-            if [ "$attempt" -eq 30 ]; then
-              echo "local staging health check failed"
-              docker logs --tail=200 gujeuk-stag-app
-              exit 1
-            fi
-
-            sleep 2
-          done
-
-          curl -fsS https://api-stag.taisu.site/purpose/all >/dev/null
-          echo "public staging health check passed"
+          /home/ubuntu/bin/discord-notify "$TITLE" "$MESSAGE" "$COLOR" || true

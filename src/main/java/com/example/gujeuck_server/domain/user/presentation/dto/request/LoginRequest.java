@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.user.presentation.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,8 +17,10 @@ public class LoginRequest {
     private String purpose;
 
     @NotNull(message = "남자 동행인 수는 null일 수 없습니다.")
-    private int maleCount;
+    @PositiveOrZero(message = "남자 동행인 수는 0 이상이어야 합니다.")
+    private Integer maleCount;
 
     @NotNull(message = "여자 동행인 수는 null일 수 없습니다.")
-    private int femaleCount;
+    @PositiveOrZero(message = "여자 동행인 수는 0 이상이어야 합니다.")
+    private Integer femaleCount;
 }

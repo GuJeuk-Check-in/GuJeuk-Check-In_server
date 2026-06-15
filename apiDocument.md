@@ -316,6 +316,9 @@ Authentication: {refreshToken}
 <details>
 <summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
 </details>
+<details>
+<summary><code>403</code> FORBIDDEN - Access Token이 없는 요청입니다</summary>
+</details>
 
 ---
 
@@ -457,7 +460,97 @@ Authentication: {refreshToken}
 
 ---
 
-### 9. 엑셀 파일 다운로드
+### 9. 월별 방문 실적 및 누계 통계 조회
+| 항목 | 내용 |
+|------|------|
+| **Domain** | Organ |
+| **기능** | 선택한 월의 방문 실적과 해당 연도 누계 이용자 통계 조회 |
+| **HTTP Method** | `GET` |
+| **API Path** | `/organ/statistics/visits?year={year}&month={month}` |
+| **토큰 필요** | O (Access Token) |
+
+**Query Parameters**
+| 파라미터 | 타입 | 필수 | 설명 |
+|----------|------|------|------|
+| year | int | O | 조회 연도 |
+| month | int | O | 조회 월 (1~12) |
+
+**Request**
+```json
+{
+  "query": {
+    "year": 2026,
+    "month": 4
+  },
+  "body": null
+}
+```
+
+**Header**
+```json
+{
+  "Authorization": "Bearer {accessToken}"
+}
+```
+
+**Response (200 OK)**
+```json
+{
+  "year": 2026,
+  "month": 4,
+  "cumulative": {
+    "total": 6549,
+    "youth": {
+      "male": 3558,
+      "female": 2654,
+      "total": 6212,
+      "rate": 94.9
+    },
+    "other": {
+      "male": 183,
+      "female": 154,
+      "total": 337,
+      "rate": 5.1
+    }
+  },
+  "monthly": {
+    "total": 1760,
+    "youth": {
+      "male": 902,
+      "female": 654,
+      "total": 1556,
+      "rate": 88.4
+    },
+    "other": {
+      "male": 105,
+      "female": 99,
+      "total": 204,
+      "rate": 11.6
+    }
+  }
+}
+```
+
+**산정 기준**
+- 이용자 수는 방문 기록의 `maleCount + femaleCount` 합계로 계산합니다.
+- 청소년은 `AGE_9_13`, `AGE_14_16`, `AGE_17_19`, `AGE_20_24`입니다.
+- 기타는 `BABY`, `ADULT`입니다.
+- 누계는 선택 연도의 1월 1일부터 선택 월의 마지막 날까지 계산합니다.
+- 이용률은 `분류 이용자 수 / 전체 이용자 수 × 100`이며 소수점 첫째 자리에서 반올림합니다.
+- 방문 기록에는 대표 이용자의 연령대만 저장되므로 동행인도 대표 이용자와 같은 분류로 집계합니다.
+- 인증된 기관의 방문 기록만 결과에 포함합니다.
+
+**Error List**
+<details>
+<summary><code>400</code> INVALID_LOG_DATE - 유효하지 않거나 미래인 연월입니다</summary>
+</details>
+<details>
+<summary><code>401</code> INVALID_TOKEN - 유효하지 않은 토큰입니다</summary>
+</details>
+
+---
+
+### 10. 엑셀 파일 다운로드
 | 항목 | 내용 |
 |------|------|
 | **Domain** | Admin |

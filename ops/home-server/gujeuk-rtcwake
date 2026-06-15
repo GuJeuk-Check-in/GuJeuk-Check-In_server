@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MAX_SECONDS=$((7 * 24 * 60 * 60))
+POWER_STATE_FILE=/sys/power/state
+SUSPEND_MODE=freeze
+RESUME_NOTIFIER=/home/ubuntu/bin/notify-server-resumed
+
+if [ "$EUID" -ne 0 ]; then
+  echo 'This command must run as root.' >&2
+  exit 1
+fi
+
+validate_seconds() {
+  local seconds="${1:-}"
+
+  if ! [[ "$seconds" =~ ^[0-9]+$ ]]; then
+    echo 'Invalid number of seconds.' >&2
+    exit 1
+  fi
+
+  if [ "$seconds" -lt 60 ] || [ "$seconds" -gt "$MAX_SECONDS" ]; then
+    echo 'Seconds must be between 60 and 604800.' >&2
+    exit 1
+  fi
+}
+
+require_suspend() {
+  if ! grep -qw "$SUSPEND_MODE" "$POWER_STATE_FILE" 2>/dev/null; then
+    echo "Suspend mode '$SUSPEND_MODE' is not supported by this system." >&2
+    exit 1
+  fi
+}
+
+case "${1:-}" in
+  schedule)
+    validate_seconds "${2:-}"
+    require_suspend
+    nohup setsid \
+      /usr/local/sbin/gujeuk-rtcwake execute "$2" \
+      >/tmp/gujeuk-scheduled-sleep.log 2>&1 </dev/null &
+    printf 'Scheduled detached sleep process: %s\n' "$!"
+    ;;
+  execute)
+    validate_seconds "${2:-}"
+    require_suspend
+    sleep 2
+    /usr/sbin/rtcwake -m "$SUSPEND_MODE" -s "$2"
+
+    if [ -x "$RESUME_NOTIFIER" ]; then
+      runuser -u ubuntu -- "$RESUME_NOTIFIER" || true
+    fi
+    ;;
+  check)
+    validate_seconds "${2:-}"
+    require_suspend
+    /usr/sbin/rtcwake -n -m "$SUSPEND_MODE" -s "$2"
+    printf '0\n' >/sys/class/rtc/rtc0/wakealarm
+    ;;
+  show)
+    /usr/sbin/rtcwake -m show
+    printf 'configured mode: %s\n' "$SUSPEND_MODE"
+    printf 'available states: '
+    cat "$POWER_STATE_FILE"
+    ;;
+  *)
+    echo 'Allowed actions: schedule <seconds>, check <seconds>, show' >&2
+    exit 1
+    ;;
+esac

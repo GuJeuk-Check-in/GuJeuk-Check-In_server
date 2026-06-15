@@ -1,0 +1,193 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RTC_HELPER=/usr/local/sbin/gujeuk-rtcwake
+INSTALLER=/home/ubuntu/bin/install-shutdown-nopasswd.sh
+
+read_hours() {
+  local input
+
+  printf 'Hours to stay in low-power sleep (example: 2 or 0.5, 0 = power off, q = cancel): '
+  read -r input
+
+  case "$input" in
+    q | Q | quit | cancel)
+      echo 'cancelled.'
+      exit 0
+      ;;
+  esac
+
+  if ! [[ "$input" =~ ^([0-9]+([.][0-9]+)?|[.][0-9]+)$ ]]; then
+    echo 'Enter a valid number of hours.'
+    exit 1
+  fi
+
+  HOURS_INPUT="$input"
+}
+
+calculate_schedule() {
+  local result
+
+  result="$(
+    python3 - "$HOURS_INPUT" 2>/dev/null <<'PY'
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+import sys
+
+try:
+    hours = Decimal(sys.argv[1])
+except InvalidOperation:
+    raise SystemExit("invalid")
+
+if hours < 0 or hours > 168:
+    raise SystemExit("range")
+
+seconds = int((hours * Decimal(3600)).to_integral_value(rounding=ROUND_HALF_UP))
+if hours > 0 and seconds < 60:
+    raise SystemExit("short")
+
+print(seconds)
+PY
+  )" || {
+    echo 'Hours must be between 0 and 168.'
+    echo 'Scheduled shutdown must be at least 1 minute.'
+    exit 1
+  }
+
+  SECONDS_TO_WAKE="$result"
+
+  if [ "$SECONDS_TO_WAKE" -gt 0 ]; then
+    WAKE_AT="$(TZ=Asia/Seoul date -d "+${SECONDS_TO_WAKE} seconds" '+%Y-%m-%d %H:%M:%S KST')"
+  else
+    WAKE_AT='not scheduled'
+  fi
+}
+
+confirm_shutdown() {
+  echo
+  if [ "$SECONDS_TO_WAKE" -gt 0 ]; then
+    echo "Enter low-power sleep now and automatically resume after ${HOURS_INPUT} hour(s)."
+    echo "Scheduled resume time: $WAKE_AT"
+  else
+    echo 'Power off without scheduling an automatic resume.'
+  fi
+
+  printf 'Continue? (yes/no): '
+  read -r answer
+
+  case "$answer" in
+    yes | YES | Yes) ;;
+    *)
+      echo 'cancelled.'
+      exit 0
+      ;;
+  esac
+}
+
+ensure_shutdown_ready() {
+  if [ "$SECONDS_TO_WAKE" -gt 0 ]; then
+    if [ ! -x "$RTC_HELPER" ] ||
+      ! sudo -n "$RTC_HELPER" show >/dev/null 2>&1; then
+      echo 'First-time scheduled shutdown setup requires the sudo password.'
+      sudo "$INSTALLER"
+    fi
+
+    if [ ! -x "$RTC_HELPER" ] ||
+      ! sudo -n "$RTC_HELPER" show >/dev/null 2>&1; then
+      echo 'Scheduled shutdown setup failed.' >&2
+      exit 1
+    fi
+    return
+  fi
+
+  if ! sudo -n -l /usr/sbin/shutdown -h now >/dev/null 2>&1; then
+    echo 'First-time shutdown setup requires the sudo password.'
+    sudo "$INSTALLER"
+  fi
+
+  if ! sudo -n -l /usr/sbin/shutdown -h now >/dev/null 2>&1; then
+    echo 'Shutdown setup failed.' >&2
+    exit 1
+  fi
+}
+
+notify_shutdown() {
+  local hostname_value
+  local ip_value
+  local message
+
+  hostname_value="$(hostname)"
+  ip_value="$(hostname -I 2>/dev/null | awk '{print $1}')"
+
+  if [ "$SECONDS_TO_WAKE" -gt 0 ]; then
+    message="$(cat <<MSG
+구즉 온프레미스 서버가 저전력 절전 모드로 전환됩니다.
+${HOURS_INPUT}시간 뒤 자동으로 다시 동작합니다.
+
+서버: ${hostname_value}
+IP: ${ip_value:-unknown}
+절전 유지 시간: ${HOURS_INPUT}시간
+예약 복귀 시간: ${WAKE_AT}
+
+절전 중에는 API와 SSH가 일시적으로 중단됩니다.
+예약 복귀 후 API, Cloudflare Tunnel, CI/CD runner가 다시 동작합니다.
+MSG
+)"
+    /home/ubuntu/bin/discord-notify \
+      "구즉 홈서버 절전 예정 · ${HOURS_INPUT}시간 뒤 자동 복귀" \
+      "$message" \
+      16753920 || true
+  else
+    message="$(cat <<MSG
+구즉 온프레미스 서버가 종료됩니다.
+
+서버: ${hostname_value}
+IP: ${ip_value:-unknown}
+자동 복귀: 예약되지 않음
+MSG
+)"
+    /home/ubuntu/bin/discord-notify \
+      '구즉 온프레미스 서버 종료 예정' \
+      "$message" \
+      16753920 || true
+  fi
+}
+
+execute_shutdown() {
+  sleep 2
+
+  if [ "$SECONDS_TO_WAKE" -gt 0 ]; then
+    echo "entering low-power sleep until $WAKE_AT..."
+
+    if [ ! -x "$RTC_HELPER" ]; then
+      echo 'Scheduled sleep is not installed.'
+      echo "Run once: sudo $INSTALLER"
+      exit 1
+    fi
+
+    if sudo -n "$RTC_HELPER" schedule "$SECONDS_TO_WAKE"; then
+      echo 'Scheduled sleep started in a detached process.'
+      echo 'A Discord message will be sent after the server resumes.'
+      exit 0
+    fi
+
+    echo 'Scheduled sleep permission is not configured.'
+    echo "Run once: sudo $INSTALLER"
+    exit 1
+  fi
+
+  echo 'powering off...'
+  if sudo -n /usr/sbin/shutdown -h now; then
+    exit 0
+  fi
+
+  echo 'Shutdown permission is not configured.'
+  echo "Run once: sudo $INSTALLER"
+  exit 1
+}
+
+read_hours
+calculate_schedule
+confirm_shutdown
+ensure_shutdown_ready
+notify_shutdown
+execute_shutdown
