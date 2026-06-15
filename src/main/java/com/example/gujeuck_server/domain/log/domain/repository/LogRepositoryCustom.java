@@ -12,7 +12,7 @@ public interface LogRepositoryCustom {
 
     Optional<Log> findByUserIdAndVisitTime(String userId, String visitDate, String visitTime);
 
-    long countByYearMonth(String yearMonth);
+    long countByYearMonth(Long organId, String yearMonth);
 
     List<Log> findAllByOrganIdAndVisitDateStartingWithOrderByDateTime(Long organId, String visitDate);
 

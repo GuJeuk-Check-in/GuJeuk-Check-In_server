@@ -19,4 +19,11 @@ public class QueryResidenceListService {
                 .map(ResidenceResponse::from)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<ResidenceResponse> execute(Long organId){
+        return residenceRepository.findAllByOrganIdOrderByResidenceIndexAsc(organId).stream()
+                .map(ResidenceResponse::from)
+                .toList();
+    }
 }

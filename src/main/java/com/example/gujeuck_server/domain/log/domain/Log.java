@@ -18,6 +18,10 @@ import lombok.*;
                 @UniqueConstraint(
                         name = "uk_log_user_visit",
                         columnNames = {"user_id", "visit_date", "visit_time"}
+                ),
+                @UniqueConstraint(
+                        name = "uk_log_organ_name_age_purpose_visit",
+                        columnNames = {"organ_id", "name", "age", "purpose", "visit_date", "visit_time"}
                 )
         }
 )
@@ -74,4 +78,3 @@ public class Log extends BaseIdEntity {
         this.privacyAgreed = privacyAgreed;
     }
 }
-

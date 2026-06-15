@@ -16,4 +16,9 @@ public class LogFacade {
         return logRepository.findById(logId)
                 .orElseThrow(() -> LogNotFountException.EXCEPTION);
     }
+
+    public Log getLogByIdAndOrganId(Long logId, Long organId) {
+        return logRepository.findByIdAndOrganId(logId, organId)
+                .orElseThrow(() -> LogNotFountException.EXCEPTION);
+    }
 }

@@ -1576,3 +1576,21 @@ prod public    https://api.taisu.site/purpose/all  -> 기존 정상 유지
 
 - 앱 컨테이너를 교체하는 짧은 순간에는 수초 단위 재시도가 발생할 수 있다.
 - 완전 무중단이 필요하면 reverse proxy 기반 blue-green 또는 rolling 구조가 추가로 필요하다.
+
+### 2026-06-15 운영 장애와 즉시 복구
+
+- 증상: `https://api.taisu.site/purpose/all`가 빈 응답처럼 보이거나 기존 운영 데이터가 사라진 것처럼 보였다.
+- 원인: `docker-compose.yml`의 운영 기본 volume 이름이 `gujeuk-mysql-data`, `gujeuk-redis-data`로 바뀌면서, 기존 운영 volume인 `gujeuk-check-in-server_mysql_data`, `gujeuk-check-in-server_redis_data` 대신 새 빈 volume으로 prod 스택이 기동됐다.
+- 확인: MySQL 로그에 `Initializing database files`가 새로 찍혔고, 새 volume 생성 시각이 `2026-06-15T00:59:49Z`로 확인됐다.
+- 복구: 운영 `.env`에 기존 volume 이름을 명시하고 prod stack을 재기동했다.
+- 복구 후 데이터 건수:
+
+```text
+organ: 5
+purpose: 12
+residence: 13
+user: 554
+log: 3594
+```
+
+- 재발 방지: 저장소의 운영 기본 volume 이름도 기존 운영 volume 이름으로 다시 맞췄다.
