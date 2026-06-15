@@ -5,6 +5,8 @@ import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.exception.DuplicateLogException;
 import com.example.gujeuck_server.domain.log.facade.LogFacade;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
+import com.example.gujeuck_server.domain.purpose.domain.Purpose;
+import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,16 +17,25 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateLogService {
     private final LogFacade logFacade;
     private final LogRepository logRepository;
+    private final PurposeFacade purposeFacade;
 
     @Transactional
     public void execute(Long organId, Long logId, LogRequest request) {
         Log log = logFacade.getLogByIdAndOrganId(logId, organId);
         String name = request.getName().trim();
-        String purpose = request.getPurpose().trim();
+        Purpose purpose = purposeFacade.getPurpose(organId, request.getPurpose().trim());
         String visitDate = request.getVisitDate().trim();
         String visitTime = request.getVisitTime().trim();
 
-        validateDuplicateLog(organId, name, request.getAge(), purpose, visitDate, visitTime, logId);
+        validateDuplicateLog(
+                organId,
+                name,
+                request.getAge(),
+                purpose.getPurposeName(),
+                visitDate,
+                visitTime,
+                logId
+        );
 
         log.updateLog(
                 name,
@@ -32,7 +43,7 @@ public class UpdateLogService {
                 request.getPhone().trim(),
                 request.getMaleCount(),
                 request.getFemaleCount(),
-                purpose,
+                purpose.getPurposeName(),
                 visitDate,
                 visitTime,
                 request.isPrivacyAgreed()
