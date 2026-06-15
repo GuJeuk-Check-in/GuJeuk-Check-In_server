@@ -88,6 +88,9 @@ jobs:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: [self-hosted, gujeuk-home-server]
     timeout-minutes: 30
+    concurrency:
+      group: gujeuk-home-deploy
+      cancel-in-progress: false
 
     steps:
       - name: Checkout

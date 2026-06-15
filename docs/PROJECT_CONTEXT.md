@@ -94,6 +94,18 @@ Docker 서비스:
 | MySQL | `gujeuk-mysql` | 운영 데이터베이스 |
 | Redis | `gujeuk-redis` | JWT 토큰 저장 |
 
+운영 데이터 volume 기본값:
+
+```text
+MySQL -> gujeuk-check-in-server_mysql_data
+Redis -> gujeuk-check-in-server_redis_data
+```
+
+주의:
+
+- 운영 `docker-compose.yml` 기본 volume 이름을 임의로 바꾸면 기존 운영 DB 대신 새 빈 volume으로 기동될 수 있다.
+- DB 연결 장애처럼 보여도 실제로는 "다른 빈 MySQL volume"에 붙은 상황일 수 있으니 volume 이름부터 확인한다.
+
 통합 모니터링은 별도 Compose 프로젝트 `gujeuk-monitoring`으로 실행한다.
 
 | 서비스 | 컨테이너 | 역할 |
