@@ -23,4 +23,9 @@ public class OrganFacade {
                 .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
     }
 
+    public Organ getOrganById(Long organId) {
+        return organRepository.findById(organId)
+                .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
+    }
+
 }
