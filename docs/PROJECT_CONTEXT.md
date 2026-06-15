@@ -177,15 +177,16 @@ develop   -> 검증 -> PR -> main -> 운영 배포
 
 CI/CD 흐름:
 
-1. GitHub-hosted runner에서 JDK 17 검증 빌드 실행
-2. GitHub-hosted runner에서 배포용 Docker 이미지 생성
-3. 이미지를 artifact tar로 업로드
-4. 홈서버 self-hosted runner가 artifact를 다운로드
-5. 브랜치에 따라 운영 또는 스테이징 배포 디렉터리에 소스 `rsync`
-6. 홈서버는 `docker load`로 이미지만 적재
-7. `deploy-stack.sh`가 MySQL/Redis 준비 상태 확인 후 앱만 재기동
-8. 로컬 API와 공개 API health check
-9. Discord에 한국어 성공·실패 메시지 전송
+1. GitHub-hosted runner에서 JDK 17로 `bootJar -x test` 실행
+2. 생성된 JAR를 artifact로 업로드
+3. GitHub-hosted runner에서 해당 JAR를 포함한 배포용 Docker 이미지 생성
+4. 이미지를 artifact tar로 업로드
+5. 홈서버 self-hosted runner가 artifact를 다운로드
+6. 브랜치에 따라 운영 또는 스테이징 배포 디렉터리에 소스 `rsync`
+7. 홈서버는 `docker load`로 이미지만 적재
+8. `deploy-stack.sh`가 MySQL/Redis 준비 상태 확인 후 앱만 재기동
+9. 로컬 API와 공개 API health check
+10. Discord에 한국어 성공·실패 메시지 전송
 
 브랜치별 배포 대상:
 

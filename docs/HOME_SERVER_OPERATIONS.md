@@ -196,13 +196,12 @@ Git으로 관리:
 
 ### Dockerfile
 
-`Dockerfile`은 멀티 스테이지 빌드를 사용한다.
+`Dockerfile`은 런타임 전용 이미지를 사용한다.
 
-1. `gradle:8.14.3-jdk17`
-2. Gradle 의존성 캐시
-3. `bootJar` 생성
-4. `eclipse-temurin:17-jre` 런타임 이미지
-5. `JAVA_OPTS`를 적용해 Spring Boot 실행
+1. CI의 `verify` job이 `bootJar -x test`로 JAR 생성
+2. `package-image` job이 artifact로 받은 `build/libs/*.jar`를 Docker build context에 포함
+3. `eclipse-temurin:17-jre` 런타임 이미지에 `app.jar`만 복사
+4. `JAVA_OPTS`를 적용해 Spring Boot 실행
 
 핵심 실행 방식:
 
@@ -637,10 +636,11 @@ ssh ubuntu@<현재-LAN-IP>
 
 ```mermaid
 flowchart TD
-    Push["main push"] --> Build["GitHub-hosted runner<br/>JDK 17 + Gradle build"]
-    Build --> Deploy["Self-hosted runner<br/>gujeuk-home-server"]
+    Push["main push"] --> Build["GitHub-hosted runner<br/>JDK 17 + bootJar"]
+    Build --> Package["GitHub-hosted runner<br/>runtime Docker image build"]
+    Package --> Deploy["Self-hosted runner<br/>gujeuk-home-server"]
     Deploy --> Sync["rsync source"]
-    Sync --> Image["docker compose build app"]
+    Sync --> Image["docker load artifact image"]
     Image --> Up["docker compose up -d app"]
     Up --> LocalCheck["localhost:8080 health"]
     LocalCheck --> PublicCheck["api.taisu.site health"]
@@ -651,17 +651,19 @@ flowchart TD
 
 1. `ubuntu-latest`에서 checkout
 2. JDK 17 설정
-3. `./gradlew clean build -x test`
-4. 홈서버 self-hosted runner에서 checkout
-5. 배포 디렉터리에 `rsync`
-6. `.env`, 백업, import 파일 보존
-7. 운영 스크립트 설치
-8. 앱 이미지 빌드
-9. 앱 컨테이너 교체
-10. 로컬 API 확인
-11. 공개 API 확인
-12. 사용하지 않는 Docker 이미지 정리
-13. Discord 결과 알림
+3. `./gradlew bootJar -x test`
+4. 생성된 JAR artifact 업로드
+5. GitHub-hosted runner에서 runtime Docker 이미지 생성
+6. 홈서버 self-hosted runner에서 checkout
+7. 배포 디렉터리에 `rsync`
+8. `.env`, 백업, import 파일 보존
+9. 운영 스크립트 설치
+10. 이미지 artifact 다운로드 및 `docker load`
+11. 앱 컨테이너 교체
+12. 로컬 API 확인
+13. 공개 API 확인
+14. 사용하지 않는 Docker 이미지 정리
+15. Discord 결과 알림
 
 ### GitHub Self-hosted Runner
 
@@ -1559,7 +1561,7 @@ Pages CORS preflight -> HTTP 200
 
 - Workflow: `.github/workflows/ci-cd.yml`
 - 배포 스크립트: `ops/home-server/deploy-stack.sh`
-- GitHub-hosted runner가 Docker 이미지를 artifact tar로 생성
+- GitHub-hosted runner가 `bootJar` 산출물을 artifact로 공유한 뒤 runtime Docker 이미지를 artifact tar로 생성
 - 홈서버는 `docker load`만 수행하고 이미지 빌드는 하지 않음
 - 배포 스크립트가 MySQL/Redis의 `healthy` 상태를 확인한 뒤 앱만 재기동
 - 스테이징은 별도 `.env`, DB, Redis, 컨테이너 이름, volume을 사용

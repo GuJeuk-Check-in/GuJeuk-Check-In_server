@@ -33,8 +33,21 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Verify build
-        run: ./gradlew clean build -x test
+      - name: Compile source for PR verification
+        if: github.event_name == 'pull_request'
+        run: ./gradlew compileJava
+
+      - name: Build bootJar for deployment flows
+        if: github.event_name != 'pull_request'
+        run: ./gradlew bootJar -x test
+
+      - name: Upload bootJar artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gujeuk-bootjar-${{ github.sha }}
+          path: build/libs/*.jar
+          retention-days: 3
 
   package-image:
     name: Package Deployment Image
@@ -49,6 +62,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Download bootJar artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: gujeuk-bootjar-${{ github.sha }}
+          path: build/libs
 
       - name: Set deployment metadata
         id: meta
