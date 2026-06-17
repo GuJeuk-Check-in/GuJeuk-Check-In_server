@@ -402,6 +402,8 @@ projectsilmoo_gujeuk_prod_synced_20260603_153552.sql.zip
 추가 요청으로 허용한 origin:
 
 ```text
+https://gujeuk-check-in-develop.pages.dev
+https://prototype.taisu.site
 http://localhost:5174
 https://gujeuk-check-in-fe.pages.dev
 ```
