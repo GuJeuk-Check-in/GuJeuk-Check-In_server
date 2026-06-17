@@ -42,6 +42,18 @@ public enum ErrorCode {
     COMPANION_NOT_FOUND(404, "존재하지 않는 동행인 ID입니다."),
     USER_ACCESS_DENIED(403, "해당 유저에 관한 권한이 없습니다."),
 
+    // pet town
+    PET_USER_NOT_FOUND(404, "해당 펫 사용자가 존재하지 않습니다."),
+    PET_ALREADY_EXISTS(409, "이미 펫이 존재합니다."),
+    PET_NOT_FOUND(404, "펫이 존재하지 않습니다."),
+    ALREADY_CHECKED_IN(409, "오늘은 이미 출석했습니다."),
+    INSUFFICIENT_POINTS(409, "포인트가 부족합니다."),
+    ALREADY_OWNED(409, "이미 보유한 아이템입니다."),
+    NOT_OWNED(422, "보유하지 않은 아이템입니다."),
+    INVALID_PET_ACTION(400, "유효하지 않은 돌보기 행동입니다."),
+    INVALID_PET_ITEM(400, "유효하지 않은 아이템입니다."),
+    INVALID_PET_SPECIES(400, "유효하지 않은 펫 종류입니다."),
+
     //organ
     ORGAN_NOT_FOUND(404, "해당 기관 계정이 존재하지 않습니다."),
     INVALID_PASSWORD_CONFIRM(401, "비밀번호 확인이 일치하지 않습니다."),

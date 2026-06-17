@@ -6,6 +6,7 @@ import com.example.gujeuck_server.domain.organ.exception.OrganNotFoundException;
 import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
 import com.example.gujeuck_server.domain.organ.domain.RefreshToken;
 import com.example.gujeuck_server.domain.organ.domain.repository.RefreshTokenRepository;
+import com.example.gujeuck_server.domain.pet.domain.enums.PrincipalType;
 import com.example.gujeuck_server.domain.user.exception.ExpiredTokenException;
 import com.example.gujeuck_server.domain.user.exception.InvalidTokenException;
 import com.example.gujeuck_server.global.security.auth.CustomUserDetailsService;
@@ -32,6 +33,7 @@ public class JwtTokenProvider {
     private final RefreshTokenRepository refreshTokenRepository;
 
     private static final String CLAIM_TYPE = "type";
+    private static final String CLAIM_PRINCIPAL_TYPE = "principalType";
     private static final String ACCESS_TYPE = "access";
     private static final String REFRESH_TYPE = "refresh";
     private static final int MILLISECONDS = 1000;
@@ -40,6 +42,14 @@ public class JwtTokenProvider {
 
     //access token 생성
     public String createAccessToken(String organName, Client client) {
+        return createAccessToken(organName, client, PrincipalType.ORGAN);
+    }
+
+    public String createPetUserAccessToken(Long petUserId) {
+        return createAccessToken(String.valueOf(petUserId), Client.USER_VIEW, PrincipalType.PET_USER);
+    }
+
+    private String createAccessToken(String subject, Client client, PrincipalType principalType) {
 
         Date now = new Date();
 
@@ -49,8 +59,9 @@ public class JwtTokenProvider {
                 : ADMIN_ACCESS_EXPIRATION;
 
         return Jwts.builder()
-                .setSubject(organName)
+                .setSubject(subject)
                 .claim(CLAIM_TYPE, ACCESS_TYPE) // 액세스 토큰임을 나타냄
+                .claim(CLAIM_PRINCIPAL_TYPE, principalType.name())
                 .setIssuedAt(now) // 토큰 발행 시간 정보
                 .setExpiration(new Date(now.getTime() + expirationTime * MILLISECONDS)) // 토큰의 만료 시간 설정
                 .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecretKey())
@@ -87,10 +98,21 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
 
         Claims claims = getClaims(token);
+        PrincipalType principalType = resolvePrincipalType(claims);
 
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(claims.getSubject());
+        UserDetails userDetails = customUserDetailsService.loadUserByPrincipal(principalType, claims.getSubject());
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    private PrincipalType resolvePrincipalType(Claims claims) {
+        String principalType = claims.get(CLAIM_PRINCIPAL_TYPE, String.class);
+
+        if (principalType == null || principalType.isBlank()) {
+            return PrincipalType.ORGAN;
+        }
+
+        return PrincipalType.valueOf(principalType);
     }
 
     public Claims getClaims(String token) {
