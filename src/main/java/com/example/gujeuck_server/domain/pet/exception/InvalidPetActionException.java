@@ -1,0 +1,12 @@
+package com.example.gujeuck_server.domain.pet.exception;
+
+import com.example.gujeuck_server.global.error.exception.ErrorCode;
+import com.example.gujeuck_server.global.error.exception.GujeukException;
+
+public class InvalidPetActionException extends GujeukException {
+    public static final GujeukException EXCEPTION = new InvalidPetActionException();
+
+    private InvalidPetActionException() {
+        super(ErrorCode.INVALID_PET_ACTION);
+    }
+}
