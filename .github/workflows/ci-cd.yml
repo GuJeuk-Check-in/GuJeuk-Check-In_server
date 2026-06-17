@@ -126,10 +126,10 @@ jobs:
 
           if [ "${GITHUB_REF_NAME}" = "main" ]; then
             echo "DEPLOY_DIR=/home/ubuntu/git/gujeuk-check-in-server" >> "$GITHUB_ENV"
-            echo "PUBLIC_HEALTH_URL=https://api.taisu.site/purpose/all" >> "$GITHUB_ENV"
+            echo "PUBLIC_HEALTH_URL=https://api.taisu.site/public/organs" >> "$GITHUB_ENV"
           else
             echo "DEPLOY_DIR=/home/ubuntu/git/gujeuk-check-in-server-stag" >> "$GITHUB_ENV"
-            echo "PUBLIC_HEALTH_URL=https://api-stag.taisu.site/purpose/all" >> "$GITHUB_ENV"
+            echo "PUBLIC_HEALTH_URL=https://api-stag.taisu.site/public/organs" >> "$GITHUB_ENV"
           fi
 
       - name: Sync source to deployment directory

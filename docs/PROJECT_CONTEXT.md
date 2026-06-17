@@ -185,7 +185,7 @@ CI/CD 흐름:
 6. 브랜치에 따라 운영 또는 스테이징 배포 디렉터리에 소스 `rsync`
 7. 홈서버는 `docker load`로 이미지만 적재
 8. `deploy-stack.sh`가 MySQL/Redis 준비 상태 확인 후 앱만 재기동
-9. 로컬 API와 공개 API health check
+9. 로컬 API와 공개 API health check (`/public/organs`)
 10. Discord에 한국어 성공·실패 메시지 전송
 
 브랜치별 배포 대상:

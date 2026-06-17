@@ -258,6 +258,11 @@ docker compose logs --tail=200 app
 cd /home/ubuntu/git/gujeuk-check-in-server-stag
 
 docker compose --env-file .env ps
+
+배포 검증 참고:
+
+- `deploy-stack.sh`의 로컬/공개 헬스체크는 인증이 필요 없는 `/public/organs`를 사용한다.
+- `/purpose/all` 같은 인증 필요 엔드포인트를 헬스체크로 사용하면 앱이 정상이어도 배포가 실패 처리된다.
 docker compose --env-file .env up -d
 docker compose --env-file .env logs --tail=200 app
 ```
