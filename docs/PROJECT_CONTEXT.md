@@ -237,8 +237,8 @@ Grafana 통합 모니터링:
 - `gujeuk-app`
 - `gujeuk-mysql`
 - `gujeuk-redis`
-- `http://localhost:8080/purpose/all`
-- `https://api.taisu.site/purpose/all`
+- `http://localhost:8080/public/organs`
+- `https://api.taisu.site/public/organs`
 - 배터리 잔량과 충전 상태
 
 Discord 알림:

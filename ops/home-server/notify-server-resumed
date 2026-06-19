@@ -4,8 +4,8 @@ set -euo pipefail
 NOTIFIER=/home/ubuntu/bin/discord-notify
 LOG_DIR=/home/ubuntu/.config/gujeuk-monitor
 LOG_FILE="$LOG_DIR/resume-notify.log"
-LOCAL_URL=http://localhost:8080/purpose/all
-PUBLIC_URL=https://api.taisu.site/purpose/all
+LOCAL_URL=http://localhost:8080/public/organs
+PUBLIC_URL=https://api.taisu.site/public/organs
 TUNNEL_WATCHDOG=/home/ubuntu/bin/watch-cloudflared.sh
 MAX_ATTEMPTS=30
 WAIT_SECONDS=10

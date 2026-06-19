@@ -8,8 +8,8 @@ FAILS_FILE="$BASE/watchdog.failures"
 NETWORK_FILE="$BASE/watchdog.network"
 BODY_FILE="$BASE/watchdog.response"
 START=/home/ubuntu/bin/start-cloudflared.sh
-LOCAL_URL=http://localhost:8080/purpose/all
-PUBLIC_URL=https://api.taisu.site/purpose/all
+LOCAL_URL=http://localhost:8080/public/organs
+PUBLIC_URL=https://api.taisu.site/public/organs
 
 mkdir -p "$BASE"
 exec 8>"$LOCK"

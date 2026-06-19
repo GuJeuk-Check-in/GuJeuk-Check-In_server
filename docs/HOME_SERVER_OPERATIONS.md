@@ -762,8 +762,8 @@ Discord Webhook은 메시지 발송만 지원한다. Discord 채팅에서 `/stat
 - `gujeuk-app`
 - `gujeuk-mysql`
 - `gujeuk-redis`
-- `http://localhost:8080/purpose/all`
-- `https://api.taisu.site/purpose/all`
+- `http://localhost:8080/public/organs`
+- `https://api.taisu.site/public/organs`
 - 배터리 잔량과 충전 상태
 
 5분마다 검사하지만 정상 메시지를 반복 전송하지 않는다.
