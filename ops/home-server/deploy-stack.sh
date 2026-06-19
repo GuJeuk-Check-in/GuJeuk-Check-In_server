@@ -24,7 +24,7 @@ APP_PORT="${APP_PORT:-8080}"
 APP_CONTAINER_NAME="${APP_CONTAINER_NAME:-gujeuk-app}"
 MYSQL_CONTAINER_NAME="${MYSQL_CONTAINER_NAME:-gujeuk-mysql}"
 REDIS_CONTAINER_NAME="${REDIS_CONTAINER_NAME:-gujeuk-redis}"
-LOCAL_HEALTH_URL="http://localhost:${APP_PORT}/purpose/all"
+LOCAL_HEALTH_URL="http://localhost:${APP_PORT}/public/organs"
 
 wait_for_health() {
   local container_name="$1"

@@ -37,5 +37,4 @@ public class LogRequest {
 
     @NotBlank(message = "방문 시간을 입력해주세요.")
     private String visitTime;
-
 }

@@ -4,8 +4,6 @@ import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.exception.InvalidLogDateException;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogSliceWithTotalResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
-import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,11 +17,8 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class QueryLogListByDateService {
     private final LogRepository logRepository;
-    private final OrganFacade organFacade;
 
-    public LogSliceWithTotalResponse queryLogListByResidence(String yearMonth, Pageable p) {
-        Organ organ = organFacade.currentOrgan();
-
+    public LogSliceWithTotalResponse queryLogListByResidence(Long organId, String yearMonth, Pageable p) {
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),
                 p.getPageSize(),
@@ -32,10 +27,10 @@ public class QueryLogListByDateService {
 
         String date = toYearMonthPrefix(yearMonth);
 
-        Slice<QueryLogListResponse> slice = logRepository.findAllByOrganIdAndVisitDateStartingWith(organ.getId(), date, pageable)
+        Slice<QueryLogListResponse> slice = logRepository.findAllByOrganIdAndVisitDateStartingWith(organId, date, pageable)
                 .map(QueryLogListResponse::from);
 
-        long total = logRepository.countByYearMonth(date);
+        long total = logRepository.countByYearMonth(organId, date);
 
         return LogSliceWithTotalResponse.builder()
                 .slice(slice)
@@ -54,7 +49,7 @@ public class QueryLogListByDateService {
             throw InvalidLogDateException.EXCEPTION;
         }
 
-        if(Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1 || Integer.parseInt(year) > now.getYear()) {
+        if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1 || Integer.parseInt(year) > now.getYear()) {
             throw InvalidLogDateException.EXCEPTION;
         }
 

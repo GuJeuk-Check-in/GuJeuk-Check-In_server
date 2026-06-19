@@ -94,6 +94,18 @@ Docker 서비스:
 | MySQL | `gujeuk-mysql` | 운영 데이터베이스 |
 | Redis | `gujeuk-redis` | JWT 토큰 저장 |
 
+운영 데이터 volume 기본값:
+
+```text
+MySQL -> gujeuk-check-in-server_mysql_data
+Redis -> gujeuk-check-in-server_redis_data
+```
+
+주의:
+
+- 운영 `docker-compose.yml` 기본 volume 이름을 임의로 바꾸면 기존 운영 DB 대신 새 빈 volume으로 기동될 수 있다.
+- DB 연결 장애처럼 보여도 실제로는 "다른 빈 MySQL volume"에 붙은 상황일 수 있으니 volume 이름부터 확인한다.
+
 통합 모니터링은 별도 Compose 프로젝트 `gujeuk-monitoring`으로 실행한다.
 
 | 서비스 | 컨테이너 | 역할 |
@@ -165,15 +177,16 @@ develop   -> 검증 -> PR -> main -> 운영 배포
 
 CI/CD 흐름:
 
-1. GitHub-hosted runner에서 JDK 17 검증 빌드 실행
-2. GitHub-hosted runner에서 배포용 Docker 이미지 생성
-3. 이미지를 artifact tar로 업로드
-4. 홈서버 self-hosted runner가 artifact를 다운로드
-5. 브랜치에 따라 운영 또는 스테이징 배포 디렉터리에 소스 `rsync`
-6. 홈서버는 `docker load`로 이미지만 적재
-7. `deploy-stack.sh`가 MySQL/Redis 준비 상태 확인 후 앱만 재기동
-8. 로컬 API와 공개 API health check
-9. Discord에 한국어 성공·실패 메시지 전송
+1. GitHub-hosted runner에서 JDK 17로 `bootJar -x test` 실행
+2. 생성된 JAR를 artifact로 업로드
+3. GitHub-hosted runner에서 해당 JAR를 포함한 배포용 Docker 이미지 생성
+4. 이미지를 artifact tar로 업로드
+5. 홈서버 self-hosted runner가 artifact를 다운로드
+6. 브랜치에 따라 운영 또는 스테이징 배포 디렉터리에 소스 `rsync`
+7. 홈서버는 `docker load`로 이미지만 적재
+8. `deploy-stack.sh`가 MySQL/Redis 준비 상태 확인 후 앱만 재기동
+9. 로컬 API와 공개 API health check (`/public/organs`)
+10. Discord에 한국어 성공·실패 메시지 전송
 
 브랜치별 배포 대상:
 
@@ -389,6 +402,8 @@ projectsilmoo_gujeuk_prod_synced_20260603_153552.sql.zip
 추가 요청으로 허용한 origin:
 
 ```text
+https://gujeuk-check-in-develop.pages.dev
+https://prototype.taisu.site
 http://localhost:5174
 https://gujeuk-check-in-fe.pages.dev
 ```

@@ -15,7 +15,16 @@ public class OrganFacade {
     public Organ currentOrgan() {
         String organName = SecurityContextHolder.getContext().getAuthentication().getName();
 
+        return getOrganByName(organName);
+    }
+
+    public Organ getOrganByName(String organName) {
         return organRepository.findByOrganName(organName)
+                .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
+    }
+
+    public Organ getOrganById(Long organId) {
+        return organRepository.findById(organId)
                 .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
     }
 

@@ -4,6 +4,7 @@ import com.example.gujeuck_server.global.error.exception.ErrorCode;
 import com.example.gujeuck_server.global.error.exception.GujeukException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -35,6 +36,26 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = ErrorCode.BAD_REQUEST;
         ErrorResponse response = ErrorResponse.of(errorCode, errorCode.getErrorMessage());
         e.printStackTrace();
+
+        return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatusCode()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+
+        String message = e.getMostSpecificCause() != null ? e.getMostSpecificCause().getMessage() : e.getMessage();
+
+        if (message != null && (
+                message.contains("uk_log_user_visit") ||
+                message.contains("uk_log_organ_name_age_purpose_visit")
+        )) {
+            ErrorCode errorCode = ErrorCode.DUPLICATE_LOG;
+            ErrorResponse response = ErrorResponse.of(errorCode, errorCode.getErrorMessage());
+            return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatusCode()));
+        }
+
+        ErrorCode errorCode = ErrorCode.BAD_REQUEST;
+        ErrorResponse response = ErrorResponse.of(errorCode, errorCode.getErrorMessage());
 
         return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatusCode()));
     }
