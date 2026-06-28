@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +32,6 @@ public class SignupService {
     private final PurposeFacade purposeFacade;
 
     private static final Long HARDCODED_ORGAN_ID = 1L;
-    private static final DateTimeFormatter VISIT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Transactional
     public void execute(SignupRequest request) {
@@ -45,9 +43,9 @@ public class SignupService {
 
         LocalDateTime visitDateTime = request.getVisitTime();
 
-        String visitDate = DateFormatter.LocalDateForm(visitDateTime.toLocalDate());
+        String visitDate = DateFormatter.toVisitDate(visitDateTime);
 
-        String visitTime = visitDateTime.toLocalTime().format(VISIT_TIME_FORMATTER);
+        String visitTime = DateFormatter.toVisitTime(visitDateTime);
 
         int currentYear = visitDateTime.getYear();
 

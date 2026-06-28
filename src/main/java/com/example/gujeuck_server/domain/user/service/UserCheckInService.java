@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +24,6 @@ public class UserCheckInService {
     private final UserRepository userRepository;
     private final LogRepository logRepository;
     private final PurposeFacade purposeFacade;
-
-    private static final DateTimeFormatter VISIT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Transactional
     public void execute(UserCheckInRequest request) {
@@ -40,8 +37,8 @@ public class UserCheckInService {
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
         LocalDateTime visitDateTime = request.getVisitTime();
-        String visitDate = DateFormatter.LocalDateForm(visitDateTime.toLocalDate());
-        String visitTime = visitDateTime.toLocalTime().format(VISIT_TIME_FORMATTER);
+        String visitDate = DateFormatter.toVisitDate(visitDateTime);
+        String visitTime = DateFormatter.toVisitTime(visitDateTime);
         int year = visitDateTime.getYear();
 
         // 같은 유저가 같은 시각에 이미 체크인했는지 확인한다.
