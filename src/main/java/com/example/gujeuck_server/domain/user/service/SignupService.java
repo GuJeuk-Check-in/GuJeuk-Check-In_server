@@ -59,7 +59,6 @@ public class SignupService {
         User user = userRepository.findByNameAndPhone(request.getName(), request.getPhone())
                 .orElseGet(() -> userRepository.save(createUser(request, age, request.getResidence(), organ)));
 
-        // 신규/기존 유저 모두 방문 횟수를 증가시켜 로그 수와 일치시킨다.
         user.increaseCount();
 
         Log log = createLog(request, age, purpose.getPurposeName(), visitDate, visitTime, currentYear, request.getResidence(), user, organ);
