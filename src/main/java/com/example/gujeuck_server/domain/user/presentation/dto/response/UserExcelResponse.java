@@ -7,7 +7,6 @@ import lombok.Builder;
 
 @Builder
 public record UserExcelResponse(
-        String userId,
         String name,
         String phone,
         Gender gender,
@@ -20,7 +19,6 @@ public record UserExcelResponse(
     // User 엔티티 -> UserExcelResponse 로 변환하는 정적 메서드
     public static UserExcelResponse from(User user) {
         return UserExcelResponse.builder()
-                .userId(user.getUserId())
                 .name(user.getName())
                 .phone(user.getPhone())
                 .gender(user.getGender())

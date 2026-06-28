@@ -14,9 +14,6 @@ import lombok.*;
 @NoArgsConstructor
 public class User extends BaseIdEntity {
 
-    @Column(nullable = false, unique = true, length = 30)
-    private String userId;
-
     private long allUserCount;
 
     @Column(nullable = false, length = 30)
@@ -49,19 +46,13 @@ public class User extends BaseIdEntity {
     @JoinColumn(name = "organ_id", nullable = false)
     private Organ organ;
 
-    public void updateUser(String name, String userId, String phone, String birthYMD, String residence, Gender gender, Age age) {
+    public void updateUser(String name, String phone, String birthYMD, String residence, Gender gender, Age age) {
         this.name = name;
-        this.userId = userId;
         this.phone = phone;
         this.birthYMD = birthYMD;
         this.residence = residence;
         this.gender = gender;
         this.age = age;
-    }
-
-    public static String generateUserId(String name, String birthYMD) {
-        String monthDay = birthYMD.substring(5).replace("-", "");
-        return name + monthDay;
     }
 
     public void increaseCount() {

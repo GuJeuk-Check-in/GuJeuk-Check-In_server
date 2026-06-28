@@ -23,14 +23,14 @@ public class LoginUserService {
     @Transactional
     public void execute(LoginRequest request) {
 
-        User user = userRepository.findByUserId(request.getUserId())
+        User user = userRepository.findById(parseUserId(request.getUserId()))
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
         String visitDate = TimeProvider.nowDateFormatted();
         String visitTime = TimeProvider.nowTimeFormatted();
         int currentYear = TimeProvider.nowYear();
 
-        if (logRepository.findByUserIdAndVisitTime(user.getUserId(), visitDate, visitTime).isPresent()) {
+        if (logRepository.findByUserIdAndVisitTime(user.getId(), visitDate, visitTime).isPresent()) {
             throw DuplicateLogException.EXCEPTION;
         }
 
@@ -38,6 +38,14 @@ public class LoginUserService {
 
         Log log = createUserLog(user, request, visitDate, visitTime, currentYear);
         saveLog(log);
+    }
+
+    private Long parseUserId(String userId) {
+        try {
+            return Long.parseLong(userId);
+        } catch (NumberFormatException exception) {
+            throw UserNotFoundException.EXCEPTION;
+        }
     }
 
     private void saveLog(Log log) {

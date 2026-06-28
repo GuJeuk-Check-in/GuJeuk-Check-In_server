@@ -62,13 +62,13 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
     }
 
     @Override
-    public Optional<Log> findByUserIdAndVisitTime(String userId, String visitDate, String visitTime) {
+    public Optional<Log> findByUserIdAndVisitTime(Long userId, String visitDate, String visitTime) {
 
         return Optional.ofNullable(
                 jpaQueryFactory
                         .selectFrom(qLog)
                         .where(
-                                qLog.user.userId.eq(userId),
+                                qLog.user.id.eq(userId),
                                 qLog.visitDate.eq(visitDate),
                                 qLog.visitTime.eq(visitTime)
                         )

@@ -11,7 +11,6 @@ import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
 import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class SignupService {
     private static final DateTimeFormatter VISIT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Transactional
-    public SignUpResponse execute(SignupRequest request) {
+    public void execute(SignupRequest request) {
 
         Organ organ = organRepository.findById(HARDCODED_ORGAN_ID)
                 .orElseThrow(() -> new RuntimeException("Organ not found"));
@@ -53,12 +52,10 @@ public class SignupService {
         residenceRepository.findByOrganIdAndResidenceName(organ.getId(), request.getResidence())
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
-        String userId = User.generateUserId(request.getName(), request.getBirthYMD());
-
-        // 이미 가입된 유저면 새로 생성하지 않고 기존 유저를 재사용한다. (예외 없이 방문 기록만 추가)
-        User user = userRepository.findByUserIdAndOrganId(userId, organ.getId())
+        // 이름+전화번호가 같으면 이미 가입된 유저로 보고 새로 생성하지 않는다. (예외 없이 방문 기록만 추가)
+        User user = userRepository.findByNameAndPhone(request.getName(), request.getPhone())
                 .orElseGet(() -> {
-                    User newUser = createUser(request, age, userId, request.getResidence(), organ);
+                    User newUser = createUser(request, age, request.getResidence(), organ);
                     newUser.increaseCount();
                     return userRepository.save(newUser);
                 });
@@ -66,13 +63,9 @@ public class SignupService {
         Log log = createLog(request, age, request.getPurpose(), visitDate, visitTime, currentYear, request.getResidence(), user, organ);
 
         logRepository.save(log);
-
-        return SignUpResponse.builder()
-                .userId(userId)
-                .build();
     }
 
-    private User createUser(SignupRequest request, Age age, String userId, String residence, Organ organ) {
+    private User createUser(SignupRequest request, Age age, String residence, Organ organ) {
 
         return User.builder()
                 .name(request.getName())
@@ -82,7 +75,6 @@ public class SignupService {
                 .residence(residence)
                 .privacyAgreed(request.getPrivacyAgreed())
                 .age(age)
-                .userId(userId)
                 .organ(organ)
                 .build();
     }
