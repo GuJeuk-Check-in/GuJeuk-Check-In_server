@@ -4,20 +4,22 @@ import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRepository;
 import com.example.gujeuck_server.domain.residence.exception.ResidenceNotFoundException;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
-import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
-import com.example.gujeuck_server.global.utility.TimeProvider;
+import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -26,58 +28,48 @@ public class SignupService {
     private final UserRepository userRepository;
     private final CalculateAgeService calculateAgeService;
     private final LogRepository logRepository;
-    private final PurposeFacade purposeFacade;
     private final OrganRepository organRepository;
     private final ResidenceRepository residenceRepository;
+    private final PurposeFacade purposeFacade;
 
     private static final Long HARDCODED_ORGAN_ID = 1L;
+    private static final DateTimeFormatter VISIT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Transactional
-    public SignUpResponse execute(SignupRequest request) {
+    public void execute(SignupRequest request) {
 
         Organ organ = organRepository.findById(HARDCODED_ORGAN_ID)
                 .orElseThrow(() -> new RuntimeException("Organ not found"));
 
-        SignUpResponse signupResponse = createUserId(HARDCODED_ORGAN_ID, request.getName(), request.getBirthYMD());
-
         Age age = calculateAgeService.getAge(request.getBirthYMD());
 
-        String visitDate = TimeProvider.nowDateFormatted();
+        LocalDateTime visitDateTime = request.getVisitTime();
 
-        String visitTime = TimeProvider.nowTimeFormatted();
+        String visitDate = DateFormatter.LocalDateForm(visitDateTime.toLocalDate());
 
-        int currentYear = TimeProvider.nowYear();
+        String visitTime = visitDateTime.toLocalTime().format(VISIT_TIME_FORMATTER);
+
+        int currentYear = visitDateTime.getYear();
 
         residenceRepository.findByOrganIdAndResidenceName(organ.getId(), request.getResidence())
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
-        User user = createUser(request, age, signupResponse.getUserId(), request.getResidence(), organ);
+        // 등록된 방문목적인지 검증하고 정규화된 이름을 사용한다.
+        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
+        // 이름+전화번호가 같으면 이미 가입된 유저로 보고 새로 생성하지 않는다. (예외 없이 방문 기록만 추가)
+        User user = userRepository.findByNameAndPhone(request.getName(), request.getPhone())
+                .orElseGet(() -> userRepository.save(createUser(request, age, request.getResidence(), organ)));
+
+        // 신규/기존 유저 모두 방문 횟수를 증가시켜 로그 수와 일치시킨다.
         user.increaseCount();
 
-        userRepository.save(user);
-
-        Log log = createLog(request, age, request.getPurpose(), visitDate, visitTime, currentYear, request.getResidence(), user, organ);
+        Log log = createLog(request, age, purpose.getPurposeName(), visitDate, visitTime, currentYear, request.getResidence(), user, organ);
 
         logRepository.save(log);
-
-        return signupResponse;
     }
 
-    private SignUpResponse createUserId(Long organId, String name, String birthYMD) {
-
-        String userId = User.generateUserId(name, birthYMD);
-
-        if (userRepository.findByUserIdAndOrganId(userId, organId).isPresent()) {
-            throw ExistUserIdException.EXCEPTION;
-        }
-
-        return SignUpResponse.builder()
-                .userId(userId)
-                .build();
-    }
-
-    private User createUser(SignupRequest request, Age age, String userId, String residence, Organ organ) {
+    private User createUser(SignupRequest request, Age age, String residence, Organ organ) {
 
         return User.builder()
                 .name(request.getName())
@@ -87,7 +79,6 @@ public class SignupService {
                 .residence(residence)
                 .privacyAgreed(request.getPrivacyAgreed())
                 .age(age)
-                .userId(userId)
                 .organ(organ)
                 .build();
     }

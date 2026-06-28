@@ -47,8 +47,6 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath residence = createString("residence");
 
-    public final StringPath userId = createString("userId");
-
     public QUser(String variable) {
         this(User.class, forVariable(variable), INITS);
     }

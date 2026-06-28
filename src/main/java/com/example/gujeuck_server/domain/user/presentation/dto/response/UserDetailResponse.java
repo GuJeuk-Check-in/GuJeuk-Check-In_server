@@ -6,7 +6,6 @@ import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 public record UserDetailResponse(
         Long id,
         String name,
-        String userId,
         Gender gender,
         String phone,
         String birthYMD,
@@ -16,7 +15,6 @@ public record UserDetailResponse(
         return new UserDetailResponse(
                 user.getId(),
                 user.getName(),
-                user.getUserId(),
                 user.getGender(),
                 user.getPhone(),
                 user.getBirthYMD(),

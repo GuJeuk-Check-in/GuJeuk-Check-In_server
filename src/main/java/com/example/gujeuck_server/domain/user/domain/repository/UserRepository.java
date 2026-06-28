@@ -12,8 +12,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 
-    Boolean existsByUserId(String userId);
-
     Slice<User> findByResidenceAndOrganId(String residence, Long organId, Pageable pageable);
 
     Slice<User> findByOrganIdAndResidenceNotIn (Long organId, List<String> residences, Pageable pageable);
@@ -25,8 +23,6 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
     long countByOrganId(Long organId);
 
     long countByOrganIdAndResidenceNotIn(Long organId, List<String> residences);
-
-    Optional<User> findByUserId(String userId);
 
     Optional<User> findByNameAndPhone(String name, String phone);
 

@@ -151,7 +151,7 @@ public class ExcelGenerator { // 이건 엑셀 파일 내용 관련한 클래스
     // ========================= User Excel 생성 =========================
 
     private static final String[] USER_HEADERS = {
-            "NO", "아이디", "성명", "연락처", "성별", "생년월일", "나이", "거주지", "개인정보 제공 동의 여부", "이용 횟수"
+            "NO", "성명", "연락처", "성별", "생년월일", "나이", "거주지", "개인정보 제공 동의 여부", "이용 횟수"
     };
     private static final String USER_SHEET_TITLE = "구즉 청소년 문화의집 회원 목록";
 
@@ -206,7 +206,6 @@ public class ExcelGenerator { // 이건 엑셀 파일 내용 관련한 클래스
 
             int col = 0;
             createCell(row, col++, no++, style);
-            createCell(row, col++, user.userId(), style);
             createCell(row, col++, user.name(), style);
             createCell(row, col++, user.phone(), style);
             createCell(row, col++, user.gender().getLabel(), style);
@@ -226,10 +225,9 @@ public class ExcelGenerator { // 이건 엑셀 파일 내용 관련한 클래스
             sheet.setColumnWidth(i, width + 1024);
         }
 
-        sheet.setColumnWidth(1, 5000);  // 아이디
-        sheet.setColumnWidth(2, 4000);  // 성명
-        sheet.setColumnWidth(3, 6000);  // 연락처
-        sheet.setColumnWidth(5, 5000);  // 생년월일
-        sheet.setColumnWidth(7, 5000);  // 거주지
+        sheet.setColumnWidth(1, 4000);  // 성명
+        sheet.setColumnWidth(2, 6000);  // 연락처
+        sheet.setColumnWidth(4, 5000);  // 생년월일
+        sheet.setColumnWidth(6, 5000);  // 거주지
     }
 }
