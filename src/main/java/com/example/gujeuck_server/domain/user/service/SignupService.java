@@ -9,7 +9,6 @@ import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRe
 import com.example.gujeuck_server.domain.residence.exception.ResidenceNotFoundException;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
-import com.example.gujeuck_server.domain.user.exception.ExistUserIdException;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
@@ -41,8 +40,6 @@ public class SignupService {
         Organ organ = organRepository.findById(HARDCODED_ORGAN_ID)
                 .orElseThrow(() -> new RuntimeException("Organ not found"));
 
-        SignUpResponse signupResponse = createUserId(HARDCODED_ORGAN_ID, request.getName(), request.getBirthYMD());
-
         Age age = calculateAgeService.getAge(request.getBirthYMD());
 
         LocalDateTime visitDateTime = request.getVisitTime();
@@ -56,26 +53,19 @@ public class SignupService {
         residenceRepository.findByOrganIdAndResidenceName(organ.getId(), request.getResidence())
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
-        User user = createUser(request, age, signupResponse.getUserId(), request.getResidence(), organ);
+        String userId = User.generateUserId(request.getName(), request.getBirthYMD());
 
-        user.increaseCount();
-
-        userRepository.save(user);
+        // 이미 가입된 유저면 새로 생성하지 않고 기존 유저를 재사용한다. (예외 없이 방문 기록만 추가)
+        User user = userRepository.findByUserIdAndOrganId(userId, organ.getId())
+                .orElseGet(() -> {
+                    User newUser = createUser(request, age, userId, request.getResidence(), organ);
+                    newUser.increaseCount();
+                    return userRepository.save(newUser);
+                });
 
         Log log = createLog(request, age, request.getPurpose(), visitDate, visitTime, currentYear, request.getResidence(), user, organ);
 
         logRepository.save(log);
-
-        return signupResponse;
-    }
-
-    private SignUpResponse createUserId(Long organId, String name, String birthYMD) {
-
-        String userId = User.generateUserId(name, birthYMD);
-
-        if (userRepository.findByUserIdAndOrganId(userId, organId).isPresent()) {
-            throw ExistUserIdException.EXCEPTION;
-        }
 
         return SignUpResponse.builder()
                 .userId(userId)
