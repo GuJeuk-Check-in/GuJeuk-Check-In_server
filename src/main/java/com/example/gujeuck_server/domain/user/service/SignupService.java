@@ -4,6 +4,7 @@ import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRepository;
 import com.example.gujeuck_server.domain.residence.exception.ResidenceNotFoundException;
@@ -29,6 +30,7 @@ public class SignupService {
     private final LogRepository logRepository;
     private final OrganRepository organRepository;
     private final ResidenceRepository residenceRepository;
+    private final PurposeFacade purposeFacade;
 
     private static final Long HARDCODED_ORGAN_ID = 1L;
     private static final DateTimeFormatter VISIT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
@@ -52,15 +54,17 @@ public class SignupService {
         residenceRepository.findByOrganIdAndResidenceName(organ.getId(), request.getResidence())
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
+        // 등록된 방문목적인지 검증하고 정규화된 이름을 사용한다.
+        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
+
         // 이름+전화번호가 같으면 이미 가입된 유저로 보고 새로 생성하지 않는다. (예외 없이 방문 기록만 추가)
         User user = userRepository.findByNameAndPhone(request.getName(), request.getPhone())
-                .orElseGet(() -> {
-                    User newUser = createUser(request, age, request.getResidence(), organ);
-                    newUser.increaseCount();
-                    return userRepository.save(newUser);
-                });
+                .orElseGet(() -> userRepository.save(createUser(request, age, request.getResidence(), organ)));
 
-        Log log = createLog(request, age, request.getPurpose(), visitDate, visitTime, currentYear, request.getResidence(), user, organ);
+        // 신규/기존 유저 모두 방문 횟수를 증가시켜 로그 수와 일치시킨다.
+        user.increaseCount();
+
+        Log log = createLog(request, age, purpose.getPurposeName(), visitDate, visitTime, currentYear, request.getResidence(), user, organ);
 
         logRepository.save(log);
     }
