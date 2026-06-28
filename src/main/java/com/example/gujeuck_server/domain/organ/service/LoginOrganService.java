@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.organ.service;
 
-import com.example.gujeuck_server.domain.organ.domain.enums.Client;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.LoginOrganRequest;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
@@ -30,8 +29,6 @@ public class LoginOrganService {
             throw PasswordMismatchException.EXCEPTION;
         }
 
-        Client client = Client.valueOf(request.getClient().toUpperCase());
-
-        return jwtTokenProvider.receiveToken(organ.getOrganName(), client);
+        return jwtTokenProvider.receiveToken(organ.getOrganName());
     }
 }

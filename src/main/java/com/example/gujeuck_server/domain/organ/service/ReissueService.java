@@ -1,7 +1,5 @@
 package com.example.gujeuck_server.domain.organ.service;
 
-import com.example.gujeuck_server.domain.organ.domain.RefreshToken;
-import com.example.gujeuck_server.domain.organ.domain.enums.Client;
 import com.example.gujeuck_server.domain.organ.domain.repository.RefreshTokenRepository;
 import com.example.gujeuck_server.domain.organ.exception.OrganNotFoundException;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
@@ -22,11 +20,9 @@ public class ReissueService {
     public TokenResponse execute(Authentication authentication) {
         String organName = authentication.getName();
 
-        RefreshToken refreshToken = refreshTokenRepository.findByOrganName(organName)
+        refreshTokenRepository.findByOrganName(organName)
                 .orElseThrow(() -> RefreshTokenNotFoundException.EXCEPTION);
 
-        Client client = Client.valueOf(refreshToken.getClient());
-
-        return jwtTokenProvider.receiveToken(organName, client);
+        return jwtTokenProvider.receiveToken(organName);
     }
 }
