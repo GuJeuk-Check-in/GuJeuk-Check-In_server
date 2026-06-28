@@ -9,6 +9,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class SignupRequest {
 
@@ -44,4 +46,7 @@ public class SignupRequest {
 
     @NotBlank(message = "방문목적을 입력해주세요.")
     private String purpose;
+
+    @NotNull(message = "방문시각을 비워둘 수 없습니다.")
+    private LocalDateTime visitTime;
 }
