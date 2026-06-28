@@ -14,10 +14,13 @@ import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.SignupRequest;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.SignUpResponse;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
-import com.example.gujeuck_server.global.utility.TimeProvider;
+import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +29,11 @@ public class SignupService {
     private final UserRepository userRepository;
     private final CalculateAgeService calculateAgeService;
     private final LogRepository logRepository;
-    private final PurposeFacade purposeFacade;
     private final OrganRepository organRepository;
     private final ResidenceRepository residenceRepository;
 
     private static final Long HARDCODED_ORGAN_ID = 1L;
+    private static final DateTimeFormatter VISIT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Transactional
     public SignUpResponse execute(SignupRequest request) {
@@ -42,11 +45,13 @@ public class SignupService {
 
         Age age = calculateAgeService.getAge(request.getBirthYMD());
 
-        String visitDate = TimeProvider.nowDateFormatted();
+        LocalDateTime visitDateTime = request.getVisitTime();
 
-        String visitTime = TimeProvider.nowTimeFormatted();
+        String visitDate = DateFormatter.LocalDateForm(visitDateTime.toLocalDate());
 
-        int currentYear = TimeProvider.nowYear();
+        String visitTime = visitDateTime.toLocalTime().format(VISIT_TIME_FORMATTER);
+
+        int currentYear = visitDateTime.getYear();
 
         residenceRepository.findByOrganIdAndResidenceName(organ.getId(), request.getResidence())
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
