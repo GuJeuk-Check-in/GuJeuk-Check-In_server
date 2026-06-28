@@ -13,7 +13,4 @@ public class LoginOrganRequest {
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
     private String password;
-
-    @NotBlank(message = "Client를 식별하지 못했습니다.")
-    private String client;
 }

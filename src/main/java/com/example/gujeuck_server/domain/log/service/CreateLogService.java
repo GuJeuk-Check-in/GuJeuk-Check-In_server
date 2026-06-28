@@ -8,7 +8,7 @@ import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
-import com.example.gujeuck_server.global.utility.TimeProvider;
+import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,17 +22,18 @@ public class CreateLogService {
 
     @Transactional
     public void execute(Organ organ, LogRequest request) {
-        int currentYear = TimeProvider.nowYear();
-        String visitDate = request.getVisitDate().trim();
         String name = request.getName().trim();
         String purposeName = request.getPurpose().trim();
-        String visitTime = request.getVisitTime().trim();
+
+        String visitDate = DateFormatter.toVisitDate(request.getVisitTime());
+        String visitTime = DateFormatter.toVisitTime(request.getVisitTime());
+        int year = request.getVisitTime().getYear();
 
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), purposeName);
 
         validateDuplicateLog(organ.getId(), name, request.getAge(), purpose.getPurposeName(), visitDate, visitTime);
 
-        Log log = createUseLog(request, name, purpose, visitDate, visitTime, currentYear, organ);
+        Log log = createUseLog(request, name, purpose, visitDate, visitTime, year, organ);
 
         logRepository.save(log);
     }

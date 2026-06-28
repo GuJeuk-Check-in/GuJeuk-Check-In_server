@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.global.security.jwt;
 
-import com.example.gujeuck_server.domain.organ.domain.enums.Client;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
 import com.example.gujeuck_server.domain.organ.exception.OrganNotFoundException;
 import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
@@ -37,26 +36,26 @@ public class JwtTokenProvider {
     private static final String ACCESS_TYPE = "access";
     private static final String REFRESH_TYPE = "refresh";
     private static final int MILLISECONDS = 1000;
-    private static final long USER_VIEW_ACCESS_EXPIRATION = 86400L; // 24시간
-    private static final long ADMIN_ACCESS_EXPIRATION = 7200L; // 2시간
+    private static final long PET_USER_ACCESS_EXPIRATION = 86400L; // 24시간
+    private static final long ORGAN_ACCESS_EXPIRATION = 7200L; // 2시간
 
     //access token 생성
-    public String createAccessToken(String organName, Client client) {
-        return createAccessToken(organName, client, PrincipalType.ORGAN);
+    public String createAccessToken(String organName) {
+        return createAccessToken(organName, PrincipalType.ORGAN);
     }
 
     public String createPetUserAccessToken(Long petUserId) {
-        return createAccessToken(String.valueOf(petUserId), Client.USER_VIEW, PrincipalType.PET_USER);
+        return createAccessToken(String.valueOf(petUserId), PrincipalType.PET_USER);
     }
 
-    private String createAccessToken(String subject, Client client, PrincipalType principalType) {
+    private String createAccessToken(String subject, PrincipalType principalType) {
 
         Date now = new Date();
 
-        // Client 타입에 따라 만료시간 설정
-        long expirationTime = (client == Client.USER_VIEW)
-                ? USER_VIEW_ACCESS_EXPIRATION
-                : ADMIN_ACCESS_EXPIRATION;
+        // 주체(Principal) 타입에 따라 만료시간 설정
+        long expirationTime = (principalType == PrincipalType.PET_USER)
+                ? PET_USER_ACCESS_EXPIRATION
+                : ORGAN_ACCESS_EXPIRATION;
 
         return Jwts.builder()
                 .setSubject(subject)
@@ -70,7 +69,7 @@ public class JwtTokenProvider {
     }
 
     //refresh token 생성
-    public String createRefreshToken(String organName, Client client) {
+    public String createRefreshToken(String organName) {
 
         Date now = new Date();
 
@@ -85,7 +84,6 @@ public class JwtTokenProvider {
         refreshTokenRepository.save(
                 RefreshToken.builder()
                         .organName(organName)
-                        .client(client.name())
                         .token(refreshToken)
                         .timeToLive((jwtProperties.getRefreshExpiration()))
                         .build()
@@ -132,14 +130,14 @@ public class JwtTokenProvider {
         }
     }
 
-    public TokenResponse receiveToken(String organName, Client client) {
+    public TokenResponse receiveToken(String organName) {
 
         organRepository.findByOrganName(organName)
                 .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
 
         return TokenResponse.builder()
-                .accessToken(createAccessToken(organName, client))
-                .refreshToken(createRefreshToken(organName, client))
+                .accessToken(createAccessToken(organName))
+                .refreshToken(createRefreshToken(organName))
                 .organName(organName)
                 .build();
     }

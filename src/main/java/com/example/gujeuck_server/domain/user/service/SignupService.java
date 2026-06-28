@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +32,6 @@ public class SignupService {
     private final PurposeFacade purposeFacade;
 
     private static final Long HARDCODED_ORGAN_ID = 1L;
-    private static final DateTimeFormatter VISIT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @Transactional
     public void execute(SignupRequest request) {
@@ -45,23 +43,20 @@ public class SignupService {
 
         LocalDateTime visitDateTime = request.getVisitTime();
 
-        String visitDate = DateFormatter.LocalDateForm(visitDateTime.toLocalDate());
+        String visitDate = DateFormatter.toVisitDate(visitDateTime);
 
-        String visitTime = visitDateTime.toLocalTime().format(VISIT_TIME_FORMATTER);
+        String visitTime = DateFormatter.toVisitTime(visitDateTime);
 
         int currentYear = visitDateTime.getYear();
 
         residenceRepository.findByOrganIdAndResidenceName(organ.getId(), request.getResidence())
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
-        // 등록된 방문목적인지 검증하고 정규화된 이름을 사용한다.
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
-        // 이름+전화번호가 같으면 이미 가입된 유저로 보고 새로 생성하지 않는다. (예외 없이 방문 기록만 추가)
         User user = userRepository.findByNameAndPhone(request.getName(), request.getPhone())
                 .orElseGet(() -> userRepository.save(createUser(request, age, request.getResidence(), organ)));
 
-        // 신규/기존 유저 모두 방문 횟수를 증가시켜 로그 수와 일치시킨다.
         user.increaseCount();
 
         Log log = createLog(request, age, purpose.getPurposeName(), visitDate, visitTime, currentYear, request.getResidence(), user, organ);
