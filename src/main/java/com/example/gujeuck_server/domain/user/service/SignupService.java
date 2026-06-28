@@ -54,10 +54,8 @@ public class SignupService {
         residenceRepository.findByOrganIdAndResidenceName(organ.getId(), request.getResidence())
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
-        // 등록된 방문목적인지 검증하고 정규화된 이름을 사용한다.
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
-        // 이름+전화번호가 같으면 이미 가입된 유저로 보고 새로 생성하지 않는다. (예외 없이 방문 기록만 추가)
         User user = userRepository.findByNameAndPhone(request.getName(), request.getPhone())
                 .orElseGet(() -> userRepository.save(createUser(request, age, request.getResidence(), organ)));
 
