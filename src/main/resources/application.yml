@@ -26,8 +26,9 @@ spring:
       ddl-auto: update
 
   flyway:
-    enabled: false
+    enabled: true
     baseline-on-migrate: true
+    baseline-version: 6
     locations: classpath:db/migration
     validate-on-migrate: false
 
