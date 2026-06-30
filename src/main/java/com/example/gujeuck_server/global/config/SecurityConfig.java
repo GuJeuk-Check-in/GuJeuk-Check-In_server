@@ -95,6 +95,7 @@ public class SecurityConfig {
         addOrigins(origins, stagUrl);
         addOrigins(origins, vercelUrl);
         addOrigins(origins, testUrl);
+        addOrigins(origins, "https://gujuck-pet-game.vercel.app/");
 
         return origins;
     }
