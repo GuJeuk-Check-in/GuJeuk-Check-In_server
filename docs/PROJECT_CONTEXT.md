@@ -101,10 +101,42 @@ MySQL -> gujeuk-check-in-server_mysql_data
 Redis -> gujeuk-check-in-server_redis_data
 ```
 
+운영 이미지 Registry 복제:
+
+```text
+GHCR image: ghcr.io/gujeuk-check-in/gujeuk-check-in-server:prod-d718e023825264058df52cad4e37a0737acf88f5
+Digest: sha256:2ad0bb57646fff2075a8d5150dcd80ca5087c863728fd63b8a3451d27f38e794
+Source: ubuntu 홈서버 운영 이미지
+Pulled target: gaemideul8
+Verified: 2026-07-03 KST
+```
+
+Primary/Replica 현재 상태:
+
+```text
+Primary DB: gaemideul8 / gujeuk-mysql-primary / 192.168.1.179:3306
+Replica DB: ubuntu / gujeuk-mysql-replica / 172.18.0.1:3307, 127.0.0.1:3307, 192.168.1.233:3307
+Primary app: gaemideul8 / gujeuk-app-primary / port 8080
+Public app: ubuntu / gujeuk-app / port 8080
+Public app DB_URL: ubuntu SSH tunnel -> gaemideul8 Primary DB
+Replica source: ubuntu SSH tunnel -> gaemideul8 Primary DB
+Fresh dump used: /home/ubuntu/git/gujeuk-check-in-server/backups/primary-switch-20260703_122952/prod-fresh.sql.gz
+Verified: 2026-07-03 KST
+```
+
+장애 승격:
+
+```bash
+/home/ubuntu/bin/gujeuk-promote-replica --yes
+```
+
+이 명령은 gaemideul8 Primary 장애 시 ubuntu의 `gujeuk-mysql-replica`를 쓰기 가능한 DB로 승격하고, ubuntu `gujeuk-app`의 `DB_URL`을 local promoted DB로 변경한 뒤 앱을 재시작한다. 기존 gaemideul8 Primary가 복구되어도 자동으로 다시 붙이지 않는다.
+
 주의:
 
 - 운영 `docker-compose.yml` 기본 volume 이름을 임의로 바꾸면 기존 운영 DB 대신 새 빈 volume으로 기동될 수 있다.
 - DB 연결 장애처럼 보여도 실제로는 "다른 빈 MySQL volume"에 붙은 상황일 수 있으니 volume 이름부터 확인한다.
+- ubuntu public app은 `APP_IMAGE=gujeuk-check-in-server:prod-d718e023825264058df52cad4e37a0737acf88f5`로 고정한다. `APP_IMAGE` 없이 compose를 직접 실행하면 `latest`로 recreate될 수 있다.
 
 통합 모니터링은 별도 Compose 프로젝트 `gujeuk-monitoring`으로 실행한다.
 
@@ -129,6 +161,7 @@ Redis -> gujeuk-check-in-server_redis_data
 | GuJeuk Prototype | `https://prototype.taisu.site` |
 | 통합 모니터링 | `https://monitor.taisu.site` |
 | Cloudflare SSH | `ssh.taisu.site` |
+| gaemideul8 SSH | `ssh.oijwef098234.com` |
 
 Cloudflare ingress:
 
@@ -138,7 +171,8 @@ api-stag.taisu.site -> http://localhost:8081
 focus.taisu.site    -> http://localhost:8787
 prototype.taisu.site -> http://localhost:8788
 monitor.taisu.site  -> http://localhost:3000
-ssh.taisu.site      -> ssh://localhost:22
+ssh.taisu.site      -> ubuntu 홈서버 Tunnel -> ssh://localhost:22
+ssh.oijwef098234.com -> gaemideul8 전용 Tunnel -> ssh://localhost:22
 ```
 
 HTTPS는 Nginx·Certbot이 아니라 Cloudflare에서 처리한다.
@@ -158,6 +192,21 @@ Host gujeuk-home
 
 ```bash
 ssh gujeuk-home
+```
+
+gaemideul8 전용 SSH Tunnel:
+
+```sshconfig
+Host gaemideul8
+  HostName ssh.oijwef098234.com
+  User gaemideul8
+  ProxyCommand env GODEBUG=netdns=go cloudflared --edge-ip-version 4 access ssh --hostname %h
+```
+
+접속 명령:
+
+```bash
+ssh gaemideul8
 ```
 
 주의:
@@ -180,13 +229,15 @@ CI/CD 흐름:
 1. GitHub-hosted runner에서 JDK 17로 `bootJar -x test` 실행
 2. 생성된 JAR를 artifact로 업로드
 3. GitHub-hosted runner에서 해당 JAR를 포함한 배포용 Docker 이미지 생성
-4. 이미지를 artifact tar로 업로드
-5. 홈서버 self-hosted runner가 artifact를 다운로드
+4. 이미지를 GHCR `ghcr.io/gujeuk-check-in/gujeuk-check-in-server`에 push
+5. 홈서버 self-hosted runner가 GHCR에서 이미지를 `docker pull`
 6. 브랜치에 따라 운영 또는 스테이징 배포 디렉터리에 소스 `rsync`
-7. 홈서버는 `docker load`로 이미지만 적재
+7. 홈서버는 pull 받은 이미지로 앱 컨테이너 교체
 8. `deploy-stack.sh`가 MySQL/Redis 준비 상태 확인 후 앱만 재기동
 9. 로컬 API와 공개 API health check (`/public/organs`)
 10. Discord에 한국어 성공·실패 메시지 전송
+
+`docs/**` 또는 Markdown만 변경한 push는 배포 workflow를 실행하지 않는다.
 
 브랜치별 배포 대상:
 

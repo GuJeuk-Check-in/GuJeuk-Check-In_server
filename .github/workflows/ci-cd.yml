@@ -3,12 +3,16 @@ name: Gujeuk CI/CD
 on:
   push:
     branches: ["main", "develop"]
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
   pull_request:
     branches: ["main", "develop"]
   workflow_dispatch:
 
 permissions:
   contents: read
+  packages: write
 
 concurrency:
   group: gujeuk-${{ github.ref }}
@@ -55,7 +59,6 @@ jobs:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
     outputs:
-      artifact_name: ${{ steps.meta.outputs.artifact_name }}
       image_ref: ${{ steps.meta.outputs.image_ref }}
       deploy_target: ${{ steps.meta.outputs.deploy_target }}
 
@@ -76,30 +79,27 @@ jobs:
 
           if [ "${GITHUB_REF_NAME}" = "main" ]; then
             DEPLOY_TARGET="prod"
-            IMAGE_REF="gujeuk-check-in-server:prod-${GITHUB_SHA}"
+            IMAGE_REF="ghcr.io/gujeuk-check-in/gujeuk-check-in-server:prod-${GITHUB_SHA}"
           else
             DEPLOY_TARGET="stag"
-            IMAGE_REF="gujeuk-check-in-server:stag-${GITHUB_SHA}"
+            IMAGE_REF="ghcr.io/gujeuk-check-in/gujeuk-check-in-server:stag-${GITHUB_SHA}"
           fi
-
-          ARTIFACT_NAME="gujeuk-image-${DEPLOY_TARGET}-${GITHUB_SHA}"
 
           echo "deploy_target=${DEPLOY_TARGET}" >> "$GITHUB_OUTPUT"
           echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
-          echo "artifact_name=${ARTIFACT_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build deployment image
         run: docker build -t "${{ steps.meta.outputs.image_ref }}" .
 
-      - name: Save deployment image
-        run: docker save -o gujeuk-image.tar "${{ steps.meta.outputs.image_ref }}"
-
-      - name: Upload deployment image
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.meta.outputs.artifact_name }}
-          path: gujeuk-image.tar
-          retention-days: 3
+      - name: Push deployment image
+        run: docker push "${{ steps.meta.outputs.image_ref }}"
 
   deploy-home:
     name: Deploy Home Server
@@ -114,11 +114,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Download deployment image
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ needs.package-image.outputs.artifact_name }}
 
       - name: Set deployment target
         run: |
@@ -156,6 +151,13 @@ jobs:
           docker --version
           docker compose version
 
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install home server recovery scripts
         run: |
           set -euo pipefail
@@ -181,15 +183,18 @@ jobs:
           install -m 0755 \
             ops/home-server/deploy-stack.sh \
             /home/ubuntu/bin/deploy-stack.sh
+          install -m 0755 \
+            ops/home-server/gujeuk-promote-replica \
+            /home/ubuntu/bin/gujeuk-promote-replica
           ln -sfn \
             /home/ubuntu/bin/server-shutdown \
             /home/ubuntu/bin/shutdown
 
-      - name: Load deployment image
+      - name: Pull deployment image
         run: |
           set -euo pipefail
 
-          docker load -i gujeuk-image.tar
+          docker pull "${{ needs.package-image.outputs.image_ref }}"
 
       - name: Deploy application
         run: |

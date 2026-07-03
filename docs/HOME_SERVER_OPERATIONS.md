@@ -70,6 +70,7 @@ flowchart LR
 | GuJeuk Prototype | `https://prototype.taisu.site` | `http://localhost:8788` |
 | 통합 모니터링 | `https://monitor.taisu.site` | `http://localhost:3000` |
 | 원격 SSH | `ssh.taisu.site` | `ssh://localhost:22` |
+| gaemideul8 SSH | `ssh.oijwef098234.com` | gaemideul8 전용 Tunnel -> `ssh://localhost:22` |
 
 ### 중요 상태
 
@@ -224,6 +225,53 @@ JAVA_OPTS=-Xms64m -Xmx128m
 - 외부 포트: 기본 `8080`
 - MySQL과 Redis의 health check 통과 후 시작
 - Spring Boot 환경 변수 주입
+
+2026-07-03 KST에는 ubuntu 홈서버의 운영 이미지를 GHCR에 push하고 gaemideul8에서 pull해 동일 digest를 검증했다.
+
+```text
+source image: gujeuk-check-in-server:prod-d718e023825264058df52cad4e37a0737acf88f5
+registry image: ghcr.io/gujeuk-check-in/gujeuk-check-in-server:prod-d718e023825264058df52cad4e37a0737acf88f5
+digest: sha256:2ad0bb57646fff2075a8d5150dcd80ca5087c863728fd63b8a3451d27f38e794
+target host: gaemideul8
+```
+
+같은 날 gaemideul8을 Primary DB로, ubuntu를 Replica DB로 구성했다. 운영 트래픽은 전환 전까지 ubuntu의 기존 앱이 처리했고, fresh dump를 뜨는 짧은 구간에만 ubuntu 앱을 중지했다.
+
+```text
+fresh dump: /home/ubuntu/git/gujeuk-check-in-server/backups/primary-switch-20260703_122952/prod-fresh.sql.gz
+gaemideul8 primary dir: /home/gaemideul8/gujeuk-prod-primary
+ubuntu replica dir: /home/ubuntu/git/gujeuk-check-in-server-replica
+primary container: gujeuk-mysql-primary
+replica container: gujeuk-mysql-replica
+primary app container: gujeuk-app-primary
+public app container: gujeuk-app
+```
+
+현재 정상 상태:
+
+```text
+gaemideul8 gujeuk-app-primary -> gaemideul8 Primary DB
+ubuntu gujeuk-app             -> SSH tunnel -> gaemideul8 Primary DB
+ubuntu gujeuk-mysql-replica   -> SSH tunnel -> gaemideul8 Primary DB
+Replica_IO_Running: Yes
+Replica_SQL_Running: Yes
+Seconds_Behind_Source: 0
+```
+
+ubuntu에서 gaemideul8 Primary DB로 직접 LAN 접속이 되지 않아 SSH tunnel을 사용한다.
+
+```text
+systemd user service: gujeuk-primary-db-tunnel.service
+local app tunnel: 172.18.0.1:13306 -> gaemideul8 192.168.1.179:3306
+local replica tunnel: 172.28.0.1:13306 -> gaemideul8 192.168.1.179:3306
+linger: ubuntu Linger=yes
+```
+
+주의:
+
+- ubuntu app의 `APP_IMAGE`를 지정하지 않고 compose를 직접 실행하면 `latest` 이미지로 recreate될 수 있다. 운영 이미지는 `gujeuk-check-in-server:prod-d718e023825264058df52cad4e37a0737acf88f5`로 고정한다.
+- MySQL 8 dump에서 일반 app DB 계정은 tablespace dump 권한이 없을 수 있으므로 fresh dump에는 `mysqldump --no-tablespaces`를 사용했다.
+- Replica MySQL은 초기화 단계에서 `super_read_only`를 켜면 entrypoint의 root/user 생성이 실패한다. 초기화와 restore 후 `read_only`, `super_read_only`를 적용한다.
 
 #### `mysql`
 
@@ -502,6 +550,24 @@ ingress:
 
 터널 ID와 credentials 파일은 민감정보이므로 문서에 기록하지 않는다.
 
+gaemideul8 장비는 `oijwef098234.com` zone 전용 Cloudflare Tunnel을 별도로 사용한다.
+
+```yaml
+ingress:
+  - hostname: ssh.oijwef098234.com
+    service: ssh://localhost:22
+  - service: http_status:404
+```
+
+gaemideul8의 cloudflared는 사용자 systemd 서비스로 실행한다.
+
+```bash
+systemctl --user status cloudflared.service
+loginctl show-user gaemideul8 -p Linger
+```
+
+`Linger=yes`여야 사용자 로그인 세션 없이도 부팅 후 Tunnel이 올라온다.
+
 ### DNS 이전 과정
 
 초기에는 가비아 DNS의 A 레코드에 당시 공인 IP를 직접 연결하는 방식을 검토했다. 그러나 홈 네트워크나 핫스팟이 바뀌면 공인 IP도 변경될 수 있어 운영 방식으로 부적합했다.
@@ -601,6 +667,19 @@ ssh gujeuk-home
 
 `gujeuk-home`은 Mac의 SSH alias이므로 홈서버 내부에서 다시 `ssh gujeuk-home`을 입력하는 용도가 아니다.
 
+gaemideul8 접속:
+
+```sshconfig
+Host gaemideul8
+  HostName ssh.oijwef098234.com
+  User gaemideul8
+  ProxyCommand env GODEBUG=netdns=go cloudflared --edge-ip-version 4 access ssh --hostname %h
+```
+
+```bash
+ssh gaemideul8
+```
+
 ### 동작 원리
 
 ```mermaid
@@ -645,9 +724,10 @@ ssh ubuntu@<현재-LAN-IP>
 flowchart TD
     Push["main push"] --> Build["GitHub-hosted runner<br/>JDK 17 + bootJar"]
     Build --> Package["GitHub-hosted runner<br/>runtime Docker image build"]
-    Package --> Deploy["Self-hosted runner<br/>gujeuk-home-server"]
+    Package --> Registry["GHCR<br/>docker push"]
+    Registry --> Deploy["Self-hosted runner<br/>gujeuk-home-server"]
     Deploy --> Sync["rsync source"]
-    Sync --> Image["docker load artifact image"]
+    Sync --> Image["docker pull GHCR image"]
     Image --> Up["docker compose up -d app"]
     Up --> LocalCheck["localhost:8080 health"]
     LocalCheck --> PublicCheck["api.taisu.site health"]
@@ -661,16 +741,19 @@ flowchart TD
 3. `./gradlew bootJar -x test`
 4. 생성된 JAR artifact 업로드
 5. GitHub-hosted runner에서 runtime Docker 이미지 생성
-6. 홈서버 self-hosted runner에서 checkout
-7. 배포 디렉터리에 `rsync`
-8. `.env`, 백업, import 파일 보존
-9. 운영 스크립트 설치
-10. 이미지 artifact 다운로드 및 `docker load`
-11. 앱 컨테이너 교체
-12. 로컬 API 확인
-13. 공개 API 확인
-14. 사용하지 않는 Docker 이미지 정리
-15. Discord 결과 알림
+6. GHCR `ghcr.io/gujeuk-check-in/gujeuk-check-in-server`에 이미지 push
+7. 홈서버 self-hosted runner에서 checkout
+8. 배포 디렉터리에 `rsync`
+9. `.env`, 백업, import 파일 보존
+10. 운영 스크립트 설치
+11. GHCR 로그인 후 이미지 `docker pull`
+12. 앱 컨테이너 교체
+13. 로컬 API 확인
+14. 공개 API 확인
+15. 사용하지 않는 Docker 이미지 정리
+16. Discord 결과 알림
+
+`docs/**` 또는 Markdown만 변경한 push는 CI/CD 배포 workflow를 실행하지 않는다.
 
 ### GitHub Self-hosted Runner
 
@@ -1272,6 +1355,35 @@ docker compose logs --tail=200 app
 curl -I http://localhost:8080/purpose/all
 ```
 
+### gaemideul8 Primary DB 장애 시
+
+현재 정상 구조는 gaemideul8 Primary DB를 ubuntu app과 gaemideul8 app이 함께 바라보는 형태다. gaemideul8 Primary DB 또는 서버가 죽으면 ubuntu app도 DB 연결 실패가 발생한다.
+
+ubuntu Replica를 승격할 때:
+
+```bash
+/home/ubuntu/bin/gujeuk-promote-replica --yes
+```
+
+이 스크립트가 수행하는 작업:
+
+```text
+1. 현재 replica 상태 출력
+2. STOP REPLICA
+3. RESET REPLICA ALL
+4. read_only / super_read_only 해제
+5. ubuntu gujeuk-app DB_URL을 172.18.0.1:3307 local DB로 변경
+6. ubuntu gujeuk-app 재시작
+7. /public/organs local health 확인
+```
+
+주의:
+
+- 승격 후에는 ubuntu Replica가 새 Primary다.
+- 기존 gaemideul8 Primary가 살아나도 그대로 다시 붙이면 안 된다.
+- gaemideul8을 복구하려면 gaemideul8 DB를 버리거나 백업한 뒤, ubuntu 새 Primary 기준의 Replica로 다시 구성한다.
+- 자동 failback은 하지 않는다.
+
 ### `502`일 때
 
 ```bash
@@ -1568,8 +1680,8 @@ Pages CORS preflight -> HTTP 200
 
 - Workflow: `.github/workflows/ci-cd.yml`
 - 배포 스크립트: `ops/home-server/deploy-stack.sh`
-- GitHub-hosted runner가 `bootJar` 산출물을 artifact로 공유한 뒤 runtime Docker 이미지를 artifact tar로 생성
-- 홈서버는 `docker load`만 수행하고 이미지 빌드는 하지 않음
+- GitHub-hosted runner가 `bootJar` 산출물을 artifact로 공유한 뒤 runtime Docker 이미지를 생성하고 GHCR에 push
+- 홈서버는 GHCR에서 이미지를 `docker pull`하며 이미지 빌드는 하지 않음
 - 배포 스크립트가 MySQL/Redis의 `healthy` 상태를 확인한 뒤 앱만 재기동
 - 스테이징은 별도 `.env`, DB, Redis, 컨테이너 이름, volume을 사용
 
