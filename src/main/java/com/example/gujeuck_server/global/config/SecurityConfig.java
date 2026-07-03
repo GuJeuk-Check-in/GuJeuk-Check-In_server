@@ -53,7 +53,19 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/api/pet-game/login", "/user/**", "/organ/create", "/organ/login", "/organ/excel/user", "/public/**", "/purpose/all", "/residence/all").permitAll()
+                        .requestMatchers(
+                                "/auth/login",
+                                "/api/pet-game/login",
+                                "/user/sign-up",
+                                "/user/login",
+                                "/user/check-in",
+                                "/organ/create",
+                                "/organ/login",
+                                "/organ/excel/user",
+                                "/purpose/all",
+                                "/residence/all",
+                                "/public/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .with(new SecurityFilterConfig(jwtTokenProvider, objectMapper), Customizer.withDefaults())
@@ -83,6 +95,7 @@ public class SecurityConfig {
         addOrigins(origins, stagUrl);
         addOrigins(origins, vercelUrl);
         addOrigins(origins, testUrl);
+        addOrigins(origins, "https://gujuck-pet-game.vercel.app/");
 
         return origins;
     }

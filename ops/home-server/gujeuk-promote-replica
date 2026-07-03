@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "${1:-}" != "--yes" ]; then
+  echo "usage: $0 --yes" >&2
+  echo "Promotes the local replica DB and points the ubuntu prod app at it." >&2
+  exit 2
+fi
+
+APP_DIR=/home/ubuntu/git/gujeuk-check-in-server
+REPLICA_DIR=/home/ubuntu/git/gujeuk-check-in-server-replica
+APP_DB_HOST=172.18.0.1
+APP_DB_PORT=3307
+TS="$(date +%Y%m%d_%H%M%S)"
+
+cd "$REPLICA_DIR"
+
+echo "Current replica status:"
+docker compose --env-file .env exec -T mysql sh -c \
+  'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "SHOW REPLICA STATUS\G"' |
+  egrep 'Replica_IO_Running:|Replica_SQL_Running:|Seconds_Behind_Source:|Last_IO_Error:|Last_SQL_Error:' || true
+
+echo "Promoting local replica..."
+docker compose --env-file .env exec -T mysql sh -c \
+  'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e "STOP REPLICA; RESET REPLICA ALL; SET GLOBAL read_only = OFF; SET GLOBAL super_read_only = OFF;"'
+
+DB_NAME="$(awk -F= '$1=="MYSQL_DATABASE"{print substr($0,index($0,"=")+1); exit}' "$APP_DIR/.env")"
+NEW_DB_URL="jdbc:mysql://${APP_DB_HOST}:${APP_DB_PORT}/${DB_NAME}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8"
+
+cd "$APP_DIR"
+cp .env ".env.before-replica-promote-${TS}"
+awk -v url="$NEW_DB_URL" '
+  BEGIN { done = 0 }
+  /^DB_URL=/ { print "DB_URL=" url; done = 1; next }
+  { print }
+  END { if (!done) print "DB_URL=" url }
+' .env > ".env.promote-${TS}"
+mv ".env.promote-${TS}" .env
+chmod 600 .env
+
+echo "Restarting ubuntu prod app against promoted local DB..."
+docker compose --env-file .env up -d --no-deps app
+
+for attempt in $(seq 1 60); do
+  if curl -fsS --max-time 3 http://127.0.0.1:8080/public/organs >/dev/null; then
+    echo "local health check passed"
+    exit 0
+  fi
+  sleep 2
+done
+
+echo "local health check failed after promoting replica" >&2
+docker logs --tail 160 gujeuk-app >&2 || true
+exit 1
