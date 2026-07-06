@@ -115,13 +115,15 @@ Primary/Replica 현재 상태:
 
 ```text
 Primary DB: gaemideul8 / gujeuk-mysql-primary / 192.168.1.179:3306
-Replica DB: ubuntu / gujeuk-mysql-replica / 172.18.0.1:3307, 127.0.0.1:3307, 192.168.1.233:3307
+Replica DB: ubuntu / gujeuk-mysql-replica / 172.18.0.1:3307, 127.0.0.1:3307
 Primary app: gaemideul8 / gujeuk-app-primary / port 8080
 Public app: ubuntu / gujeuk-app / port 8080
 Public app DB_URL: ubuntu SSH tunnel -> gaemideul8 Primary DB
 Replica source: ubuntu SSH tunnel -> gaemideul8 Primary DB
 Fresh dump used: /home/ubuntu/git/gujeuk-check-in-server/backups/primary-switch-20260703_122952/prod-fresh.sql.gz
-Verified: 2026-07-03 KST
+Verified: 2026-07-06 KST
+Replica verified: Replica_IO_Running=Yes, Replica_SQL_Running=Yes, Seconds_Behind_Source=0
+Replica safety: read_only=ON, super_read_only=ON
 ```
 
 장애 승격:
@@ -137,6 +139,7 @@ Verified: 2026-07-03 KST
 - 운영 `docker-compose.yml` 기본 volume 이름을 임의로 바꾸면 기존 운영 DB 대신 새 빈 volume으로 기동될 수 있다.
 - DB 연결 장애처럼 보여도 실제로는 "다른 빈 MySQL volume"에 붙은 상황일 수 있으니 volume 이름부터 확인한다.
 - ubuntu public app은 `APP_IMAGE=gujeuk-check-in-server:prod-d718e023825264058df52cad4e37a0737acf88f5`로 고정한다. `APP_IMAGE` 없이 compose를 직접 실행하면 `latest`로 recreate될 수 있다.
+- ubuntu replica compose는 고정 LAN IP에 port bind하지 않는다. 2026-07-06에 이전 `192.168.1.233:3307` bind가 실제 IP 변경 후 컨테이너 네트워크 부착을 막아 제거했다.
 
 통합 모니터링은 별도 Compose 프로젝트 `gujeuk-monitoring`으로 실행한다.
 

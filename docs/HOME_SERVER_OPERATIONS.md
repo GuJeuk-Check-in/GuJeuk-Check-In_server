@@ -256,6 +256,9 @@ ubuntu gujeuk-mysql-replica   -> SSH tunnel -> gaemideul8 Primary DB
 Replica_IO_Running: Yes
 Replica_SQL_Running: Yes
 Seconds_Behind_Source: 0
+read_only: ON
+super_read_only: ON
+Verified: 2026-07-06 KST
 ```
 
 ubuntu에서 gaemideul8 Primary DB로 직접 LAN 접속이 되지 않아 SSH tunnel을 사용한다.
@@ -272,6 +275,8 @@ linger: ubuntu Linger=yes
 - ubuntu app의 `APP_IMAGE`를 지정하지 않고 compose를 직접 실행하면 `latest` 이미지로 recreate될 수 있다. 운영 이미지는 `gujeuk-check-in-server:prod-d718e023825264058df52cad4e37a0737acf88f5`로 고정한다.
 - MySQL 8 dump에서 일반 app DB 계정은 tablespace dump 권한이 없을 수 있으므로 fresh dump에는 `mysqldump --no-tablespaces`를 사용했다.
 - Replica MySQL은 초기화 단계에서 `super_read_only`를 켜면 entrypoint의 root/user 생성이 실패한다. 초기화와 restore 후 `read_only`, `super_read_only`를 적용한다.
+- Replica compose는 고정 LAN IP에 port bind하지 않는다. 2026-07-06에 `192.168.1.233:3307` bind가 현재 IP와 달라 Docker network attach를 막았고, `127.0.0.1:3307`과 `172.18.0.1:3307`만 남겼다.
+- Replica I/O가 `Access denied for user 'gujeuk_repl'@'172.18.0.1'`로 실패하면 Primary에 SSH tunnel 경유 host grant가 있는지 확인한다. 2026-07-06 기준 `gujeuk_repl@172.18.0.1` grant를 추가했다.
 
 #### `mysql`
 
