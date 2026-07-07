@@ -19,7 +19,6 @@ public class LogRequest {
     private Age age;
 
     @NotBlank(message = "전화번호를 입력해주세요.")
-    @Size(max = 30, message = "전화번호은 11자리 이상으로 입력할 수 없습니다.")
     private String phone;
 
     @NotNull(message = "남자 동행인 수는 null일 수 없습니다.")

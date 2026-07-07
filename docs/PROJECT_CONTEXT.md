@@ -94,6 +94,24 @@ Docker 서비스:
 | MySQL | `gujeuk-mysql` | 운영 데이터베이스 |
 | Redis | `gujeuk-redis` | JWT 토큰 저장 |
 
+Oracle Always Free HAProxy:
+
+```text
+Host: oracle-haproxy
+Public IP: 161.33.21.41
+OS: Ubuntu 24.04
+SSH: ssh -i ~/.ssh/oracle_haproxy.key ubuntu@161.33.21.41
+HAProxy frontend: 0.0.0.0:80
+HAProxy HTTPS frontend: 0.0.0.0:443 with local self-signed cert for Cloudflare Full mode testing
+Cloudflare Tunnel: oracle-haproxy / 6582395b-e23e-4d68-800d-198dd71bdb48
+Proxy API route: https://proxy.oijwef098234.com -> Oracle cloudflared -> http://localhost:80 -> HAProxy
+Backends:
+  - ubuntu API: https://api.taisu.site
+  - gaemideul8 API: https://api.oijwef098234.com
+Status: HAProxy local health checks OK, both backends UP/L7OK, public HTTPS round-robin via proxy.oijwef098234.com verified 2026-07-07 KST.
+Pending: OCI VCN Security List/NSG inbound TCP 443 is still closed unless opened separately. The proxy.oijwef098234.com route uses Cloudflare Tunnel, so it does not depend on public 443.
+```
+
 운영 데이터 volume 기본값:
 
 ```text
@@ -114,14 +132,15 @@ Verified: 2026-07-03 KST
 Primary/Replica 현재 상태:
 
 ```text
-Primary DB: gaemideul8 / gujeuk-mysql-primary / 192.168.1.179:3306
+Primary DB: gaemideul8 / gujeuk-mysql-primary / gaemideul8-local 127.0.0.1:3306, ubuntu access via SSH tunnel
 Replica DB: ubuntu / gujeuk-mysql-replica / 172.18.0.1:3307, 127.0.0.1:3307
 Primary app: gaemideul8 / gujeuk-app-primary / port 8080
 Public app: ubuntu / gujeuk-app / port 8080
+Secondary public app route: gaemideul8 Cloudflare Tunnel -> https://api.oijwef098234.com -> http://localhost:8080
 Public app DB_URL: ubuntu SSH tunnel -> gaemideul8 Primary DB
 Replica source: ubuntu SSH tunnel -> gaemideul8 Primary DB
 Fresh dump used: /home/ubuntu/git/gujeuk-check-in-server/backups/primary-switch-20260703_122952/prod-fresh.sql.gz
-Verified: 2026-07-06 KST
+Verified: 2026-07-07 KST
 Replica verified: Replica_IO_Running=Yes, Replica_SQL_Running=Yes, Seconds_Behind_Source=0
 Replica safety: read_only=ON, super_read_only=ON
 ```
@@ -140,6 +159,7 @@ Replica safety: read_only=ON, super_read_only=ON
 - DB 연결 장애처럼 보여도 실제로는 "다른 빈 MySQL volume"에 붙은 상황일 수 있으니 volume 이름부터 확인한다.
 - ubuntu public app은 `APP_IMAGE=gujeuk-check-in-server:prod-d718e023825264058df52cad4e37a0737acf88f5`로 고정한다. `APP_IMAGE` 없이 compose를 직접 실행하면 `latest`로 recreate될 수 있다.
 - ubuntu replica compose는 고정 LAN IP에 port bind하지 않는다. 2026-07-06에 이전 `192.168.1.233:3307` bind가 실제 IP 변경 후 컨테이너 네트워크 부착을 막아 제거했다.
+- gaemideul8의 Wi-Fi IP는 고정값으로 가정하지 않는다. 2026-07-07 확인 시 `172.20.10.9`였고, ubuntu의 Docker bridge `172.20.0.0/16` 라우트와 충돌해 ubuntu -> gaemideul8 직접 IP 프록시는 실패했다. 프록시 준비 상태는 gaemideul8 자체 Cloudflare Tunnel의 `api.oijwef098234.com -> localhost:8080` 경로로 확인한다.
 
 통합 모니터링은 별도 Compose 프로젝트 `gujeuk-monitoring`으로 실행한다.
 
@@ -165,6 +185,9 @@ Replica safety: read_only=ON, super_read_only=ON
 | 통합 모니터링 | `https://monitor.taisu.site` |
 | Cloudflare SSH | `ssh.taisu.site` |
 | gaemideul8 SSH | `ssh.oijwef098234.com` |
+| gaemideul8 API | `https://api.oijwef098234.com` |
+| Oracle HAProxy | `http://161.33.21.41` |
+| Oracle HAProxy Cloudflare route | `https://proxy.oijwef098234.com` |
 
 Cloudflare ingress:
 
@@ -176,6 +199,7 @@ prototype.taisu.site -> http://localhost:8788
 monitor.taisu.site  -> http://localhost:3000
 ssh.taisu.site      -> ubuntu 홈서버 Tunnel -> ssh://localhost:22
 ssh.oijwef098234.com -> gaemideul8 전용 Tunnel -> ssh://localhost:22
+api.oijwef098234.com -> gaemideul8 전용 Tunnel -> http://localhost:8080
 ```
 
 HTTPS는 Nginx·Certbot이 아니라 Cloudflare에서 처리한다.
@@ -463,6 +487,11 @@ https://gujeuk-check-in-fe.pages.dev
 ```
 
 origin은 쉼표로 여러 개를 전달할 수 있고 후행 `/`는 코드에서 제거한다.
+
+2026-07-07 KST 확인:
+
+- 운영 `.env`의 `STAG_BASE_URL`에 `https://prototype.taisu.site`를 추가했다.
+- `https://prototype.taisu.site` Origin의 `PATCH /organ/user/{id}` CORS preflight가 HTTP 200을 반환한다.
 
 ## 12. 보안 긴급 사항
 

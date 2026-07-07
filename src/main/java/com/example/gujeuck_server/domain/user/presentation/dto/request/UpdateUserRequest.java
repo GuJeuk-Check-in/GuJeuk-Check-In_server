@@ -11,7 +11,6 @@ public record UpdateUserRequest(
         String name,
 
         @NotBlank(message = "전화번호를 입력해주세요.")
-        @Size(max = 11, message = "전화번호는 11자리 이상으로 입력할 수 없습니다.")
         String phone,
 
         @NotNull(message = "성별을 선택해주세요.")
