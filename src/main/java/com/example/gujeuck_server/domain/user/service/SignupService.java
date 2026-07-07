@@ -54,7 +54,8 @@ public class SignupService {
 
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
-        User user = userRepository.findByNameAndPhone(request.getName(), request.getPhone())
+        User user = userRepository.findAllByNameAndNormalizedPhone(request.getName(), normalizePhone(request.getPhone())).stream()
+                .findFirst()
                 .orElseGet(() -> userRepository.save(createUser(request, age, request.getResidence(), organ)));
 
         user.increaseCount();
@@ -76,6 +77,10 @@ public class SignupService {
                 .age(age)
                 .organ(organ)
                 .build();
+    }
+
+    private String normalizePhone(String phone) {
+        return phone == null ? "" : phone.replaceAll("\\D", "");
     }
 
     private Log createLog(SignupRequest request, Age age, String purpose, String visitDate, String visitTime, int year, String residence, User user, Organ organ) {
