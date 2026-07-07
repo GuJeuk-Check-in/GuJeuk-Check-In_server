@@ -79,8 +79,8 @@ flowchart LR
 - 운영 API는 Docker Compose 단일 스택으로 구성되어 있다.
 - 운영과 스테이징은 서로 다른 디렉터리와 Compose 스택으로 분리되어 있다.
 - HTTPS는 Nginx나 Certbot이 아니라 Cloudflare가 외부 구간에서 처리한다.
-- `develop`/`main` push 자동 배포는 2026-07-07 KST에 비활성화했다.
-- 서버 반영은 별도 수동 배포 절차로 진행한다.
+- `develop` 브랜치 push 시 스테이징 API가 `8081`로 자동 배포된다.
+- `main` 브랜치 push 시 운영 API가 `8080`으로 자동 배포된다.
 - Wi-Fi 자동 변경 기능은 Netplan 충돌 사고가 있어 **현재 사용 금지**다.
 - `rtcwake -m off` 예약 자동 부팅은 Samsung 550XED에서 실제 복귀에 실패했다. **현재 사용 금지**다.
 - `rtcwake -m mem`의 `deep` 모드는 정상 resume 대신 콜드 부팅이 발생했다. **현재 사용 금지**다.
@@ -772,29 +772,44 @@ ssh ubuntu@<현재-LAN-IP>
 
 ## 8. CI/CD
 
-### 현재 GitHub Actions
+### 운영 브랜치 `main`
 
-2026-07-07 KST 기준 `.github/workflows/ci-cd.yml`은 배포를 수행하지 않는다.
-
-현재 흐름:
+현재 `main`의 `.github/workflows/ci-cd.yml`은 다음 흐름이다.
 
 ```mermaid
 flowchart TD
-    Trigger["pull_request 또는 workflow_dispatch"] --> Build["GitHub-hosted runner<br/>JDK 17 + compileJava"]
+    Push["main push"] --> Build["GitHub-hosted runner<br/>JDK 17 + bootJar"]
+    Build --> Package["GitHub-hosted runner<br/>runtime Docker image build"]
+    Package --> Registry["GHCR<br/>docker push"]
+    Registry --> Deploy["Self-hosted runner<br/>gujeuk-home-server"]
+    Deploy --> Sync["rsync source"]
+    Sync --> Image["docker pull GHCR image"]
+    Image --> Up["docker compose up -d app"]
+    Up --> LocalCheck["localhost:8080 health"]
+    LocalCheck --> PublicCheck["api.taisu.site health"]
+    PublicCheck --> Notify["Discord 한국어 결과 알림"]
 ```
 
-제거한 자동화:
+세부 단계:
 
-1. `main`/`develop` push 자동 실행
-2. `./gradlew bootJar -x test`
-3. bootJar artifact 업로드
-4. GHCR runtime Docker 이미지 build/push
-5. 홈서버 self-hosted runner 배포
-6. 운영/스테이징 배포 디렉터리 `rsync`
-7. 앱 컨테이너 교체와 public health check
-8. Discord CI/CD 결과 알림
+1. `ubuntu-latest`에서 checkout
+2. JDK 17 설정
+3. `./gradlew bootJar -x test`
+4. 생성된 JAR artifact 업로드
+5. GitHub-hosted runner에서 runtime Docker 이미지 생성
+6. GHCR `ghcr.io/gujeuk-check-in/gujeuk-check-in-server`에 이미지 push
+7. 홈서버 self-hosted runner에서 checkout
+8. 배포 디렉터리에 `rsync`
+9. `.env`, 백업, import 파일 보존
+10. 운영 스크립트 설치
+11. GHCR 로그인 후 이미지 `docker pull`
+12. 앱 컨테이너 교체
+13. 로컬 API 확인
+14. 공개 API 확인
+15. 사용하지 않는 Docker 이미지 정리
+16. Discord 결과 알림
 
-서버 반영은 별도 수동 배포 절차로 진행한다.
+`docs/**` 또는 Markdown만 변경한 push는 CI/CD 배포 workflow를 실행하지 않는다.
 
 ### GitHub Self-hosted Runner
 
