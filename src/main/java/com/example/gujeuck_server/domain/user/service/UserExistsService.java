@@ -16,7 +16,7 @@ public class UserExistsService {
     @Transactional(readOnly = true)
     public UserExistsResponse execute(UserExistsRequest request) {
 
-        return userRepository.findByPhone(request.getPhone())
+        return userRepository.findByNameAndPhone(request.getName(), request.getPhone())
                 .map(user -> UserExistsResponse.of(true, user.getId()))
                 .orElseGet(() -> UserExistsResponse.of(false, null));
     }
