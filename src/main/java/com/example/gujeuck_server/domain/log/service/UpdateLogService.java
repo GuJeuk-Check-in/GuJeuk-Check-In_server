@@ -8,7 +8,6 @@ import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
-import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,8 +24,8 @@ public class UpdateLogService {
         Log log = logFacade.getLogByIdAndOrganId(logId, organId);
         String name = request.getName().trim();
         Purpose purpose = purposeFacade.getPurpose(organId, request.getPurpose().trim());
-        String visitDate = DateFormatter.toVisitDate(request.getVisitTime());
-        String visitTime = DateFormatter.toVisitTime(request.getVisitTime());
+        String visitDate = request.getVisitDate();
+        String visitTime = request.getVisitTime();
 
         validateDuplicateLog(
                 organId,
