@@ -41,7 +41,7 @@ public class UpdateLogService {
         log.updateLog(
                 name,
                 request.getAge(),
-                request.getPhone().trim(),
+                request.getPhone(),
                 request.getMaleCount(),
                 request.getFemaleCount(),
                 purpose.getPurposeName(),

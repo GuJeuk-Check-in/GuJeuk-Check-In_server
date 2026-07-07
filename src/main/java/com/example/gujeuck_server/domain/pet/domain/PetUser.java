@@ -18,7 +18,6 @@ public class PetUser extends BaseIdEntity {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(nullable = false, unique = true, length = 20)
     private String phone;
 
     public void syncProfile(String name, String phone) {

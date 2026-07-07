@@ -70,7 +70,7 @@ public class CreateLogService {
         return Log.builder()
                 .name(name)
                 .age(request.getAge())
-                .phone(request.getPhone().trim())
+                .phone(request.getPhone())
                 .maleCount(request.getMaleCount())
                 .femaleCount(request.getFemaleCount())
                 .purpose(purpose.getPurposeName())

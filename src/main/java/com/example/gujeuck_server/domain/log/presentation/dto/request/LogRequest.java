@@ -18,7 +18,6 @@ public class LogRequest {
     @NotNull(message = "나이를 선택해주세요.")
     private Age age;
 
-    @NotBlank(message = "전화번호를 입력해주세요.")
     private String phone;
 
     @NotNull(message = "남자 동행인 수는 null일 수 없습니다.")
