@@ -64,8 +64,8 @@ develop
 주의:
 
 - 권장 흐름은 `feature/* -> develop -> main`이다.
-- `develop` push는 홈서버 스테이징 스택으로 자동 배포된다.
-- `main` push는 홈서버 운영 스택으로 자동 배포된다.
+- `develop`/`main` push 자동 배포는 2026-07-07 KST에 비활성화했다.
+- 서버 반영은 별도 수동 배포 절차로 진행한다.
 - `develop -> main` 머지 전 스테이징 검증을 끝낸다.
 
 ## 4. 운영 인프라
@@ -242,29 +242,25 @@ ssh gaemideul8
 - 홈서버 내부에서 `ssh gujeuk-home`을 실행하는 용도가 아니다.
 - 서버 전원, 인터넷 또는 cloudflared가 꺼지면 이 경로로 접속할 수 없다.
 
-## 6. CI/CD
+## 6. CI
 
-브랜치별 자동 배포:
+2026-07-07 KST 기준 `.github/workflows/ci-cd.yml`은 배포를 수행하지 않는다.
 
-```text
-feature/* -> PR -> develop -> 스테이징 배포
-develop   -> 검증 -> PR -> main -> 운영 배포
-```
+현재 GitHub Actions 흐름:
 
-CI/CD 흐름:
+1. `pull_request` 또는 `workflow_dispatch`에서만 실행
+2. GitHub-hosted runner에서 JDK 17 설정
+3. `./gradlew compileJava` 실행
 
-1. GitHub-hosted runner에서 JDK 17로 `bootJar -x test` 실행
-2. 생성된 JAR를 artifact로 업로드
-3. GitHub-hosted runner에서 해당 JAR를 포함한 배포용 Docker 이미지 생성
-4. 이미지를 GHCR `ghcr.io/gujeuk-check-in/gujeuk-check-in-server`에 push
-5. 홈서버 self-hosted runner가 GHCR에서 이미지를 `docker pull`
-6. 브랜치에 따라 운영 또는 스테이징 배포 디렉터리에 소스 `rsync`
-7. 홈서버는 pull 받은 이미지로 앱 컨테이너 교체
-8. `deploy-stack.sh`가 MySQL/Redis 준비 상태 확인 후 앱만 재기동
-9. 로컬 API와 공개 API health check (`/public/organs`)
-10. Discord에 한국어 성공·실패 메시지 전송
+제거한 자동화:
 
-`docs/**` 또는 Markdown만 변경한 push는 배포 workflow를 실행하지 않는다.
+- `main`/`develop` push 자동 실행
+- `bootJar` artifact 업로드
+- GHCR 이미지 build/push
+- 홈서버 self-hosted runner 배포
+- Discord CI/CD 결과 알림
+
+서버 반영은 별도 수동 배포 절차로 진행한다.
 
 브랜치별 배포 대상:
 
