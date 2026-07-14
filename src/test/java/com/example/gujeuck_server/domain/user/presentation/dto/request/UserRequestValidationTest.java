@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UserRequestValidationTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
@@ -25,23 +25,23 @@ class UserRequestValidationTest {
         assertThat(invalidFields).contains(
                 "name",
                 "gender",
-                "phone",
                 "maleCount",
                 "femaleCount",
                 "birthYMD",
                 "residence",
                 "privacyAgreed",
-                "purpose"
+                "purpose",
+                "visitTime"
         );
     }
 
     @Test
-    void 빈_로그인_요청은_필수값_검증에_실패한다() throws Exception {
-        LoginRequest request = objectMapper.readValue("{}", LoginRequest.class);
+    void 빈_체크인_요청은_필수값_검증에_실패한다() throws Exception {
+        UserCheckInRequest request = objectMapper.readValue("{}", UserCheckInRequest.class);
 
         Set<String> invalidFields = invalidFields(validator.validate(request));
 
-        assertThat(invalidFields).contains("userId", "purpose", "maleCount", "femaleCount");
+        assertThat(invalidFields).contains("userId", "purpose", "maleCount", "femaleCount", "visitTime");
     }
 
     @Test
@@ -56,7 +56,8 @@ class UserRequestValidationTest {
                   "birthYMD": "2000-01-01",
                   "residence": "테스트",
                   "privacyAgreed": false,
-                  "purpose": "테스트"
+                  "purpose": "테스트",
+                  "visitTime": "2026-07-14T14:30:00"
                 }
                 """, SignupRequest.class);
 

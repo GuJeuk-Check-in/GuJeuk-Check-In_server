@@ -108,18 +108,19 @@ Backend:
 
 ```text
 gujeuk_ubuntu_api -> https://api.taisu.site/purpose/all health check
-gujeuk_gaemi_api  -> https://api.oijwef098234.com/purpose/all health check
+gujeuk_gaemi_api  -> https://gujeuk-api.oijwef098234.com/purpose/all health check
 ```
 
-HAProxy는 backend별 Cloudflare Host/SNI가 달라야 하므로 단일 backend의 `balance roundrobin` 대신 frontend Lua action으로 요청을 교대로 `gujeuk_ubuntu_api`와 `gujeuk_gaemi_api`에 배정한다. 각 backend에서 `Host`와 SNI를 해당 Cloudflare hostname으로 강제 설정한다. 한쪽 backend가 down이면 `nbsrv()` 조건으로 살아있는 backend로 fallback한다.
+HAProxy는 backend별 Cloudflare Host/SNI가 달라야 하므로 각 backend에서 `Host`와 SNI를 해당 Cloudflare hostname으로 강제 설정한다. 2026-07-14 KST 최종 이전 후에는 `gujeuk_gaemi_api`가 primary이며, `gujeuk_ubuntu_api`는 fallback 조건으로만 남아 있다. `api.taisu.site` 자체도 ubuntu Spring 앱이 아니라 ubuntu의 `oijwef-api-proxy` nginx 컨테이너를 거쳐 oijwef API로 전달된다.
 
 2026-07-14 KST 상태:
 
 ```text
-gaemideul8 API route: https://api.oijwef098234.com -> 530
-gaemideul8 SSH route: ssh.oijwef098234.com -> websocket bad handshake
-ubuntu backend: https://api.taisu.site/purpose/all -> 200
-proxy route: https://proxy.oijwef098234.com/purpose/all -> 200, X-Gujeuk-Origin: ubuntu
+oijwef API route: https://gujeuk-api.oijwef098234.com -> 200
+oijwef legacy API route: https://api.oijwef098234.com -> 200
+oijwef SSH route: ssh.oijwef098234.com -> OK
+legacy taisu API route: https://api.taisu.site -> ubuntu cloudflared -> oijwef-api-proxy -> gujeuk-api.oijwef098234.com -> 200
+proxy route: https://proxy.oijwef098234.com/purpose/all -> 200, X-Gujeuk-Origin: oijwef098234
 ```
 
 검증 결과:
@@ -128,9 +129,9 @@ proxy route: https://proxy.oijwef098234.com/purpose/all -> 200, X-Gujeuk-Origin:
 VM local http://127.0.0.1/purpose/all -> 200
 Public http://161.33.21.41/purpose/all -> 200
 Public https://proxy.oijwef098234.com/purpose/all -> 200
-X-Gujeuk-Origin alternates: ubuntu, gaemideul8
-HAProxy stats: both backends UP/L7OK
-Backend direct checks from VM: api.taisu.site 200, api.oijwef098234.com 200
+X-Gujeuk-Origin: oijwef098234
+HAProxy primary backend: gujeuk_gaemi_api -> gujeuk-api.oijwef098234.com
+Backend direct checks: api.taisu.site 200, gujeuk-api.oijwef098234.com 200
 ```
 
 주의:
@@ -318,17 +319,20 @@ Verified: 2026-07-07 KST
 2026-07-14 KST 장애 승격 후 현재 상태:
 
 ```text
-gaemideul8 public API route    -> 530
-gaemideul8 SSH route           -> websocket bad handshake
-ubuntu gujeuk-primary-db-tunnel -> gaemideul8 SSH 실패로 반복 재시작
-ubuntu gujeuk-mysql-replica     -> promoted primary
-ubuntu gujeuk-app               -> local promoted DB 172.18.0.1:3307
-ubuntu local /purpose/all       -> 200
-proxy.oijwef098234.com          -> ubuntu backend으로 200
+ubuntu gujeuk-mysql-replica     -> formerly promoted primary, now fallback data copy only
+oijwef gujeuk-mysql             -> current primary DB
+oijwef gujeuk-app               -> current public app, local compose DB mysql:3306
+oijwef local /purpose/all       -> 200
+gujeuk-api.oijwef098234.com     -> 200
+api.oijwef098234.com            -> 200
+api.taisu.site                  -> ubuntu cloudflared -> oijwef-api-proxy -> oijwef API, 200
+proxy.oijwef098234.com          -> oijwef backend primary, 200
 pre-promotion env backup        -> /home/ubuntu/git/gujeuk-check-in-server/.env.before-replica-promote-20260713_231140
+final cutover source dump       -> /home/ubuntu/git/gujeuk-check-in-server/backups/final-oijwef-cutover-20260714_071524
+final cutover target import     -> /home/gaemideul8/migration-imports/final-oijwef-cutover-20260714_071524
 ```
 
-승격 직전 replica 상태는 `Replica_IO_Running=Connecting`, `Replica_SQL_Running=Yes`, `Source_Log_File=mysql-bin.000005`, `Exec_Source_Log_Pos=1124`였다. gaemideul8이 복구되어도 자동 failback하지 않는다.
+승격 직전 replica 상태는 `Replica_IO_Running=Connecting`, `Replica_SQL_Running=Yes`, `Source_Log_File=mysql-bin.000005`, `Exec_Source_Log_Pos=1124`였다. 이후 oijwef DB로 최종 cutover했으므로 운영 primary 판단은 oijwef 상태를 기준으로 한다.
 
 ubuntu에서 gaemideul8 Primary DB로 직접 LAN 접속이 되지 않아 SSH tunnel을 사용한다.
 
@@ -339,7 +343,7 @@ local replica tunnel: 172.28.0.1:13306 -> gaemideul8 127.0.0.1:3306 through Clou
 linger: ubuntu Linger=yes
 ```
 
-2026-07-07 KST 확인 시 gaemideul8의 Wi-Fi IP는 `172.20.10.9`였고, ubuntu에는 Docker bridge `172.20.0.0/16` 라우트가 있어 ubuntu에서 `172.20.10.9:8080`으로 직접 접근하면 Docker bridge로 라우팅되어 실패했다. gaemideul8의 IP는 네트워크에 따라 바뀔 수 있으므로 직접 IP 프록시 대상으로 쓰지 않는다. gaemideul8 앱은 별도 Cloudflare Tunnel route `https://api.oijwef098234.com -> http://localhost:8080`으로 요청 수신 준비 상태를 검증한다.
+2026-07-07 KST 확인 시 gaemideul8/oijwef 장비의 Wi-Fi IP는 네트워크에 따라 바뀔 수 있고, ubuntu의 Docker bridge 라우트와 충돌할 수 있으므로 직접 IP 프록시 대상으로 쓰지 않는다. oijwef 앱은 Cloudflare Tunnel route `https://gujeuk-api.oijwef098234.com -> http://localhost:8080` 또는 legacy route `https://api.oijwef098234.com -> http://localhost:8080`으로 요청 수신 준비 상태를 검증한다.
 
 주의:
 
@@ -525,6 +529,23 @@ https://gujeuk-check-in-fe.pages.dev
 
 2026-07-07 KST에 운영 `.env`의 `STAG_BASE_URL`에 `https://prototype.taisu.site`를 추가하고 `gujeuk-app`을 재생성했다. `https://prototype.taisu.site` Origin의 `PATCH /organ/user/{id}` CORS preflight는 HTTP 200으로 확인했다.
 
+2026-07-14 KST 최종 oijwef 이전 후 운영/스테이징 앱의 CORS origin을 갱신했다. `https://gujeuk.com`, `https://www.gujeuk.com`, `https://taisu.site`, 기존 Cloudflare Pages/Prototype origin을 허용 목록에 포함했고 앱 컨테이너를 재생성했다.
+
+검증 결과:
+
+```text
+OPTIONS https://api.taisu.site/purpose/all
+Origin: https://www.gujeuk.com -> HTTP 200
+Origin: https://gujeuk.com     -> HTTP 200
+Origin: https://taisu.site     -> HTTP 200
+
+OPTIONS https://gujeuk-api.oijwef098234.com/purpose/all
+Origin: https://www.gujeuk.com -> HTTP 200
+
+GET https://api.taisu.site/purpose/all
+Origin: https://www.gujeuk.com -> HTTP 200 with access-control-allow-origin
+```
+
 허용 메서드:
 
 ```text
@@ -647,6 +668,19 @@ loginctl show-user gaemideul8 -p Linger
 ```
 
 `Linger=yes`여야 사용자 로그인 세션 없이도 부팅 후 Tunnel이 올라온다.
+
+2026-07-14 KST 기준 실제 실행 상태:
+
+```text
+unit: /home/gaemideul8/.config/systemd/user/cloudflared.service
+config: /home/gaemideul8/.cloudflared/config.yml
+linger: yes
+routes:
+  gujeuk-api.oijwef098234.com  -> http://localhost:8080
+  gujeuk-stag.oijwef098234.com -> http://localhost:8081
+  api.oijwef098234.com         -> http://localhost:8080
+  ssh.oijwef098234.com         -> ssh://localhost:22
+```
 
 ### DNS 이전 과정
 
@@ -1437,9 +1471,9 @@ curl -I http://localhost:8080/purpose/all
 
 ### gaemideul8 Primary DB 장애 시
 
-현재 정상 구조는 gaemideul8 Primary DB를 ubuntu app과 gaemideul8 app이 함께 바라보는 형태다. gaemideul8 Primary DB 또는 서버가 죽으면 ubuntu app도 DB 연결 실패가 발생한다.
+현재 정상 구조는 oijwef의 `gujeuk-mysql`이 운영 primary DB이고, oijwef `gujeuk-app`이 이를 바라보는 형태다. ubuntu의 `api.taisu.site`/`api-stag.taisu.site` 경로는 ubuntu Spring 앱이 아니라 `oijwef-api-proxy` nginx 컨테이너를 통해 oijwef API로 전달된다.
 
-2026-07-14 KST에는 gaemideul8 Cloudflare API/SSH 경로가 실패해 ubuntu app이 DB 연결 실패로 restart loop에 들어갔다. `/home/ubuntu/bin/gujeuk-promote-replica --yes`를 실행해 ubuntu replica를 promoted primary로 전환했고, `api.taisu.site`와 `proxy.oijwef098234.com`은 ubuntu backend 기준으로 복구됐다.
+2026-07-14 KST에는 gaemideul8/oijwef Cloudflare API/SSH 경로가 실패해 ubuntu app이 DB 연결 실패로 restart loop에 들어갔다. `/home/ubuntu/bin/gujeuk-promote-replica --yes`를 실행해 ubuntu replica를 promoted primary로 전환했고, 이후 최종 dump/restore cutover로 oijwef의 `gujeuk-mysql`을 운영 primary로 전환했다.
 
 ubuntu Replica를 승격할 때:
 
@@ -1462,8 +1496,9 @@ ubuntu Replica를 승격할 때:
 주의:
 
 - 승격 후에는 ubuntu Replica가 새 Primary다.
-- 기존 gaemideul8 Primary가 살아나도 그대로 다시 붙이면 안 된다.
-- gaemideul8을 복구하려면 gaemideul8 DB를 버리거나 백업한 뒤, ubuntu 새 Primary 기준의 Replica로 다시 구성한다.
+- 2026-07-14 최종 cutover 이후에는 oijwef DB가 운영 primary다.
+- ubuntu promoted DB를 다시 운영 primary처럼 사용하면 데이터가 갈릴 수 있다.
+- oijwef를 복구하려면 oijwef DB 백업과 현재 운영 primary 상태를 먼저 확인한다.
 - 자동 failback은 하지 않는다.
 
 ### `502`일 때
