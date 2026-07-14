@@ -60,3 +60,12 @@ cors:
     stag-url: ${STAG_BASE_URL}
     vercel-url: ${VERCEL_URL}
     test-url: ${TEST_URL}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
