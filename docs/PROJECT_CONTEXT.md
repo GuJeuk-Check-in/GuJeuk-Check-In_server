@@ -107,7 +107,7 @@ Cloudflare Tunnel: oracle-haproxy / 6582395b-e23e-4d68-800d-198dd71bdb48
 Proxy API route: https://proxy.oijwef098234.com -> Oracle cloudflared -> http://localhost:80 -> HAProxy
 Backends:
   - oijwef098234 API: https://gujeuk-api.oijwef098234.com
-  - ubuntu legacy API route: https://api.taisu.site (ubuntu cloudflared -> local nginx proxy -> oijwef API)
+  - taisu API route: https://api.taisu.site (taisu-oijwef tunnel -> oijwef API)
 Status: 2026-07-14 KST 현재 `proxy.oijwef098234.com`은 oijwef098234 backend를 primary로 사용하고, `X-Gujeuk-Origin: oijwef098234`로 200 응답한다.
 Pending: OCI VCN Security List/NSG inbound TCP 443 is still closed unless opened separately. The proxy.oijwef098234.com route uses Cloudflare Tunnel, so it does not depend on public 443.
 ```
@@ -136,7 +136,7 @@ Current Primary DB: oijwef098234 / gujeuk-mysql / Docker network mysql:3306
 Current public app: oijwef098234 / gujeuk-app / port 8080
 Current public app DB_URL: local compose mysql at mysql:3306
 Current staging app: oijwef098234 / gujeuk-app-stag / port 8081
-Legacy taisu API route: api.taisu.site and api-stag.taisu.site terminate on ubuntu cloudflared, then local nginx container `oijwef-api-proxy` forwards to gujeuk-api.oijwef098234.com and gujeuk-stag.oijwef098234.com.
+Taisu public routes: api.taisu.site and api-stag.taisu.site terminate on oijwef `cloudflared-taisu-oijwef.service` and route directly to local ports 8080/8081.
 Previous Primary DB: ubuntu / gujeuk-mysql-replica promoted / 172.18.0.1:3307, 127.0.0.1:3307
 Fresh dump used: /home/ubuntu/git/gujeuk-check-in-server/backups/primary-switch-20260703_122952/prod-fresh.sql.gz
 Promoted: 2026-07-14 KST via /home/ubuntu/bin/gujeuk-promote-replica --yes
@@ -159,7 +159,7 @@ Verified after cutover: gujeuk-api.oijwef098234.com 200, api.oijwef098234.com 20
 
 - 운영 `docker-compose.yml` 기본 volume 이름을 임의로 바꾸면 기존 운영 DB 대신 새 빈 volume으로 기동될 수 있다.
 - DB 연결 장애처럼 보여도 실제로는 "다른 빈 MySQL volume"에 붙은 상황일 수 있으니 volume 이름부터 확인한다.
-- ubuntu의 `api.taisu.site` / `api-stag.taisu.site`는 더 이상 ubuntu Spring 앱을 직접 보지 않는다. ubuntu의 `oijwef-api-proxy` nginx 컨테이너가 oijwef API로 프록시한다.
+- ubuntu의 `api.taisu.site` / `api-stag.taisu.site` 경로는 더 이상 운영 경로가 아니다. 2026-07-14 KST 이후 해당 DNS는 oijwef의 `taisu-oijwef` Cloudflare Tunnel로 직접 연결된다.
 - oijwef public app은 실제 운영 이미지 `ghcr.io/gujeuk-check-in/gujeuk-check-in-server:prod-b12496b92436a98abbbae9d29446e609d9edd93e`를 사용한다.
 - ubuntu replica compose는 고정 LAN IP에 port bind하지 않는다. 2026-07-06에 이전 `192.168.1.233:3307` bind가 실제 IP 변경 후 컨테이너 네트워크 부착을 막아 제거했다.
 - gaemideul8의 Wi-Fi IP는 고정값으로 가정하지 않는다. 2026-07-07 확인 시 `172.20.10.9`였고, ubuntu의 Docker bridge `172.20.0.0/16` 라우트와 충돌해 ubuntu -> gaemideul8 직접 IP 프록시는 실패했다. 프록시 준비 상태는 gaemideul8 자체 Cloudflare Tunnel의 `api.oijwef098234.com -> localhost:8080` 경로로 확인한다.
@@ -195,12 +195,12 @@ Verified after cutover: gujeuk-api.oijwef098234.com 200, api.oijwef098234.com 20
 Cloudflare ingress:
 
 ```text
-api.taisu.site      -> http://localhost:8080
-api-stag.taisu.site -> http://localhost:8081
-focus.taisu.site    -> http://localhost:8787
-prototype.taisu.site -> http://localhost:8788
-monitor.taisu.site  -> http://localhost:3000
-ssh.taisu.site      -> ubuntu 홈서버 Tunnel -> ssh://localhost:22
+api.taisu.site      -> oijwef taisu-oijwef Tunnel -> http://localhost:8080
+api-stag.taisu.site -> oijwef taisu-oijwef Tunnel -> http://localhost:8081
+focus.taisu.site    -> oijwef taisu-oijwef Tunnel -> http://localhost:8787
+prototype.taisu.site -> oijwef taisu-oijwef Tunnel -> http://localhost:8788
+monitor.taisu.site  -> oijwef taisu-oijwef Tunnel -> http://localhost:3000
+ssh.taisu.site      -> oijwef taisu-oijwef Tunnel -> ssh://localhost:22
 ssh.oijwef098234.com -> gaemideul8 전용 Tunnel -> ssh://localhost:22
 api.oijwef098234.com -> gaemideul8 전용 Tunnel -> http://localhost:8080
 ```
@@ -219,6 +219,30 @@ primary routes:
   ssh.oijwef098234.com         -> ssh://localhost:22
 ```
 
+taisu.site 전용 Tunnel도 gaemideul8 사용자 systemd 서비스로 실행한다.
+
+```text
+service: cloudflared-taisu-oijwef.service --user
+unit: /home/gaemideul8/.config/systemd/user/cloudflared-taisu-oijwef.service
+config: /home/gaemideul8/.cloudflared/taisu-oijwef.yml
+tunnel: taisu-oijwef / 7484f1b5-8221-4afa-a3ea-09793c7a5e46
+primary routes:
+  api.taisu.site       -> http://localhost:8080
+  api-stag.taisu.site  -> http://localhost:8081
+  monitor.taisu.site   -> http://localhost:3000
+  ssh.taisu.site       -> ssh://localhost:22
+```
+
+oijwef 장비(`ant`) 덮개 닫힘 방지:
+
+```text
+/etc/systemd/logind.conf.d/99-server.conf
+HandleLidSwitch=ignore
+HandleLidSwitchExternalPower=ignore
+HandleLidSwitchDocked=ignore
+Verified: 2026-07-14 KST with systemd-analyze cat-config systemd/logind.conf
+```
+
 HTTPS는 Nginx·Certbot이 아니라 Cloudflare에서 처리한다.
 
 ## 5. 원격 접속
@@ -226,17 +250,19 @@ HTTPS는 Nginx·Certbot이 아니라 Cloudflare에서 처리한다.
 Mac의 `~/.ssh/config`에 다음 alias가 구성되어 있다.
 
 ```sshconfig
-Host gujeuk-home
+Host taisu-oijwef
   HostName ssh.taisu.site
-  User ubuntu
-  ProxyCommand cloudflared access ssh --hostname %h
+  User gaemideul8
+  ProxyCommand env GODEBUG=netdns=go cloudflared --edge-ip-version 4 access ssh --hostname %h
 ```
 
 접속 명령:
 
 ```bash
-ssh gujeuk-home
+ssh taisu-oijwef
 ```
+
+기존 `gujeuk-home` alias는 ubuntu 홈서버용이었고, 2026-07-14 KST `ssh.taisu.site`를 oijwef로 이전한 뒤에는 `User ubuntu` 설정으로 접속하면 실패한다.
 
 gaemideul8 전용 SSH Tunnel:
 

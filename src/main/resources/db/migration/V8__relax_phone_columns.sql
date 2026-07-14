@@ -38,6 +38,53 @@ PREPARE stmt FROM @ddl;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
-ALTER TABLE `user` MODIFY COLUMN phone VARCHAR(255) NULL;
-ALTER TABLE `log` MODIFY COLUMN phone VARCHAR(255) NULL;
-ALTER TABLE pet_user MODIFY COLUMN phone VARCHAR(255) NULL;
+SET @user_phone_column_exists := (
+    SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'user'
+      AND COLUMN_NAME = 'phone'
+);
+
+SET @ddl := IF(
+    @user_phone_column_exists > 0,
+    'ALTER TABLE `user` MODIFY COLUMN phone VARCHAR(255) NULL',
+    'DO 0'
+);
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @log_phone_column_exists := (
+    SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'log'
+      AND COLUMN_NAME = 'phone'
+);
+
+SET @ddl := IF(
+    @log_phone_column_exists > 0,
+    'ALTER TABLE `log` MODIFY COLUMN phone VARCHAR(255) NULL',
+    'DO 0'
+);
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @pet_user_phone_column_exists := (
+    SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'pet_user'
+      AND COLUMN_NAME = 'phone'
+);
+
+SET @ddl := IF(
+    @pet_user_phone_column_exists > 0,
+    'ALTER TABLE pet_user MODIFY COLUMN phone VARCHAR(255) NULL',
+    'DO 0'
+);
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
