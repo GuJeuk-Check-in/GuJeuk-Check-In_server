@@ -15,9 +15,15 @@ public class UserExistsService {
 
     @Transactional(readOnly = true)
     public UserExistsResponse execute(UserExistsRequest request) {
+        String normalizedPhone = normalizePhone(request.getPhone());
 
-        return userRepository.findByPhone(request.getPhone())
+        return userRepository.findAllByNameAndNormalizedPhone(request.getName(), normalizedPhone).stream()
+                .findFirst()
                 .map(user -> UserExistsResponse.of(true, user.getId()))
                 .orElseGet(() -> UserExistsResponse.of(false, null));
+    }
+
+    private String normalizePhone(String phone) {
+        return phone == null ? "" : phone.replaceAll("\\D", "");
     }
 }

@@ -26,6 +26,12 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     Optional<User> findByNameAndPhone(String name, String phone);
 
+    @Query(
+            value = "select * from `user` where name = :name and regexp_replace(phone, '[^0-9]', '') = :phone",
+            nativeQuery = true
+    )
+    List<User> findAllByNameAndNormalizedPhone(@Param("name") String name, @Param("phone") String phone);
+
     Optional<User> findByPhone(String phone);
 
     @Query("select u from User u where replace(replace(u.phone, '-', ''), ' ', '') = :phone")

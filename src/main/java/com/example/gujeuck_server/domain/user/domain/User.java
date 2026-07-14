@@ -19,7 +19,6 @@ public class User extends BaseIdEntity {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(nullable = false, length = 20, unique = true)
     private String phone;
 
     @Column(nullable = false)

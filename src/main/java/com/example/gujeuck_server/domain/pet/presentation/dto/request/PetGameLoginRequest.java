@@ -12,6 +12,5 @@ public class PetGameLoginRequest {
     @Size(max = 10, message = "이름과 전화번호를 올바르게 입력해주세요.")
     private String name;
 
-    @NotBlank(message = "이름과 전화번호를 올바르게 입력해주세요.")
     private String phone;
 }

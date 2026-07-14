@@ -438,7 +438,7 @@ Authentication: {refreshToken}
 |------|------|------|------|
 | name | string | O | 이름 (최대 30자) |
 | userId | string | O | 사용자 ID (최대 30자) |
-| phone | string | O | 전화번호 (최대 11자) |
+| phone | string | O | 전화번호 |
 | birthYMD | string | O | 생년월일 |
 | residence | string | O | 거주지 |
 

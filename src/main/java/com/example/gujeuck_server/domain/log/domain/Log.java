@@ -40,7 +40,6 @@ public class Log extends BaseIdEntity {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(nullable = false, length = 20)
     private String phone;
 
     @Column(nullable = false)

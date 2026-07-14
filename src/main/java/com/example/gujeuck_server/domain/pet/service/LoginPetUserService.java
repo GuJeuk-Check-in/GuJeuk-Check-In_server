@@ -47,7 +47,7 @@ public class LoginPetUserService {
         String normalizedName = normalizeName(rawName);
         String normalizedPhone = normalizePhone(rawPhone);
 
-        validateInput(normalizedName, normalizedPhone);
+        validateInput(normalizedName);
 
         return userRepository.findAllByNormalizedPhone(normalizedPhone).stream()
                 .filter(user -> normalizeName(user.getName()).equals(normalizedName))
@@ -69,8 +69,8 @@ public class LoginPetUserService {
                         .build()));
     }
 
-    private void validateInput(String normalizedName, String normalizedPhone) {
-        if (normalizedName.isBlank() || normalizedPhone.length() < 9) {
+    private void validateInput(String normalizedName) {
+        if (normalizedName.isBlank()) {
             throw new InvalidPetGameLoginInputException();
         }
     }

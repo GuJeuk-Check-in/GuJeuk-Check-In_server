@@ -5,8 +5,6 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Getter
 @NoArgsConstructor
 public class LogRequest {
@@ -18,8 +16,6 @@ public class LogRequest {
     @NotNull(message = "나이를 선택해주세요.")
     private Age age;
 
-    @NotBlank(message = "전화번호를 입력해주세요.")
-    @Size(max = 30, message = "전화번호은 11자리 이상으로 입력할 수 없습니다.")
     private String phone;
 
     @NotNull(message = "남자 동행인 수는 null일 수 없습니다.")
@@ -34,6 +30,9 @@ public class LogRequest {
     @AssertTrue(message = "개인정보 수집 및 이용 동의를 체크해주세요.")
     private boolean privacyAgreed;
 
-    @NotNull(message = "방문시각을 비워둘 수 없습니다.")
-    private LocalDateTime visitTime;
+    @NotBlank(message = "방문일자를 비워둘 수 없습니다.")
+    private String visitDate;
+
+    @NotBlank(message = "방문시각을 비워둘 수 없습니다.")
+    private String visitTime;
 }

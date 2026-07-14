@@ -21,8 +21,6 @@ public class SignupRequest {
     @NotNull(message = "성별을 입력해주세요.")
     private Gender gender;
 
-    @NotBlank(message = "전화번호를 입력해주세요.")
-    @Size(max = 20, message = "전화번호는 20자 이하로 입력해주세요.")
     private String phone;
 
     @NotNull(message = "남자 동행인 수는 null일 수 없습니다.")
