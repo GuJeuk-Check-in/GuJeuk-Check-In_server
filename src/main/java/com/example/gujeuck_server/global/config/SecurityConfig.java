@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/login",
                                 "/api/pet-game/login",
+                                "/user",
                                 "/user/**",
                                 "/organ/create",
                                 "/organ/login",

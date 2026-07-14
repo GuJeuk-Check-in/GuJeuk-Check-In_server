@@ -108,7 +108,7 @@ Proxy API route: https://proxy.oijwef098234.com -> Oracle cloudflared -> http://
 Backends:
   - ubuntu API: https://api.taisu.site
   - gaemideul8 API: https://api.oijwef098234.com
-Status: HAProxy local health checks OK, both backends UP/L7OK, public HTTPS round-robin via proxy.oijwef098234.com verified 2026-07-07 KST.
+Status: 2026-07-14 KST 현재 gaemideul8 Cloudflare API/SSH 경로가 530/websocket bad handshake로 실패해 ubuntu backend만 UP 상태다. `proxy.oijwef098234.com`은 ubuntu backend로 200 응답한다.
 Pending: OCI VCN Security List/NSG inbound TCP 443 is still closed unless opened separately. The proxy.oijwef098234.com route uses Cloudflare Tunnel, so it does not depend on public 443.
 ```
 
@@ -132,17 +132,17 @@ Verified: 2026-07-03 KST
 Primary/Replica 현재 상태:
 
 ```text
-Primary DB: gaemideul8 / gujeuk-mysql-primary / gaemideul8-local 127.0.0.1:3306, ubuntu access via SSH tunnel
-Replica DB: ubuntu / gujeuk-mysql-replica / 172.18.0.1:3307, 127.0.0.1:3307
-Primary app: gaemideul8 / gujeuk-app-primary / port 8080
-Public app: ubuntu / gujeuk-app / port 8080
-Secondary public app route: gaemideul8 Cloudflare Tunnel -> https://api.oijwef098234.com -> http://localhost:8080
-Public app DB_URL: ubuntu SSH tunnel -> gaemideul8 Primary DB
-Replica source: ubuntu SSH tunnel -> gaemideul8 Primary DB
+Current Primary DB: ubuntu / gujeuk-mysql-replica promoted / 172.18.0.1:3307, 127.0.0.1:3307
+Current public app: ubuntu / gujeuk-app / port 8080
+Current public app DB_URL: local promoted DB at 172.18.0.1:3307
+Previous Primary DB: gaemideul8 / gujeuk-mysql-primary / gaemideul8-local 127.0.0.1:3306
+Previous primary route status: gaemideul8 Cloudflare Tunnel -> https://api.oijwef098234.com currently returns 530
+Previous SSH route status: ssh.oijwef098234.com currently fails with websocket bad handshake
 Fresh dump used: /home/ubuntu/git/gujeuk-check-in-server/backups/primary-switch-20260703_122952/prod-fresh.sql.gz
-Verified: 2026-07-07 KST
-Replica verified: Replica_IO_Running=Yes, Replica_SQL_Running=Yes, Seconds_Behind_Source=0
-Replica safety: read_only=ON, super_read_only=ON
+Promoted: 2026-07-14 KST via /home/ubuntu/bin/gujeuk-promote-replica --yes
+Pre-promotion app env backup: /home/ubuntu/git/gujeuk-check-in-server/.env.before-replica-promote-20260713_231140
+Verified after promotion: ubuntu local /purpose/all 200, proxy.oijwef098234.com /purpose/all 200 with X-Gujeuk-Origin: ubuntu
+Promotion source state: Replica_IO_Running=Connecting, Replica_SQL_Running=Yes, Source_Log_File=mysql-bin.000005, Exec_Source_Log_Pos=1124
 ```
 
 장애 승격:
@@ -151,7 +151,7 @@ Replica safety: read_only=ON, super_read_only=ON
 /home/ubuntu/bin/gujeuk-promote-replica --yes
 ```
 
-이 명령은 gaemideul8 Primary 장애 시 ubuntu의 `gujeuk-mysql-replica`를 쓰기 가능한 DB로 승격하고, ubuntu `gujeuk-app`의 `DB_URL`을 local promoted DB로 변경한 뒤 앱을 재시작한다. 기존 gaemideul8 Primary가 복구되어도 자동으로 다시 붙이지 않는다.
+이 명령은 gaemideul8 Primary 장애 시 ubuntu의 `gujeuk-mysql-replica`를 쓰기 가능한 DB로 승격하고, ubuntu `gujeuk-app`의 `DB_URL`을 local promoted DB로 변경한 뒤 앱을 재시작한다. 2026-07-14 KST에 이미 실행되어 현재 ubuntu DB가 promoted primary다. 기존 gaemideul8 Primary가 복구되어도 자동으로 다시 붙이지 않는다.
 
 주의:
 

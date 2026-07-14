@@ -113,6 +113,15 @@ gujeuk_gaemi_api  -> https://api.oijwef098234.com/purpose/all health check
 
 HAProxy는 backend별 Cloudflare Host/SNI가 달라야 하므로 단일 backend의 `balance roundrobin` 대신 frontend Lua action으로 요청을 교대로 `gujeuk_ubuntu_api`와 `gujeuk_gaemi_api`에 배정한다. 각 backend에서 `Host`와 SNI를 해당 Cloudflare hostname으로 강제 설정한다. 한쪽 backend가 down이면 `nbsrv()` 조건으로 살아있는 backend로 fallback한다.
 
+2026-07-14 KST 상태:
+
+```text
+gaemideul8 API route: https://api.oijwef098234.com -> 530
+gaemideul8 SSH route: ssh.oijwef098234.com -> websocket bad handshake
+ubuntu backend: https://api.taisu.site/purpose/all -> 200
+proxy route: https://proxy.oijwef098234.com/purpose/all -> 200, X-Gujeuk-Origin: ubuntu
+```
+
 검증 결과:
 
 ```text
@@ -292,7 +301,7 @@ primary app container: gujeuk-app-primary
 public app container: gujeuk-app
 ```
 
-현재 정상 상태:
+2026-07-07 기준 정상 상태:
 
 ```text
 gaemideul8 gujeuk-app-primary -> gaemideul8 Primary DB
@@ -305,6 +314,21 @@ read_only: ON
 super_read_only: ON
 Verified: 2026-07-07 KST
 ```
+
+2026-07-14 KST 장애 승격 후 현재 상태:
+
+```text
+gaemideul8 public API route    -> 530
+gaemideul8 SSH route           -> websocket bad handshake
+ubuntu gujeuk-primary-db-tunnel -> gaemideul8 SSH 실패로 반복 재시작
+ubuntu gujeuk-mysql-replica     -> promoted primary
+ubuntu gujeuk-app               -> local promoted DB 172.18.0.1:3307
+ubuntu local /purpose/all       -> 200
+proxy.oijwef098234.com          -> ubuntu backend으로 200
+pre-promotion env backup        -> /home/ubuntu/git/gujeuk-check-in-server/.env.before-replica-promote-20260713_231140
+```
+
+승격 직전 replica 상태는 `Replica_IO_Running=Connecting`, `Replica_SQL_Running=Yes`, `Source_Log_File=mysql-bin.000005`, `Exec_Source_Log_Pos=1124`였다. gaemideul8이 복구되어도 자동 failback하지 않는다.
 
 ubuntu에서 gaemideul8 Primary DB로 직접 LAN 접속이 되지 않아 SSH tunnel을 사용한다.
 
@@ -1414,6 +1438,8 @@ curl -I http://localhost:8080/purpose/all
 ### gaemideul8 Primary DB 장애 시
 
 현재 정상 구조는 gaemideul8 Primary DB를 ubuntu app과 gaemideul8 app이 함께 바라보는 형태다. gaemideul8 Primary DB 또는 서버가 죽으면 ubuntu app도 DB 연결 실패가 발생한다.
+
+2026-07-14 KST에는 gaemideul8 Cloudflare API/SSH 경로가 실패해 ubuntu app이 DB 연결 실패로 restart loop에 들어갔다. `/home/ubuntu/bin/gujeuk-promote-replica --yes`를 실행해 ubuntu replica를 promoted primary로 전환했고, `api.taisu.site`와 `proxy.oijwef098234.com`은 ubuntu backend 기준으로 복구됐다.
 
 ubuntu Replica를 승격할 때:
 
