@@ -63,7 +63,8 @@ public class SecurityConfig {
                                 "/organ/excel/user",
                                 "/purpose/all",
                                 "/residence/all",
-                                "/public/**"
+                                "/public/**",
+                                "/common/health"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
