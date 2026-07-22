@@ -1863,3 +1863,185 @@ log: 3594
 ```
 
 - 재발 방지: 저장소의 운영 기본 volume 이름도 기존 운영 volume 이름으로 다시 맞췄다.
+
+---
+
+## 22. 2026-07-20 AWS EC2 prod/stag 구축과 데이터 이전
+
+### 목표와 범위
+
+- 서울 리전의 단일 EC2에 prod와 stag를 Docker Compose로 실행
+- 각 환경에 별도 Docker MySQL과 Redis 사용
+- CI/CD와 무중단 배포는 이번 단계에서 제외
+- 홈서버 prod/stag MySQL과 Redis 데이터를 AWS로 최종 이전
+
+### AWS 리소스
+
+```text
+Region: ap-northeast-2
+VPC: vpc-0b76ba7adc377d487 (default)
+Subnet: subnet-047a34350a3b11379 (ap-northeast-2a)
+Instance: i-05e2a254f15e59ead
+Name: gujeuk-aws-prod-stag
+Type: t3.medium
+AMI: ami-05fa22e12f2cb12aa / Ubuntu Server 24.04 LTS
+Root EBS: encrypted gp3 30GB
+Elastic IP: 3.37.79.125
+Security group: sg-0c16acf4997f79b3f
+Key pair: gujeuk-aws-deploy
+Termination protection: enabled
+```
+
+Security group inbound:
+
+```text
+TCP 22  <- 14.50.190.128/32
+TCP 80  <- 0.0.0.0/0
+TCP 443 <- 0.0.0.0/0
+```
+
+앱 포트 `8080`과 `8081`, MySQL, Redis는 security group에서 공개하지 않는다.
+
+### 원격 관리
+
+직접 SSH:
+
+```bash
+ssh -i ~/.ssh/id_ed25519 ubuntu@3.37.79.125
+```
+
+현재 관리자 공인 IP가 바뀌면 SSH rule을 새 `/32`로 교체해야 한다. 자동 구축에는 TCP 22 경로 대신 Systems Manager를 사용했다.
+
+```text
+IAM role: gujeuk-aws-ec2-ssm-role
+Managed policy: AmazonSSMManagedInstanceCore
+Instance profile: gujeuk-aws-ec2-ssm-profile
+SSM status: Online
+```
+
+### Docker 배포
+
+서버 경로:
+
+```text
+/home/ubuntu/gujeuk-aws/prod
+/home/ubuntu/gujeuk-aws/stag
+/home/ubuntu/gujeuk-aws/proxy
+```
+
+배포 이미지:
+
+```text
+source: origin/main 488a2044d067ac6fe33ae56b1132211c553f521f
+image: ghcr.io/gujeuk-check-in/gujeuk-check-in-server:aws-main-488a2044d067
+digest: sha256:cbc48242c59ecf7a7282bf96eb745e89cb15371673bc5a0581b1652712fd7171
+```
+
+컨테이너:
+
+```text
+gujeuk-app-prod
+gujeuk-mysql-prod
+gujeuk-redis-prod
+gujeuk-app-stag
+gujeuk-mysql-stag
+gujeuk-redis-stag
+gujeuk-aws-caddy
+```
+
+운영 명령:
+
+```bash
+cd /home/ubuntu/gujeuk-aws/prod
+docker compose --project-name gujeuk-aws-prod --env-file .env ps
+docker compose --project-name gujeuk-aws-prod --env-file .env logs --tail=200
+
+cd /home/ubuntu/gujeuk-aws/stag
+docker compose --project-name gujeuk-aws-stag --env-file .env ps
+docker compose --project-name gujeuk-aws-stag --env-file .env logs --tail=200
+
+cd /home/ubuntu/gujeuk-aws/proxy
+docker compose ps
+docker compose logs --tail=200 caddy
+```
+
+검증 결과:
+
+```text
+prod localhost:8080/purpose/all -> HTTP 200
+stag localhost:8081/purpose/all -> HTTP 200
+prod/stag app restart count -> 0
+MySQL/Redis -> healthy
+Flyway -> empty schema에 V1-V8 적용 성공
+```
+
+### Secret 전달
+
+- env와 GHCR 토큰은 저장소나 SSM 명령 본문에 직접 기록하지 않았다.
+- 로컬 임시 번들을 private S3에 SSE-S3로 암호화 업로드했다.
+- 10분짜리 presigned URL로 EC2가 한 번 내려받았다.
+- GHCR pull 후 서버 토큰 파일, S3 객체, 임시 버킷, 로컬 임시 번들을 삭제했다.
+- 실제 prod/stag env는 EC2의 각 `.env`에 mode 600으로만 남는다.
+
+### Cloudflare 연결 완료
+
+2026-07-20에 두 hostname의 명시적인 proxied A record를 생성했다.
+
+```text
+aws-api.oijwef098234.com  -> explicit proxied A -> 3.37.79.125
+aws-stag.oijwef098234.com -> explicit proxied A -> 3.37.79.125
+```
+
+Caddy 재시작 후 Let's Encrypt HTTP-01 검증과 인증서 발급이 완료됐다.
+
+```bash
+curl -i https://aws-api.oijwef098234.com/purpose/all
+curl -i https://aws-stag.oijwef098234.com/purpose/all
+```
+
+검증 결과:
+
+```text
+aws-api.oijwef098234.com/purpose/all  -> Cloudflare -> Caddy -> prod -> HTTP 200
+aws-stag.oijwef098234.com/purpose/all -> Cloudflare -> Caddy -> stag -> HTTP 200
+TLS certificate verification result -> 0
+response header -> via: 1.1 Caddy
+response body -> 이전된 prod/stag 데이터
+```
+
+### 최종 데이터 이전
+
+홈서버 앱을 중지해 쓰기를 동결한 후 MySQL dump와 Redis RDB를 생성하고 AWS로 복원했다. 원본과 AWS의 최종 건수는 다음과 같이 일치한다.
+
+```text
+prod: organ 5, purpose 12, residence 13, user 583, log 4442, Redis 24 keys
+stag: organ 1, purpose 4, residence 2, user 5, log 37, Redis 0 keys
+```
+
+백업 경로:
+
+```text
+home source: /home/gaemideul8/migration-aws-cutover-20260720_113023/final
+AWS source copy: /home/ubuntu/gujeuk-aws/backups/source-cutover-20260720_113023
+AWS pre-import: /home/ubuntu/gujeuk-aws/backups/pre-cutover-20260720_113023
+```
+
+Redis 7 AOF가 복사한 RDB보다 우선되는 문제는 source RDB를 appendonly 비활성 상태로 읽힌 뒤 AOF를 다시 활성화하고 rewrite하여 해결했다. prod Redis는 재시작 후에도 24 keys를 유지한다.
+
+### 회원가입 스키마 불일치 복구
+
+AWS prod에서 `POST /user/sign-up` 호출 시 다음 오류가 발생했다.
+
+```text
+Field 'user_id' doesn't have a default value
+```
+
+복원된 prod 스키마에는 Flyway V7 성공 이력이 있었지만 폐기된 `user.user_id VARCHAR(30) NOT NULL` 컬럼이 남아 있었다. 해당 컬럼을 참조하는 외래키와 인덱스가 없음을 확인하고 다음 순서로 복구했다.
+
+1. `/home/ubuntu/gujeuk-aws/backups/signup-schema-fix-20260720_1228`에 전체 prod DB 백업
+2. 기존 `user_id` 값은 삭제하지 않고 컬럼을 `VARCHAR(30) NULL`로 변경
+3. `user_id`를 생략한 INSERT를 트랜잭션에서 실행한 뒤 롤백
+4. 검증 전후 `user` 건수 583건 일치 및 로컬 API HTTP 200 확인
+5. 재발 방지를 위해 `V9__make_legacy_user_id_nullable.sql` 추가
+
+기존 `api.taisu.site`와 `api-stag.taisu.site`는 여전히 홈서버 Tunnel DNS를 사용한다. 클라이언트가 `aws-api.oijwef098234.com`과 `aws-stag.oijwef098234.com`을 사용하면 기존 레코드 변경 없이 AWS로 연결되지만, 기존 hostname은 홈서버 종료 시 동작하지 않는다.

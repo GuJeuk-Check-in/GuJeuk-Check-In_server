@@ -12,18 +12,24 @@ import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.UserCheckInRequest;
 import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.web.SortArgumentResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+import static com.example.gujeuck_server.domain.log.domain.QLog.log;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserCheckInService {
 
     private final UserRepository userRepository;
     private final LogRepository logRepository;
     private final PurposeFacade purposeFacade;
+    private final SortArgumentResolver sortArgumentResolver;
 
     @Transactional
     public void execute(UserCheckInRequest request) {
@@ -37,8 +43,11 @@ public class UserCheckInService {
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
 
         LocalDateTime visitDateTime = request.getVisitTime();
+        log.info("포멧팅 하기 전 시각 : ", visitDateTime.toString());
         String visitDate = DateFormatter.toVisitDate(visitDateTime);
         String visitTime = DateFormatter.toVisitTime(visitDateTime);
+        log.info("포멧팅 한 후의 날짜 : ", visitDate);
+        log.info("포멧팅 한 후의 시간 : ", visitTime);
         int year = visitDateTime.getYear();
 
         // 같은 유저가 같은 시각에 이미 체크인했는지 확인한다.
