@@ -1,7 +1,10 @@
 package com.example.gujeuck_server.domain.common.presentation;
 
+import com.example.gujeuck_server.domain.common.presentation.dto.response.ReadyHealthResponse;
 import com.example.gujeuck_server.domain.common.service.HealthCheckService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommonController {
     private final HealthCheckService healthCheckService;
 
-    @GetMapping("/health")
-    public String health() {
-        return healthCheckService.healthCheck();
-    }
+    @GetMapping("/health/ready")
+    public ResponseEntity<ReadyHealthResponse> ready() {
+        ReadyHealthResponse response = healthCheckService.ready();
+        HttpStatus status = response.hasUpStatus() ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE;
 
+        return ResponseEntity.status(status).body(response);
+    }
 }
