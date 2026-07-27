@@ -168,6 +168,7 @@ jobs:
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
 
             export APP_IMAGE="$IMAGE_REF"
+            export COMPOSE_PROJECT_NAME="gujeuk-aws-${DEPLOY_TARGET}"
             docker compose --env-file .env pull app
             docker compose --env-file .env up -d
 
