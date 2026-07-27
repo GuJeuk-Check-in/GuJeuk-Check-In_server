@@ -1,6 +1,6 @@
 # GuJeuk 프로젝트 현재 상황
 
-> 최종 갱신: 2026-06-15 KST
+> 최종 갱신: 2026-07-20 KST
 > 목적: 새로운 Codex 대화에서도 현재 서비스·배포·운영 상황을 빠르게 파악하기 위한 기준 문서
 
 ## 1. 문서 사용 방법
@@ -672,3 +672,52 @@ docker compose logs --tail=200 grafana prometheus loki alloy
 - credential rotation
 
 상세 명령과 장애 이력은 `docs/HOME_SERVER_OPERATIONS.md`에 기록하고, 이 문서에는 현재 판단에 필요한 핵심만 유지한다.
+
+## 18. AWS 이전 상태
+
+2026-07-20 KST에 서울 리전에서 prod/stag 공용 Docker 호스트를 신규 생성했다.
+
+```text
+Region: ap-northeast-2
+Instance: i-05e2a254f15e59ead / gujeuk-aws-prod-stag
+Type: t3.medium
+OS: Ubuntu Server 24.04 LTS
+Root volume: encrypted gp3 30GB
+Elastic IP: 3.37.79.125
+Security group: sg-0c16acf4997f79b3f / gujeuk-aws-app-sg
+SSH key pair: gujeuk-aws-deploy (local ~/.ssh/id_ed25519 public key imported)
+SSM role: gujeuk-aws-ec2-ssm-role
+SSM instance profile: gujeuk-aws-ec2-ssm-profile
+```
+
+현재 AWS 런타임:
+
+```text
+source commit: origin/main / 488a2044d067ac6fe33ae56b1132211c553f521f
+image: ghcr.io/gujeuk-check-in/gujeuk-check-in-server:aws-main-488a2044d067
+prod app/mysql/redis: localhost:8080 -> HTTP 200
+stag app/mysql/redis: localhost:8081 -> HTTP 200
+reverse proxy: gujeuk-aws-caddy / host ports 80, 443
+server path: /home/ubuntu/gujeuk-aws
+```
+
+현재 데이터 상태:
+
+```text
+prod: organ 5, purpose 12, residence 13, user 583, log 4442, Redis 24 keys
+stag: organ 1, purpose 4, residence 2, user 5, log 37, Redis 0 keys
+source backup: /home/gaemideul8/migration-aws-cutover-20260720_113023/final
+AWS backup: /home/ubuntu/gujeuk-aws/backups/source-cutover-20260720_113023
+```
+
+주의:
+
+- 홈서버 prod/stag 앱은 최종 dump 이후 중지했으며 AWS DB와 Redis로 데이터 이전을 완료했다.
+- CI/CD와 무중단 전환은 구성하지 않았다.
+- `aws-api.oijwef098234.com`과 `aws-stag.oijwef098234.com`은 명시적인 proxied A record로 `3.37.79.125`를 가리킨다.
+- Caddy의 Let's Encrypt 인증서 발급이 완료됐고 두 Cloudflare HTTPS 경로 모두 `/purpose/all` HTTP 200을 반환한다.
+- 기존 `api.taisu.site`와 `api-stag.taisu.site`는 아직 홈서버 Tunnel 레코드이므로 AWS hostname을 사용하는 클라이언트만 AWS로 연결된다.
+- 2026-07-20 prod 회원가입 500 원인은 복원 스키마에 폐기된 `user.user_id VARCHAR(30) NOT NULL`이 남아 있었기 때문이다. 전체 백업 후 기존 값은 보존하면서 NULL 허용으로 변경했고, V9 보정 migration을 추가했다.
+- SSH 22는 2026-07-20 확인 당시 관리자 공인 IP `14.50.190.128/32`에만 허용했다. 관리자 IP가 바뀌면 보안 그룹 rule을 갱신한다.
+- 기존 AWS `t2.micro` 인스턴스 2대(`i-02c201072f29819ed`, `i-0ecf972c13bf39b24`)는 별도 기존 자원이라 변경하지 않았다.
+- AWS CLI 로그인에 root 임시 세션을 사용했다. 구축 완료 후 IAM 관리자 사용자 또는 IAM Identity Center로 전환한다.

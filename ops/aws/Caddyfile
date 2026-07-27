@@ -1,0 +1,7 @@
+aws-api.oijwef098234.com, api.taisu.site {
+    reverse_proxy host.docker.internal:8080
+}
+
+aws-stag.oijwef098234.com, api-stag.taisu.site {
+    reverse_proxy host.docker.internal:8081
+}
