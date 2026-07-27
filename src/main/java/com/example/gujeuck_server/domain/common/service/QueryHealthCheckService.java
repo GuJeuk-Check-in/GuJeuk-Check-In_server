@@ -9,7 +9,7 @@ import java.sql.Connection;
 
 @Service
 @RequiredArgsConstructor
-public class HealthCheckService {
+public class QueryHealthCheckService {
     private final DataSource dataSource;
 
     public ReadyHealthResponse ready() {

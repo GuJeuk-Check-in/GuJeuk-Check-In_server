@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class HealthCheckServiceTest {
+class QueryHealthCheckServiceTest {
 
     @Mock
     private DataSource dataSource;
@@ -24,14 +24,14 @@ class HealthCheckServiceTest {
     private Connection connection;
 
     @InjectMocks
-    private HealthCheckService healthCheckService;
+    private QueryHealthCheckService queryHealthCheckService;
 
     @Test
     void DB_연결이_가능하면_ready는_UP이다() throws SQLException {
         when(dataSource.getConnection()).thenReturn(connection);
         when(connection.isValid(1)).thenReturn(true);
 
-        ReadyHealthResponse response = healthCheckService.ready();
+        ReadyHealthResponse response = queryHealthCheckService.ready();
 
         assertThat(response.status()).isEqualTo("UP");
         assertThat(response.db()).isEqualTo("UP");
@@ -43,7 +43,7 @@ class HealthCheckServiceTest {
         when(dataSource.getConnection()).thenReturn(connection);
         when(connection.isValid(1)).thenReturn(false);
 
-        ReadyHealthResponse response = healthCheckService.ready();
+        ReadyHealthResponse response = queryHealthCheckService.ready();
 
         assertThat(response.status()).isEqualTo("DOWN");
         assertThat(response.db()).isEqualTo("DOWN");
@@ -54,7 +54,7 @@ class HealthCheckServiceTest {
     void DB_연결_확인에서_예외가_발생하면_ready는_DOWN이다() throws SQLException {
         when(dataSource.getConnection()).thenThrow(new SQLException("database unavailable"));
 
-        ReadyHealthResponse response = healthCheckService.ready();
+        ReadyHealthResponse response = queryHealthCheckService.ready();
 
         assertThat(response.status()).isEqualTo("DOWN");
         assertThat(response.db()).isEqualTo("DOWN");

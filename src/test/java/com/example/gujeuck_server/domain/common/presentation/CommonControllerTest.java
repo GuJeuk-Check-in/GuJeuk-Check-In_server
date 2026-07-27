@@ -1,7 +1,7 @@
 package com.example.gujeuck_server.domain.common.presentation;
 
 import com.example.gujeuck_server.domain.common.presentation.dto.response.ReadyHealthResponse;
-import com.example.gujeuck_server.domain.common.service.HealthCheckService;
+import com.example.gujeuck_server.domain.common.service.QueryHealthCheckService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,18 +19,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CommonControllerTest {
 
     @Mock
-    private HealthCheckService healthCheckService;
+    private QueryHealthCheckService queryHealthCheckService;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new CommonController(healthCheckService)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new CommonController(queryHealthCheckService)).build();
     }
 
     @Test
     void ready가_UP이면_200으로_반환한다() throws Exception {
-        when(healthCheckService.ready()).thenReturn(ReadyHealthResponse.up());
+        when(queryHealthCheckService.ready()).thenReturn(ReadyHealthResponse.up());
 
         mockMvc.perform(get("/common/health/ready"))
                 .andExpect(status().isOk())
@@ -41,7 +41,7 @@ class CommonControllerTest {
 
     @Test
     void ready가_DOWN이면_503으로_반환한다() throws Exception {
-        when(healthCheckService.ready()).thenReturn(ReadyHealthResponse.down());
+        when(queryHealthCheckService.ready()).thenReturn(ReadyHealthResponse.down());
 
         mockMvc.perform(get("/common/health/ready"))
                 .andExpect(status().isServiceUnavailable())
