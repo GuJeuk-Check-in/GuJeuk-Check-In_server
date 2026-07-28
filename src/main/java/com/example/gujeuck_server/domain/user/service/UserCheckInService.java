@@ -34,15 +34,15 @@ public class UserCheckInService {
     @Transactional
     public void execute(UserCheckInRequest request) {
 
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
         Organ organ = user.getOrgan();
 
         // 등록된 방문목적인지 검증하고 정규화된 이름을 사용한다.
-        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.purpose());
 
-        LocalDateTime visitDateTime = request.getVisitTime();
+        LocalDateTime visitDateTime = request.visitTime();
         log.info("포멧팅 하기 전 시각 : ", visitDateTime.toString());
         String visitDate = DateFormatter.toVisitDate(visitDateTime);
         String visitTime = DateFormatter.toVisitTime(visitDateTime);
@@ -75,8 +75,8 @@ public class UserCheckInService {
                 .name(user.getName())
                 .phone(user.getPhone())
                 .age(user.getAge())
-                .maleCount(request.getMaleCount())
-                .femaleCount(request.getFemaleCount())
+                .maleCount(request.maleCount())
+                .femaleCount(request.femaleCount())
                 .purpose(purpose)
                 .privacyAgreed(user.isPrivacyAgreed())
                 .visitDate(visitDate)
