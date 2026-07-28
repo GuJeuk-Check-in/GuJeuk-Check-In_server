@@ -3,7 +3,7 @@ package com.example.gujeuck_server.domain.user.presentation.dto.request;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 
-public record HaDataRequest(
+public record HaDataSignUpRequest(
         String name,
         String phone,
         Gender gender,
