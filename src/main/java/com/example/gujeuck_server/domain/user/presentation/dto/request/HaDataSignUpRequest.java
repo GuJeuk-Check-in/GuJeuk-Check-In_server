@@ -3,6 +3,8 @@ package com.example.gujeuck_server.domain.user.presentation.dto.request;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 
+import java.time.LocalDateTime;
+
 public record HaDataSignUpRequest(
         String name,
         String phone,
@@ -14,6 +16,7 @@ public record HaDataSignUpRequest(
         int count,
         int maleCount,
         int femaleCount,
-        String purpose
+        String purpose,
+        LocalDateTime visitTime
 ) {
 }
