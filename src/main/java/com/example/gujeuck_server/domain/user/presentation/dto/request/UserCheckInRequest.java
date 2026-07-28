@@ -3,39 +3,36 @@ package com.example.gujeuck_server.domain.user.presentation.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class UserCheckInRequest {
-
+@Builder
+public record UserCheckInRequest (
     @NotNull(message = "userId를 입력해주세요.")
-    private Long userId;
+    Long userId,
 
     @NotNull(message = "남자 동행인 수는 null일 수 없습니다.")
     @PositiveOrZero(message = "남자 동행인 수는 0 이상이어야 합니다.")
-    private Integer maleCount;
+    Integer maleCount,
 
     @NotNull(message = "여자 동행인 수는 null일 수 없습니다.")
     @PositiveOrZero(message = "여자 동행인 수는 0 이상이어야 합니다.")
-    private Integer femaleCount;
+    Integer femaleCount,
 
     @NotBlank(message = "방문목적을 입력해주세요.")
-    private String purpose;
+    String purpose,
 
     @NotNull(message = "방문시각을 비워둘 수 없습니다.")
-    private LocalDateTime visitTime;
-
-    public UserCheckInRequest(Long userId, Integer maleCount, Integer femaleCount,  String purpose, LocalDateTime visitTime) {
-        this.userId = userId;
-        this.maleCount = maleCount;
-        this.femaleCount = femaleCount;
-        this.purpose = purpose;
-        this.visitTime = visitTime;
+    LocalDateTime visitTime
+) {
+    public static UserCheckInRequest create(Long userId, Integer maleCount, Integer femaleCount, String purpose, LocalDateTime visitTime) {
+        return UserCheckInRequest.builder()
+            .userId(userId)
+            .maleCount(maleCount)
+            .femaleCount(femaleCount)
+            .purpose(purpose)
+            .visitTime(visitTime)
+            .build();
     }
 }

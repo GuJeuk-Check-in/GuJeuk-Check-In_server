@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.example.gujeuck_server.domain.log.domain.QLog.log;
+
 @Service
 @RequiredArgsConstructor
 public class UserSingUpHaService {
@@ -47,8 +49,6 @@ public class UserSingUpHaService {
             } else {
                 user = foundUsers.get(0);
             }
-
-            UserCheckInRequest userCheckInRequest = new UserCheckInRequest();
 
             logRepository.save(log);
     }
