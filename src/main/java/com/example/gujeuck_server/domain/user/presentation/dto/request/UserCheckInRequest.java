@@ -5,10 +5,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @NoArgsConstructor
 public class UserCheckInRequest {
 
@@ -28,4 +30,12 @@ public class UserCheckInRequest {
 
     @NotNull(message = "방문시각을 비워둘 수 없습니다.")
     private LocalDateTime visitTime;
+
+    public UserCheckInRequest(Long userId, Integer maleCount, Integer femaleCount,  String purpose, LocalDateTime visitTime) {
+        this.userId = userId;
+        this.maleCount = maleCount;
+        this.femaleCount = femaleCount;
+        this.purpose = purpose;
+        this.visitTime = visitTime;
+    }
 }
