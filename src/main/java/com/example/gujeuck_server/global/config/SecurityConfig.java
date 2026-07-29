@@ -64,7 +64,7 @@ public class SecurityConfig {
                                 "/purpose/all",
                                 "/residence/all",
                                 "/public/**",
-                                "/user/ha-log", "/user/ha-sign-up"
+                                "/user/ha-log", "/user/ha-sign-up",
                                 "/common/health/ready"
                         ).permitAll()
                         .anyRequest().authenticated()
