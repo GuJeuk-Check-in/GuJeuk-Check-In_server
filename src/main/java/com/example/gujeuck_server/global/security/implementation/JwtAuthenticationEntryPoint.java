@@ -19,7 +19,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void execute(HttpServletResponse response, HttpServletRequest request, AuthenticationException authException) throws IOException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         ErrorCode errorCode = ErrorCode.TOKEN_NOT_FOUND;
         response.setStatus(errorCode.getStatusCode());
         response.setContentType("application/json");
