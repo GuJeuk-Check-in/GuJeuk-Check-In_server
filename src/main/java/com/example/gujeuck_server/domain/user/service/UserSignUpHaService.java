@@ -64,7 +64,6 @@ public class UserSignUpHaService {
             .phone(request.phone())
             .age(request.age())
             .residence(request.residence())
-            .allUserCount(request.count())
             .birthYMD(request.birthYMD())
             .gender(request.gender())
             .privacyAgreed(request.privacyAgreed())

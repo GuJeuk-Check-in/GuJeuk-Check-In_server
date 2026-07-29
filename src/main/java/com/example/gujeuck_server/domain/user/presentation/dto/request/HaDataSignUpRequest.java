@@ -13,7 +13,6 @@ public record HaDataSignUpRequest(
         Age age,
         String residence,
         boolean privacyAgreed,
-        int count,
         int maleCount,
         int femaleCount,
         String purpose,
