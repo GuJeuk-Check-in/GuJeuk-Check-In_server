@@ -1,0 +1,140 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: discord-alerts
+    receivers:
+      - uid: gujeuk-discord-webhook
+        type: discord
+        settings:
+          url: $__env{DISCORD_WEBHOOK_URL}
+          use_discord_username: true
+
+policies:
+  - orgId: 1
+    receiver: discord-alerts
+    group_by: ["alertname"]
+    group_wait: 10s
+    group_interval: 1m
+    repeat_interval: 1h
+
+groups:
+  - orgId: 1
+    name: gujeuk-status-alerts
+    folder: 구즉 상태
+    interval: 1m
+    rules:
+      - uid: gujeuk-alert-ec2-offline
+        title: "EC2 OFFLINE"
+        condition: B
+        for: 1m
+        noDataState: OK
+        execErrState: Alerting
+        data:
+          - refId: A
+            relativeTimeRange: { from: 120, to: 0 }
+            datasourceUid: gujeuk-prometheus
+            model: { refId: A, expr: "ec2_online == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [-999] }
+        labels: { severity: critical }
+        annotations: { summary: "EC2 인스턴스가 OFFLINE 상태입니다." }
+
+      - uid: gujeuk-alert-spring-down
+        title: "Spring API DOWN"
+        condition: B
+        for: 1m
+        noDataState: OK
+        execErrState: Alerting
+        data:
+          - refId: A
+            relativeTimeRange: { from: 120, to: 0 }
+            datasourceUid: gujeuk-prometheus
+            model: { refId: A, expr: "spring_api_up == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [-999] }
+        labels: { severity: critical }
+        annotations: { summary: "{{ $labels.target }} Spring API가 DOWN 상태입니다." }
+
+      - uid: gujeuk-alert-db-down
+        title: "DB DOWN"
+        condition: B
+        for: 1m
+        noDataState: OK
+        execErrState: Alerting
+        data:
+          - refId: A
+            relativeTimeRange: { from: 120, to: 0 }
+            datasourceUid: gujeuk-prometheus
+            model: { refId: A, expr: "database_up == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [-999] }
+        labels: { severity: critical }
+        annotations: { summary: "{{ $labels.target }} DB 연결이 DOWN 상태입니다." }
+
+      - uid: gujeuk-alert-container-stopped
+        title: "컨테이너 중지/재시작"
+        condition: B
+        for: 1m
+        noDataState: OK
+        execErrState: Alerting
+        data:
+          - refId: A
+            relativeTimeRange: { from: 120, to: 0 }
+            datasourceUid: gujeuk-prometheus
+            model: { refId: A, expr: "docker_container_running == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [-999] }
+        labels: { severity: critical }
+        annotations: { summary: "컨테이너 {{ $labels.container }} 가 RUNNING 상태가 아닙니다." }
+
+      - uid: gujeuk-alert-container-unhealthy
+        title: "컨테이너 Healthcheck 실패"
+        condition: B
+        for: 1m
+        noDataState: OK
+        execErrState: Alerting
+        data:
+          - refId: A
+            relativeTimeRange: { from: 120, to: 0 }
+            datasourceUid: gujeuk-prometheus
+            model: { refId: A, expr: "docker_container_healthy == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [-999] }
+        labels: { severity: warning }
+        annotations: { summary: "컨테이너 {{ $labels.container }} Healthcheck가 UNHEALTHY 상태입니다." }

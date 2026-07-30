@@ -1,0 +1,89 @@
+{
+  "title": "구즉 상태 대시보드",
+  "uid": "gujeuk-status",
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "EC2",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "targets": [{ "expr": "ec2_online", "legendFormat": "EC2" }],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "1": { "text": "ONLINE", "color": "green" }, "0": { "text": "OFFLINE", "color": "red" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Spring API (prod/stag)",
+      "gridPos": { "h": 4, "w": 8, "x": 4, "y": 0 },
+      "targets": [{ "expr": "spring_api_up", "legendFormat": "{{target}}" }],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "1": { "text": "UP", "color": "green" }, "0": { "text": "DOWN", "color": "red" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "DB (prod/stag)",
+      "gridPos": { "h": 4, "w": 8, "x": 12, "y": 0 },
+      "targets": [{ "expr": "database_up", "legendFormat": "{{target}}" }],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": {
+              "1": { "text": "UP", "color": "green" },
+              "0": { "text": "DOWN", "color": "red" },
+              "-1": { "text": "NOT_CONFIGURED", "color": "gray" }
+            } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "컨테이너 실행 상태",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 4 },
+      "targets": [{ "expr": "docker_container_running", "legendFormat": "{{container}}" }],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "1": { "text": "RUNNING", "color": "green" }, "0": { "text": "STOPPED/RESTARTING", "color": "red" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      }
+    },
+    {
+      "type": "stat",
+      "title": "컨테이너 Healthcheck",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 4 },
+      "targets": [{ "expr": "docker_container_healthy", "legendFormat": "{{container}}" }],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": {
+              "1": { "text": "HEALTHY", "color": "green" },
+              "0": { "text": "UNHEALTHY", "color": "red" },
+              "-1": { "text": "NOT_CONFIGURED", "color": "gray" }
+            } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] }
+        }
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}
