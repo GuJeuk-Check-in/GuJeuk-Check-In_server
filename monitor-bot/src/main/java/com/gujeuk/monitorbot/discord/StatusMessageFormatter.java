@@ -20,33 +20,24 @@ public class StatusMessageFormatter {
         boolean healthy = isHealthy(snapshot);
         StringBuilder body = new StringBuilder();
 
-        body.append("# ").append(title).append("\n");
-        body.append("전체 상태 : **").append(healthy ? "정상" : "장애 발생").append("**\n\n");
+        body.append("# ").append(healthy ? "🟢 " : "🔴 ").append(title).append("\n\n");
 
         body.append("## EC2\n");
         body.append(badge(snapshot.ec2Online())).append("\n\n");
 
         for (StatusSnapshot.TargetStatus target : snapshot.targets()) {
             body.append("## ").append(targetHeader(target.name())).append("\n");
-
-            body.append("### Spring API\n");
-            body.append(badge(target.springApiUp())).append("\n");
-
-            body.append("### App\n");
-            body.append(containerLine(target.app())).append("\n");
-
-            body.append("### DB\n");
-            body.append(containerLine(target.database())).append("\n");
-
-            body.append("### Redis\n");
-            body.append(containerLine(target.redis())).append("\n\n");
+            body.append("**Spring API** ").append(badge(target.springApiUp())).append("\n");
+            body.append("**App** ").append(containerLine(target.app())).append("\n");
+            body.append("**DB** ").append(containerLine(target.database())).append("\n");
+            body.append("**Redis** ").append(containerLine(target.redis())).append("\n\n");
         }
 
         if (!snapshot.extraContainers().isEmpty()) {
             body.append("## 기타 컨테이너\n");
             for (ContainerStatus status : snapshot.extraContainers()) {
-                body.append("### ").append(status.containerName()).append("\n");
-                body.append(containerLine(status)).append("\n");
+                body.append("**").append(status.containerName()).append("** ")
+                        .append(containerLine(status)).append("\n");
             }
         }
 
@@ -95,10 +86,17 @@ public class StatusMessageFormatter {
     }
 
     private String badge(boolean up) {
-        return up ? "정상 (UP)" : "장애 (DOWN)";
+        return up ? "🟢 UP" : "🔴 DOWN";
     }
 
     private String containerLine(ContainerStatus status) {
+        String stateEmoji = switch (status.state()) {
+            case RUNNING -> "🟢";
+            case RESTARTING -> "🟡";
+            case STOPPED -> "🔴";
+            case NOT_FOUND -> "⚫";
+        };
+
         String health = switch (status.health()) {
             case HEALTHY -> "HEALTHY";
             case UNHEALTHY -> "UNHEALTHY";
@@ -106,6 +104,6 @@ public class StatusMessageFormatter {
             case NOT_FOUND -> "NOT_FOUND";
         };
 
-        return status.state() + " (" + health + ")";
+        return stateEmoji + " " + status.state() + " (" + health + ")";
     }
 }
