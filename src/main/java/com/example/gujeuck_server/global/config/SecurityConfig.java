@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.global.config;
 
+import com.example.gujeuck_server.global.security.implementation.JwtAuthenticationEntryPoint;
 import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.List;
 public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Value("${cors.allowed-origins.prod-url}")
     private String prodUrl;
@@ -63,10 +65,14 @@ public class SecurityConfig {
                                 "/organ/excel/user",
                                 "/purpose/all",
                                 "/residence/all",
-                                "/public/**"
+                                "/public/**",
+                                "/user/ha-log", "/user/ha-sign-up",
+                                "/common/health/ready"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                    .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .with(new SecurityFilterConfig(jwtTokenProvider, objectMapper), Customizer.withDefaults())
                 .build();
     }

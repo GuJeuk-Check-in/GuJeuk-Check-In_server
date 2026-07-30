@@ -1,0 +1,46 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: monitor-bot
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health
+  endpoint:
+    health:
+      show-details: never
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+monitor:
+  discord:
+    bot-token: ${DISCORD_BOT_TOKEN:}
+    guild-id: ${DISCORD_GUILD_ID:}
+    channel-id: ${DISCORD_CHANNEL_ID:}
+    webhook-url: ${DISCORD_WEBHOOK_URL:}
+  report-cron: ${REPORT_CRON:0 0 * * * *}
+  targets:
+    - name: prod
+      health-check-url: ${PROD_HEALTH_CHECK_URL:http://gujeuk-app-prod:8080/common/health/ready}
+      app-container: gujeuk-app-prod
+      db-container: gujeuk-mysql-prod
+      redis-container: gujeuk-redis-prod
+    - name: stag
+      health-check-url: ${STAG_HEALTH_CHECK_URL:http://gujeuk-app-stag:8080/common/health/ready}
+      app-container: gujeuk-app-stag
+      db-container: gujeuk-mysql-stag
+      redis-container: gujeuk-redis-stag
+  extra-containers: gujeuk-aws-caddy
+  health-check-timeout-seconds: 3
+
+logging:
+  level:
+    root: INFO
+    com.gujeuk.monitorbot: INFO
+    net.dv8tion.jda: WARN
