@@ -27,12 +27,12 @@ monitor:
   report-cron: ${REPORT_CRON:0 0 * * * *}
   targets:
     - name: prod
-      health-check-url: ${PROD_HEALTH_CHECK_URL:http://gujeuk-app-prod:8080/purpose/all}
+      health-check-url: ${PROD_HEALTH_CHECK_URL:http://gujeuk-app-prod:8080/common/health/ready}
       app-container: gujeuk-app-prod
       db-container: gujeuk-mysql-prod
       redis-container: gujeuk-redis-prod
     - name: stag
-      health-check-url: ${STAG_HEALTH_CHECK_URL:http://gujeuk-app-stag:8080/purpose/all}
+      health-check-url: ${STAG_HEALTH_CHECK_URL:http://gujeuk-app-stag:8080/common/health/ready}
       app-container: gujeuk-app-stag
       db-container: gujeuk-mysql-stag
       redis-container: gujeuk-redis-stag
