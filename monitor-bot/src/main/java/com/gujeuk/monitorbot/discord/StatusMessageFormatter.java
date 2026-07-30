@@ -18,35 +18,44 @@ public class StatusMessageFormatter {
 
     public MessageEmbed buildEmbed(StatusSnapshot snapshot, String title) {
         boolean healthy = isHealthy(snapshot);
+        StringBuilder body = new StringBuilder();
 
-        EmbedBuilder embed = new EmbedBuilder()
-                .setTitle(title)
-                .setColor(healthy ? COLOR_HEALTHY : COLOR_DEGRADED)
-                .setDescription("**전체 상태**  " + (healthy ? "정상" : "장애 발생") + "\n**EC2**  " + badge(snapshot.ec2Online()))
-                .setFooter("구즉 모니터링 · monitor-bot")
-                .setTimestamp(Instant.now());
+        body.append("# ").append(title).append("\n");
+        body.append("전체 상태 : **").append(healthy ? "정상" : "장애 발생").append("**\n\n");
+
+        body.append("## EC2\n");
+        body.append(badge(snapshot.ec2Online())).append("\n\n");
 
         for (StatusSnapshot.TargetStatus target : snapshot.targets()) {
-            embed.addField(
-                    targetHeader(target.name()),
-                    "Spring API : " + badge(target.springApiUp()) + "\n"
-                            + "App : " + containerLine(target.app()) + "\n"
-                            + "DB : " + containerLine(target.database()) + "\n"
-                            + "Redis : " + containerLine(target.redis()),
-                    true
-            );
+            body.append("## ").append(targetHeader(target.name())).append("\n");
+
+            body.append("### Spring API\n");
+            body.append(badge(target.springApiUp())).append("\n");
+
+            body.append("### App\n");
+            body.append(containerLine(target.app())).append("\n");
+
+            body.append("### DB\n");
+            body.append(containerLine(target.database())).append("\n");
+
+            body.append("### Redis\n");
+            body.append(containerLine(target.redis())).append("\n\n");
         }
 
         if (!snapshot.extraContainers().isEmpty()) {
-            StringBuilder extra = new StringBuilder();
+            body.append("## 기타 컨테이너\n");
             for (ContainerStatus status : snapshot.extraContainers()) {
-                extra.append("`").append(status.containerName()).append("` : ")
-                        .append(containerLine(status)).append("\n");
+                body.append("### ").append(status.containerName()).append("\n");
+                body.append(containerLine(status)).append("\n");
             }
-            embed.addField("기타 컨테이너", extra.toString(), false);
         }
 
-        return embed.build();
+        return new EmbedBuilder()
+                .setColor(healthy ? COLOR_HEALTHY : COLOR_DEGRADED)
+                .setDescription(body.toString())
+                .setFooter("구즉 모니터링 · monitor-bot")
+                .setTimestamp(Instant.now())
+                .build();
     }
 
     private boolean isHealthy(StatusSnapshot snapshot) {
