@@ -1,51 +1,109 @@
 package com.gujeuk.monitorbot.discord;
 
+import com.gujeuk.monitorbot.docker.ContainerState;
 import com.gujeuk.monitorbot.docker.ContainerStatus;
+import com.gujeuk.monitorbot.docker.HealthState;
 import com.gujeuk.monitorbot.status.StatusSnapshot;
+import java.awt.Color;
+import java.time.Instant;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StatusMessageFormatter {
 
-    public String format(StatusSnapshot snapshot) {
-        StringBuilder sb = new StringBuilder();
+    private static final Color COLOR_HEALTHY = new Color(0x2ECC71);
+    private static final Color COLOR_DEGRADED = new Color(0xE74C3C);
 
-        sb.append("**구즉 서버 상태**\n");
-        sb.append("EC2: ").append(snapshot.ec2Online() ? "🟢 ONLINE" : "🔴 OFFLINE").append("\n\n");
+    public MessageEmbed buildEmbed(StatusSnapshot snapshot, String title) {
+        boolean healthy = isHealthy(snapshot);
+
+        EmbedBuilder embed = new EmbedBuilder()
+                .setTitle((healthy ? "🟢 " : "🔴 ") + title)
+                .setColor(healthy ? COLOR_HEALTHY : COLOR_DEGRADED)
+                .setDescription("**EC2**  " + badge(snapshot.ec2Online()))
+                .setFooter("구즉 모니터링 · monitor-bot")
+                .setTimestamp(Instant.now());
 
         for (StatusSnapshot.TargetStatus target : snapshot.targets()) {
-            sb.append("**[").append(target.name().toUpperCase()).append("]**\n");
-            sb.append("- Spring API: ").append(target.springApiUp() ? "🟢 UP" : "🔴 DOWN").append("\n");
-            sb.append("- App 컨테이너: ").append(containerLine(target.app())).append("\n");
-            sb.append("- DB: ").append(containerLine(target.database())).append("\n");
-            sb.append("- Redis: ").append(containerLine(target.redis())).append("\n\n");
+            embed.addField(
+                    targetHeader(target.name()),
+                    "Spring API  " + badge(target.springApiUp()) + "\n"
+                            + "App  " + containerLine(target.app()) + "\n"
+                            + "DB  " + containerLine(target.database()) + "\n"
+                            + "Redis  " + containerLine(target.redis()),
+                    true
+            );
         }
 
         if (!snapshot.extraContainers().isEmpty()) {
-            sb.append("**[기타 컨테이너]**\n");
+            StringBuilder extra = new StringBuilder();
             for (ContainerStatus status : snapshot.extraContainers()) {
-                sb.append("- ").append(status.containerName()).append(": ").append(containerLine(status)).append("\n");
+                extra.append("`").append(status.containerName()).append("`  ")
+                        .append(containerLine(status)).append("\n");
             }
+            embed.addField("🧩 기타 컨테이너", extra.toString(), false);
         }
 
-        return sb.toString();
+        return embed.build();
+    }
+
+    private boolean isHealthy(StatusSnapshot snapshot) {
+        if (!snapshot.ec2Online()) {
+            return false;
+        }
+        for (StatusSnapshot.TargetStatus target : snapshot.targets()) {
+            if (!target.springApiUp()) {
+                return false;
+            }
+            if (!isOk(target.app()) || !isOk(target.database()) || !isOk(target.redis())) {
+                return false;
+            }
+        }
+        for (ContainerStatus status : snapshot.extraContainers()) {
+            if (!isOk(status)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isOk(ContainerStatus status) {
+        boolean running = status.state() == ContainerState.RUNNING;
+        boolean healthOk = status.health() != HealthState.UNHEALTHY && status.health() != HealthState.NOT_FOUND;
+        return running && healthOk;
+    }
+
+    private String targetHeader(String name) {
+        if ("prod".equalsIgnoreCase(name)) {
+            return "🚀 PROD";
+        }
+        if ("stag".equalsIgnoreCase(name)) {
+            return "🧪 STAG";
+        }
+        return "📦 " + name.toUpperCase();
+    }
+
+    private String badge(boolean up) {
+        return up ? "🟢 UP" : "🔴 DOWN";
     }
 
     private String containerLine(ContainerStatus status) {
         String state = switch (status.state()) {
-            case RUNNING -> "🟢 RUNNING";
-            case RESTARTING -> "🟡 RESTARTING";
-            case STOPPED -> "🔴 STOPPED";
-            case NOT_FOUND -> "⚫ NOT_FOUND";
+            case RUNNING -> "🟢";
+            case RESTARTING -> "🟡";
+            case STOPPED -> "🔴";
+            case NOT_FOUND -> "⚫";
         };
 
         String health = switch (status.health()) {
             case HEALTHY -> "HEALTHY";
             case UNHEALTHY -> "UNHEALTHY";
-            case NOT_CONFIGURED -> "NOT_CONFIGURED";
+            case NOT_CONFIGURED -> "-";
             case NOT_FOUND -> "NOT_FOUND";
         };
 
-        return state + " / " + health;
+        return state + " " + status.state() + " (" + health + ")";
     }
 }

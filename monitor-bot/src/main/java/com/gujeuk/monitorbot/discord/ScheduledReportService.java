@@ -35,7 +35,7 @@ public class ScheduledReportService {
             return;
         }
 
-        String message = "**[정기 보고]**\n" + statusMessageFormatter.format(statusService.snapshot());
-        channel.sendMessage(message).queue();
+        var embed = statusMessageFormatter.buildEmbed(statusService.snapshot(), "구즉 정기 보고");
+        channel.sendMessageEmbeds(embed).queue();
     }
 }
