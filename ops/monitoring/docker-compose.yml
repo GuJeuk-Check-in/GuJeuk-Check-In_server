@@ -1,0 +1,78 @@
+services:
+  prometheus:
+    image: prom/prometheus:v3.13.1
+    container_name: prometheus
+    restart: unless-stopped
+
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+
+    ports:
+      - "127.0.0.1:9090:9090"
+
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:13.1.1
+    container_name: grafana
+    restart: unless-stopped
+
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+
+    env_file:
+      - ./monitor-bot/.env
+
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+    ports:
+      - "127.0.0.1:3000:3000"
+
+    depends_on:
+      - prometheus
+
+    networks:
+      - monitoring
+
+  monitor-bot:
+    build:
+      context: ./monitor-bot
+    container_name: monitor-bot
+    restart: unless-stopped
+
+    env_file:
+      - ./monitor-bot/.env
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    ports:
+      - "127.0.0.1:8090:8090"
+
+    networks:
+      - monitoring
+      - gujeuk-aws-prod_default
+      - gujeuk-aws-stag_default
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  monitoring:
+    name: monitoring
+  gujeuk-aws-prod_default:
+    external: true
+  gujeuk-aws-stag_default:
+    external: true
