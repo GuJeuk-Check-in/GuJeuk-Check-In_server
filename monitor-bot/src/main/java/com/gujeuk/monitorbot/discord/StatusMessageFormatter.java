@@ -20,19 +20,19 @@ public class StatusMessageFormatter {
         boolean healthy = isHealthy(snapshot);
 
         EmbedBuilder embed = new EmbedBuilder()
-                .setTitle((healthy ? "🟢 " : "🔴 ") + title)
+                .setTitle(title)
                 .setColor(healthy ? COLOR_HEALTHY : COLOR_DEGRADED)
-                .setDescription("**EC2**  " + badge(snapshot.ec2Online()))
+                .setDescription("**전체 상태**  " + (healthy ? "정상" : "장애 발생") + "\n**EC2**  " + badge(snapshot.ec2Online()))
                 .setFooter("구즉 모니터링 · monitor-bot")
                 .setTimestamp(Instant.now());
 
         for (StatusSnapshot.TargetStatus target : snapshot.targets()) {
             embed.addField(
                     targetHeader(target.name()),
-                    "Spring API  " + badge(target.springApiUp()) + "\n"
-                            + "App  " + containerLine(target.app()) + "\n"
-                            + "DB  " + containerLine(target.database()) + "\n"
-                            + "Redis  " + containerLine(target.redis()),
+                    "Spring API : " + badge(target.springApiUp()) + "\n"
+                            + "App : " + containerLine(target.app()) + "\n"
+                            + "DB : " + containerLine(target.database()) + "\n"
+                            + "Redis : " + containerLine(target.redis()),
                     true
             );
         }
@@ -40,10 +40,10 @@ public class StatusMessageFormatter {
         if (!snapshot.extraContainers().isEmpty()) {
             StringBuilder extra = new StringBuilder();
             for (ContainerStatus status : snapshot.extraContainers()) {
-                extra.append("`").append(status.containerName()).append("`  ")
+                extra.append("`").append(status.containerName()).append("` : ")
                         .append(containerLine(status)).append("\n");
             }
-            embed.addField("🧩 기타 컨테이너", extra.toString(), false);
+            embed.addField("기타 컨테이너", extra.toString(), false);
         }
 
         return embed.build();
@@ -77,26 +77,19 @@ public class StatusMessageFormatter {
 
     private String targetHeader(String name) {
         if ("prod".equalsIgnoreCase(name)) {
-            return "🚀 PROD";
+            return "PROD";
         }
         if ("stag".equalsIgnoreCase(name)) {
-            return "🧪 STAG";
+            return "STAG";
         }
-        return "📦 " + name.toUpperCase();
+        return name.toUpperCase();
     }
 
     private String badge(boolean up) {
-        return up ? "🟢 UP" : "🔴 DOWN";
+        return up ? "정상 (UP)" : "장애 (DOWN)";
     }
 
     private String containerLine(ContainerStatus status) {
-        String state = switch (status.state()) {
-            case RUNNING -> "🟢";
-            case RESTARTING -> "🟡";
-            case STOPPED -> "🔴";
-            case NOT_FOUND -> "⚫";
-        };
-
         String health = switch (status.health()) {
             case HEALTHY -> "HEALTHY";
             case UNHEALTHY -> "UNHEALTHY";
@@ -104,6 +97,6 @@ public class StatusMessageFormatter {
             case NOT_FOUND -> "NOT_FOUND";
         };
 
-        return state + " " + status.state() + " (" + health + ")";
+        return status.state() + " (" + health + ")";
     }
 }
