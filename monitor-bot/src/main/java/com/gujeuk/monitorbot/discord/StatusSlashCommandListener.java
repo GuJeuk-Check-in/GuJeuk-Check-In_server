@@ -24,8 +24,8 @@ public class StatusSlashCommandListener extends ListenerAdapter {
         event.deferReply().queue();
 
         try {
-            var embed = statusMessageFormatter.buildEmbed(statusService.snapshot(), "구즉 서버 상태");
-            event.getHook().sendMessageEmbeds(embed).queue();
+            String message = statusMessageFormatter.format(statusService.snapshot());
+            event.getHook().sendMessage(message).queue();
         } catch (Exception e) {
             log.error("/서버상태 처리 중 오류", e);
             event.getHook().sendMessage("상태 조회 중 오류가 발생했습니다.").queue();
