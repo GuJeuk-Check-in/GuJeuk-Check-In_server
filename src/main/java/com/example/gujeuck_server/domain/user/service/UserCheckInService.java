@@ -50,14 +50,14 @@ public class UserCheckInService {
         log.info("포멧팅 한 후의 시간 : ", visitTime);
         int year = visitDateTime.getYear();
 
-        // 같은 유저가 같은 시각에 이미 체크인했는지 확인한다.
-        if (logRepository.findByUserIdAndVisitTime(user.getId(), visitDate, visitTime).isPresent()) {
+        // 같은 유저가 같은 순간(초 단위)에 이미 체크인했는지 확인한다.
+        if (logRepository.findByUserIdAndVisitAt(user.getId(), visitDateTime, purpose.getPurposeName()).isPresent()) {
             throw DuplicateLogException.EXCEPTION;
         }
 
         user.increaseCount();
 
-        Log log = createLog(user, organ, purpose.getPurposeName(), request, visitDate, visitTime, year);
+        Log log = createLog(user, organ, purpose.getPurposeName(), request, visitDate, visitTime, visitDateTime, year);
 
         logRepository.save(log);
     }
@@ -69,6 +69,7 @@ public class UserCheckInService {
             UserCheckInRequest request,
             String visitDate,
             String visitTime,
+            LocalDateTime visitAt,
             int year
     ) {
         return Log.builder()
@@ -81,6 +82,7 @@ public class UserCheckInService {
                 .privacyAgreed(user.isPrivacyAgreed())
                 .visitDate(visitDate)
                 .visitTime(visitTime)
+                .visitAt(visitAt)
                 .year(year)
                 .user(user)
                 .organ(organ)

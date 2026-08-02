@@ -7,6 +7,8 @@ import com.example.gujeuck_server.global.entity.BaseIdEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder
@@ -17,7 +19,7 @@ import lombok.*;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_log_user_visit",
-                        columnNames = {"user_id", "visit_date", "visit_time"}
+                        columnNames = {"user_id", "visit_at", "purpose"}
                 ),
                 @UniqueConstraint(
                         name = "uk_log_organ_name_age_purpose_visit",
@@ -56,6 +58,9 @@ public class Log extends BaseIdEntity {
 
     @Column(nullable = false)
     private String visitTime;
+
+    // 중복 체크인 판단 전용(초 단위까지 포함). 화면/엑셀 표시는 여전히 visitDate/visitTime(분 단위)을 사용한다.
+    private LocalDateTime visitAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",  nullable = true)

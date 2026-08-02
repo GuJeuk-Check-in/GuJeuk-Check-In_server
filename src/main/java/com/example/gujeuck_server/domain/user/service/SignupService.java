@@ -60,7 +60,7 @@ public class SignupService {
 
         user.increaseCount();
 
-        Log log = createLog(request, age, purpose.getPurposeName(), visitDate, visitTime, currentYear, request.getResidence(), user, organ);
+        Log log = createLog(request, age, purpose.getPurposeName(), visitDate, visitTime, visitDateTime, currentYear, request.getResidence(), user, organ);
 
         logRepository.save(log);
     }
@@ -83,7 +83,7 @@ public class SignupService {
         return phone == null ? "" : phone.replaceAll("\\D", "");
     }
 
-    private Log createLog(SignupRequest request, Age age, String purpose, String visitDate, String visitTime, int year, String residence, User user, Organ organ) {
+    private Log createLog(SignupRequest request, Age age, String purpose, String visitDate, String visitTime, LocalDateTime visitAt, int year, String residence, User user, Organ organ) {
         return Log.builder()
                 .name(request.getName())
                 .phone(request.getPhone())
@@ -94,6 +94,7 @@ public class SignupService {
                 .privacyAgreed(request.getPrivacyAgreed())
                 .visitDate(visitDate)
                 .visitTime(visitTime)
+                .visitAt(visitAt)
                 .year(year)
                 .user(user)
                 .organ(organ)

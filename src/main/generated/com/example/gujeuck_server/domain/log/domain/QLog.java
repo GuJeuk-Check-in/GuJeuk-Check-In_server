@@ -45,6 +45,8 @@ public class QLog extends EntityPathBase<Log> {
 
     public final com.example.gujeuck_server.domain.user.domain.QUser user;
 
+    public final DateTimePath<java.time.LocalDateTime> visitAt = createDateTime("visitAt", java.time.LocalDateTime.class);
+
     public final StringPath visitDate = createString("visitDate");
 
     public final StringPath visitTime = createString("visitTime");
