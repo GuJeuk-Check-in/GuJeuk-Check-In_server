@@ -22,15 +22,6 @@ PREPARE stmt FROM @ddl;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
-SET @ddl := IF(
-    @log_table_exists > 0,
-    'UPDATE `log` SET visit_at = STR_TO_DATE(CONCAT(visit_date, '' '', visit_time), ''%Y년%m월%d일 %H:%i'') WHERE visit_at IS NULL',
-    'DO 0'
-);
-PREPARE stmt FROM @ddl;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
 SET @uk_log_user_visit_exists := (
     SELECT COUNT(*)
     FROM information_schema.STATISTICS
