@@ -24,6 +24,10 @@ import java.time.LocalDateTime;
                 @UniqueConstraint(
                         name = "uk_log_organ_name_age_purpose_visit",
                         columnNames = {"organ_id", "name", "age", "purpose", "visit_date", "visit_time"}
+                ),
+                @UniqueConstraint(
+                        name = "uk_log_client_record_id",
+                        columnNames = {"client_record_id"}
                 )
         }
 )
@@ -61,6 +65,9 @@ public class Log extends BaseIdEntity {
 
     // 중복 체크인 판단 전용(초 단위까지 포함). 화면/엑셀 표시는 여전히 visitDate/visitTime(분 단위)을 사용한다.
     private LocalDateTime visitAt;
+
+    // HA(고가용성) 경로에서만 클라이언트가 생성해 전달하는 요청 식별자. 재요청 시 중복검사 없이 멱등 처리하는 데 사용한다.
+    private String clientRecordId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",  nullable = true)

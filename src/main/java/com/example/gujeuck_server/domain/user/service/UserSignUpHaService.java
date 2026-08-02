@@ -34,7 +34,8 @@ public class UserSignUpHaService {
             request.maleCount(),
             request.femaleCount(),
             request.purpose(),
-            request.visitTime()
+            request.visitTime(),
+            request.clientRecordId()
         );
 
         userCheckInService.execute(checkInRequest);
