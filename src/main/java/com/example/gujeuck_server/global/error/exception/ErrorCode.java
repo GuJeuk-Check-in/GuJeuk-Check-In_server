@@ -19,6 +19,7 @@ public enum ErrorCode {
     //log
     LOG_NOT_FOUND(404, "존재하지 않는 이용목록입니다."),
     DUPLICATE_LOG(409, "이미 해당 시간의 로그가 존재합니다."),
+    CLIENT_RECORD_ID_MISMATCH(409, "동일한 clientRecordId로 다른 요청 본문이 전달되었습니다."),
     LOG_ACCESS_DENIED(403, "해당 방문 기록에 관한 권한이 없습니다."),
     INVALID_LOG_DATE(400, "유효하지 않은 날짜 형식입니다."),
 

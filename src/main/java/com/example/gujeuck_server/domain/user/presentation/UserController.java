@@ -10,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
@@ -42,12 +40,12 @@ public class UserController {
     }
 
     @PostMapping("/ha-log")
-    public void haLog(@RequestBody @Valid List<HaDataLogRequest> requests) {
-        userLogHaService.execute(requests);
+    public void haLog(@RequestBody @Valid HaDataLogRequest request) {
+        userLogHaService.execute(request);
     }
 
     @PostMapping("/ha-sign-up")
-    public void haSingUp(@RequestBody @Valid List<HaDataSignUpRequest> requests) {
-        userSignUpHaService.execute(requests);
+    public void haSingUp(@RequestBody @Valid HaDataSignUpRequest request) {
+        userSignUpHaService.execute(request);
     }
 }
