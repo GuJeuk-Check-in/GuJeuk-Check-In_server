@@ -17,7 +17,7 @@ import lombok.*;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_log_user_visit",
-                        columnNames = {"user_id", "visit_date", "visit_time"}
+                        columnNames = {"user_id", "visit_date", "visit_time", "purpose"}
                 ),
                 @UniqueConstraint(
                         name = "uk_log_organ_name_age_purpose_visit",
