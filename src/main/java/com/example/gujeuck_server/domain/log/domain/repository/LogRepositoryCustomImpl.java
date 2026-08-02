@@ -14,6 +14,7 @@ import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,15 +63,14 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
     }
 
     @Override
-    public Optional<Log> findByUserIdAndVisitTime(Long userId, String visitDate, String visitTime, String purpose) {
+    public Optional<Log> findByUserIdAndVisitAt(Long userId, LocalDateTime visitAt, String purpose) {
 
         return Optional.ofNullable(
                 jpaQueryFactory
                         .selectFrom(qLog)
                         .where(
                                 qLog.user.id.eq(userId),
-                                qLog.visitDate.eq(visitDate),
-                                qLog.visitTime.eq(visitTime),
+                                qLog.visitAt.eq(visitAt),
                                 qLog.purpose.eq(purpose)
                         )
                         .setLockMode(LockModeType.PESSIMISTIC_WRITE)
