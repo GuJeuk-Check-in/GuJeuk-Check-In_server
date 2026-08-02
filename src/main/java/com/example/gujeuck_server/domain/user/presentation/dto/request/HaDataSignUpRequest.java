@@ -6,6 +6,7 @@ import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 import java.time.LocalDateTime;
 
 public record HaDataSignUpRequest(
+        String clientRecordId,
         String name,
         String phone,
         Gender gender,
