@@ -62,7 +62,7 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
     }
 
     @Override
-    public Optional<Log> findByUserIdAndVisitTime(Long userId, String visitDate, String visitTime) {
+    public Optional<Log> findByUserIdAndVisitTime(Long userId, String visitDate, String visitTime, String purpose) {
 
         return Optional.ofNullable(
                 jpaQueryFactory
@@ -70,7 +70,8 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                         .where(
                                 qLog.user.id.eq(userId),
                                 qLog.visitDate.eq(visitDate),
-                                qLog.visitTime.eq(visitTime)
+                                qLog.visitTime.eq(visitTime),
+                                qLog.purpose.eq(purpose)
                         )
                         .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                         .fetchOne()

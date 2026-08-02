@@ -51,7 +51,7 @@ public class UserCheckInService {
         int year = visitDateTime.getYear();
 
         // 같은 유저가 같은 시각에 이미 체크인했는지 확인한다.
-        if (logRepository.findByUserIdAndVisitTime(user.getId(), visitDate, visitTime).isPresent()) {
+        if (logRepository.findByUserIdAndVisitTime(user.getId(), visitDate, visitTime, purpose.getPurposeName()).isPresent()) {
             throw DuplicateLogException.EXCEPTION;
         }
 
