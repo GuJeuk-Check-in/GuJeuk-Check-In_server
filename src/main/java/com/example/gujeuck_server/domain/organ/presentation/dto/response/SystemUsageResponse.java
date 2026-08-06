@@ -20,20 +20,21 @@ public record SystemUsageResponse(
     SystemUsageOneResponse november,
     SystemUsageOneResponse december
     ) {
-    public static SystemUsageResponse of(List<SystemUsageOneResponse> systemUsageOneResponses) {
+    public static SystemUsageResponse of(SystemUsageOneResponse total, List<SystemUsageOneResponse> months) {
         return SystemUsageResponse.builder()
-            .total(systemUsageOneResponses.get(0))
-            .january(systemUsageOneResponses.get(1))
-            .february(systemUsageOneResponses.get(2))
-            .march(systemUsageOneResponses.get(3))
-            .april(systemUsageOneResponses.get(4))
-            .may(systemUsageOneResponses.get(5))
-            .june(systemUsageOneResponses.get(6))
-            .july(systemUsageOneResponses.get(7))
-            .august(systemUsageOneResponses.get(8))
-            .september(systemUsageOneResponses.get(9))
-            .october(systemUsageOneResponses.get(10))
-            .december(systemUsageOneResponses.get(11))
+            .total(total)
+            .january(months.get(0))
+            .february(months.get(1))
+            .march(months.get(2))
+            .april(months.get(3))
+            .may(months.get(4))
+            .june(months.get(5))
+            .july(months.get(6))
+            .august(months.get(7))
+            .september(months.get(8))
+            .october(months.get(9))
+            .november(months.get(10))
+            .december(months.get(11))
             .build();
     }
 }

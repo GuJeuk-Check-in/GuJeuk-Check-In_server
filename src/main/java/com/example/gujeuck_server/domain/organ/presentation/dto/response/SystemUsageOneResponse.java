@@ -4,13 +4,17 @@ import lombok.Builder;
 
 @Builder
 public record SystemUsageOneResponse(
-    int opDate,
-    int avgRate
+    Integer opDate,
+    Double avgRate
 ) {
-    public static SystemUsageOneResponse of(int opDate, int avgRate) {
+    public static SystemUsageOneResponse of(Integer opDate, Double avgRate) {
         return SystemUsageOneResponse.builder()
             .opDate(opDate)
             .avgRate(avgRate)
             .build();
+    }
+
+    public static SystemUsageOneResponse empty() {
+        return SystemUsageOneResponse.of(null, null);
     }
 }
