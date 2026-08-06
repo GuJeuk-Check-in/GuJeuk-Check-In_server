@@ -1,0 +1,18 @@
+CREATE TABLE IF NOT EXISTS check_in_funnel_event (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    client_event_id VARCHAR(36) NOT NULL,
+    session_id VARCHAR(36) NOT NULL,
+    event_name VARCHAR(60) NOT NULL,
+    occurred_at TIMESTAMP(3) NOT NULL,
+    elapsed_ms_from_start BIGINT NOT NULL,
+    user_id BIGINT NULL,
+    age_group VARCHAR(30) NULL,
+    purpose VARCHAR(255) NULL,
+    failure_reason VARCHAR(255) NULL,
+    is_existing_user BIT NULL,
+    visit_count BIGINT NULL,
+    visit_count_bucket VARCHAR(30) NULL,
+    created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_check_in_funnel_event_client_event_id (client_event_id)
+);
