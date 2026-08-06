@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
+import com.example.gujeuck_server.domain.log.domain.MonthlyOperationCount;
 import com.example.gujeuck_server.domain.log.domain.QLog;
 import com.example.gujeuck_server.domain.log.domain.VisitStatisticsCount;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
@@ -149,5 +150,29 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
 
     private long valueOrZero(Long value) {
         return value == null ? 0 : value;
+    }
+
+    @Override
+    public MonthlyOperationCount findMonthlyOperationCount(Long organId, String yearMonth) {
+        Tuple result = jpaQueryFactory
+                .select(qLog.visitDate.countDistinct(), qLog.maleCount.sum().add(qLog.femaleCount.sum()))
+                .from(qLog)
+                .where(
+                        qLog.organ.id.eq(organId),
+                        qLog.visitDate.startsWith(yearMonth)
+                )
+                .fetchOne();
+
+        if (result == null) {
+            return new MonthlyOperationCount(0, 0);
+        }
+
+        Long operatingDays = result.get(0, Long.class);
+        Integer totalVisitors = result.get(1, Integer.class);
+
+        return new MonthlyOperationCount(
+                operatingDays == null ? 0 : operatingDays,
+                totalVisitors == null ? 0 : totalVisitors
+        );
     }
 }
