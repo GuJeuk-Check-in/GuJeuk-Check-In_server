@@ -96,6 +96,83 @@ class CommonControllerTest {
     }
 
     @Test
+    void 체크인_퍼널_이벤트의_purpose와_failureReason은_255자까지_허용한다() throws Exception {
+        String maxLengthValue = "a".repeat(255);
+
+        mockMvc.perform(post("/common/analytics/check-in-funnel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "events": [
+                                    {
+                                      "clientEventId": "11111111-1111-1111-1111-111111111111",
+                                      "sessionId": "22222222-2222-2222-2222-222222222222",
+                                      "eventName": "check_in_api_failed",
+                                      "occurredAt": "2026-08-05T10:17:30.000Z",
+                                      "elapsedMsFromStart": 120000,
+                                      "purpose": "%s",
+                                      "failureReason": "%s"
+                                    }
+                                  ]
+                                }
+                                """.formatted(maxLengthValue, maxLengthValue)))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(""));
+
+        verify(createCheckInFunnelEventService).execute(any());
+    }
+
+    @Test
+    void 체크인_퍼널_이벤트의_purpose가_256자이면_400이다() throws Exception {
+        String tooLongPurpose = "a".repeat(256);
+
+        mockMvc.perform(post("/common/analytics/check-in-funnel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "events": [
+                                    {
+                                      "clientEventId": "11111111-1111-1111-1111-111111111111",
+                                      "sessionId": "22222222-2222-2222-2222-222222222222",
+                                      "eventName": "purpose_selected",
+                                      "occurredAt": "2026-08-05T10:17:30.000Z",
+                                      "elapsedMsFromStart": 120000,
+                                      "purpose": "%s"
+                                    }
+                                  ]
+                                }
+                                """.formatted(tooLongPurpose)))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(createCheckInFunnelEventService);
+    }
+
+    @Test
+    void 체크인_퍼널_이벤트의_failureReason이_256자이면_400이다() throws Exception {
+        String tooLongFailureReason = "a".repeat(256);
+
+        mockMvc.perform(post("/common/analytics/check-in-funnel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "events": [
+                                    {
+                                      "clientEventId": "11111111-1111-1111-1111-111111111111",
+                                      "sessionId": "22222222-2222-2222-2222-222222222222",
+                                      "eventName": "check_in_api_failed",
+                                      "occurredAt": "2026-08-05T10:17:30.000Z",
+                                      "elapsedMsFromStart": 120000,
+                                      "failureReason": "%s"
+                                    }
+                                  ]
+                                }
+                                """.formatted(tooLongFailureReason)))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(createCheckInFunnelEventService);
+    }
+
+    @Test
     void 체크인_퍼널_이벤트_목록이_비어있으면_400이다() throws Exception {
         mockMvc.perform(post("/common/analytics/check-in-funnel")
                         .contentType(MediaType.APPLICATION_JSON)

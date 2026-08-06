@@ -4,6 +4,7 @@ import com.example.gujeuck_server.domain.common.analytics.domain.enums.CheckInFu
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -27,7 +28,11 @@ public record CheckInFunnelEventRequest(
 
         Long userId,
         Age ageGroup,
+
+        @Size(max = 255, message = "purpose는 255자 이하여야 합니다.")
         String purpose,
+
+        @Size(max = 255, message = "failureReason은 255자 이하여야 합니다.")
         String failureReason
 ) {
 }
