@@ -25,10 +25,6 @@ public class TimeProvider {
         return ZonedDateTime.now(KOREA_ZONE).toLocalTime();
     }
 
-    public static LocalDateTime nowDateTime() {
-        return ZonedDateTime.now(KOREA_ZONE).toLocalDateTime();
-    }
-
     public static int nowYear() {
         return ZonedDateTime.now(KOREA_ZONE).getYear();
     }
