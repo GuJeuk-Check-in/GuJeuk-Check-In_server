@@ -5,6 +5,7 @@ import com.example.gujeuck_server.domain.common.domain.funnel.repository.CheckIn
 import com.example.gujeuck_server.domain.common.presentation.funnel.dto.request.CheckInFunnelEventRequest;
 import com.example.gujeuck_server.domain.common.presentation.funnel.dto.request.CheckInFunnelEventsRequest;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.global.utility.TimeProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +56,7 @@ public class CreateCheckInFunnelEventService {
                 request.clientEventId().toString(),
                 request.sessionId().toString(),
                 request.eventName().value(),
-                request.occurredAt(),
+                TimeProvider.toKoreaLocalDateTime(request.occurredAt()),
                 request.elapsedMsFromStart(),
                 request.userId(),
                 request.ageGroup() == null ? null : request.ageGroup().name(),

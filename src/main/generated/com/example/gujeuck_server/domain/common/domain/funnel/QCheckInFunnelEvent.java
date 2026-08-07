@@ -21,7 +21,7 @@ public class QCheckInFunnelEvent extends EntityPathBase<CheckInFunnelEvent> {
 
     public final StringPath clientEventId = createString("clientEventId");
 
-    public final DateTimePath<java.time.Instant> createdAt = createDateTime("createdAt", java.time.Instant.class);
+    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
 
     public final NumberPath<Long> elapsedMsFromStart = createNumber("elapsedMsFromStart", Long.class);
 
@@ -33,7 +33,7 @@ public class QCheckInFunnelEvent extends EntityPathBase<CheckInFunnelEvent> {
 
     public final BooleanPath isExistingUser = createBoolean("isExistingUser");
 
-    public final DateTimePath<java.time.Instant> occurredAt = createDateTime("occurredAt", java.time.Instant.class);
+    public final DateTimePath<java.time.LocalDateTime> occurredAt = createDateTime("occurredAt", java.time.LocalDateTime.class);
 
     public final StringPath purpose = createString("purpose");
 

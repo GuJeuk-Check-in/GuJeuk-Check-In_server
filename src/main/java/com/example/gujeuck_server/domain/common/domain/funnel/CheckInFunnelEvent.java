@@ -3,6 +3,7 @@ package com.example.gujeuck_server.domain.common.domain.funnel;
 import com.example.gujeuck_server.domain.common.domain.funnel.enums.VisitCountBucket;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.global.entity.BaseIdEntity;
+import com.example.gujeuck_server.global.utility.TimeProvider;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,7 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -43,7 +44,7 @@ public class CheckInFunnelEvent extends BaseIdEntity {
     private String eventName;
 
     @Column(name = "occurred_at", nullable = false)
-    private Instant occurredAt;
+    private LocalDateTime occurredAt;
 
     @Column(name = "elapsed_ms_from_start", nullable = false)
     private long elapsedMsFromStart;
@@ -72,12 +73,12 @@ public class CheckInFunnelEvent extends BaseIdEntity {
     private VisitCountBucket visitCountBucket;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @PrePersist
     void prePersist() {
         if (createdAt == null) {
-            createdAt = Instant.now();
+            createdAt = TimeProvider.nowDateTime();
         }
     }
 }

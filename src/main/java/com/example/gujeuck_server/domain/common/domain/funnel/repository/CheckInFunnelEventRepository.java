@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public interface CheckInFunnelEventRepository extends JpaRepository<CheckInFunnelEvent, Long> {
     @Modifying
@@ -45,7 +45,7 @@ public interface CheckInFunnelEventRepository extends JpaRepository<CheckInFunne
             @Param("clientEventId") String clientEventId,
             @Param("sessionId") String sessionId,
             @Param("eventName") String eventName,
-            @Param("occurredAt") Instant occurredAt,
+            @Param("occurredAt") LocalDateTime occurredAt,
             @Param("elapsedMsFromStart") Long elapsedMsFromStart,
             @Param("userId") Long userId,
             @Param("ageGroup") String ageGroup,

@@ -3,7 +3,9 @@ package com.example.gujeuck_server.global.utility;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -23,6 +25,10 @@ public class TimeProvider {
         return ZonedDateTime.now(KOREA_ZONE).toLocalTime();
     }
 
+    public static LocalDateTime nowDateTime() {
+        return ZonedDateTime.now(KOREA_ZONE).toLocalDateTime();
+    }
+
     public static int nowYear() {
         return ZonedDateTime.now(KOREA_ZONE).getYear();
     }
@@ -37,5 +43,9 @@ public class TimeProvider {
 
     public static ZonedDateTime nowZoned() {
         return ZonedDateTime.now(KOREA_ZONE);
+    }
+
+    public static LocalDateTime toKoreaLocalDateTime(Instant instant) {
+        return instant.atZone(KOREA_ZONE).toLocalDateTime();
     }
 }

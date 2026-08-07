@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,6 +28,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CreateCheckInFunnelEventServiceTest {
+
+    private static final LocalDateTime OCCURRED_AT = LocalDateTime.of(2026, 8, 5, 19, 17, 30);
 
     @Mock
     private CheckInFunnelEventRepository checkInFunnelEventRepository;
@@ -120,7 +123,7 @@ class CreateCheckInFunnelEventServiceTest {
                 eq(clientEventId.toString()),
                 anyString(),
                 anyString(),
-                any(),
+                eq(OCCURRED_AT),
                 anyLong(),
                 userId == null ? isNull() : eq(userId),
                 anyString(),
