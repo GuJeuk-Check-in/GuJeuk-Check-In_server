@@ -4,10 +4,13 @@ import com.example.gujeuck_server.domain.common.domain.funnel.enums.VisitCountBu
 import com.example.gujeuck_server.domain.common.service.funnel.CreateCheckInFunnelEventService;
 import com.example.gujeuck_server.domain.common.presentation.funnel.dto.response.CheckInFunnelEventResponse;
 import com.example.gujeuck_server.domain.common.service.funnel.QueryCheckInFunnelEventService;
+import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.global.error.GlobalExceptionHandler;
+import com.example.gujeuck_server.global.security.auth.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +21,10 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -25,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -56,9 +64,22 @@ class CheckInFunnelControllerTest {
                         queryCheckInFunnelEventService
                 ))
                 .setControllerAdvice(new GlobalExceptionHandler())
-                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+                .setCustomArgumentResolvers(
+                        new AuthenticationPrincipalArgumentResolver(),
+                        new PageableHandlerMethodArgumentResolver()
+                )
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
                 .build();
+
+        CustomUserDetails userDetails = new CustomUserDetails(organ());
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities())
+        );
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -85,7 +106,7 @@ class CheckInFunnelControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string(""));
 
-        verify(createCheckInFunnelEventService).execute(any());
+        verify(createCheckInFunnelEventService).execute(eq(1L), any());
     }
 
     @Test
@@ -146,7 +167,16 @@ class CheckInFunnelControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().string(""));
 
-        verify(createCheckInFunnelEventService).execute(any());
+        verify(createCheckInFunnelEventService).execute(eq(1L), any());
+    }
+
+    private Organ organ() {
+        Organ organ = Organ.builder()
+                .organName("구즉청소년문화의집")
+                .password("password")
+                .build();
+        ReflectionTestUtils.setField(organ, "id", 1L);
+        return organ;
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.example.gujeuck_server.domain.common.presentation.funnel.dto.request.
 import com.example.gujeuck_server.domain.common.presentation.funnel.dto.response.CheckInFunnelEventResponse;
 import com.example.gujeuck_server.domain.common.service.funnel.CreateCheckInFunnelEventService;
 import com.example.gujeuck_server.domain.common.service.funnel.QueryCheckInFunnelEventService;
+import com.example.gujeuck_server.global.security.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,8 +29,11 @@ public class CheckInFunnelController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/check-in-funnel")
-    public void createCheckInFunnelEvents(@RequestBody @Valid CheckInFunnelEventsRequest request) {
-        createCheckInFunnelEventService.execute(request);
+    public void createCheckInFunnelEvents(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid CheckInFunnelEventsRequest request
+    ) {
+        createCheckInFunnelEventService.execute(userDetails.organ().getId(), request);
     }
 
     @GetMapping("/check-in-funnel/events")

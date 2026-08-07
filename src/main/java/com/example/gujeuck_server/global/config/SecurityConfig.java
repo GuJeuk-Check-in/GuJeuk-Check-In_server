@@ -56,6 +56,10 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/common/analytics/check-in-funnel",
+                                "/common/analytics/check-in-funnel/**"
+                        ).hasRole("ORGAN")
+                        .requestMatchers(
                                 "/auth/login",
                                 "/api/pet-game/login",
                                 "/user",
@@ -67,8 +71,7 @@ public class SecurityConfig {
                                 "/residence/all",
                                 "/public/**",
                                 "/user/ha-log", "/user/ha-sign-up",
-                                "/common/health/ready",
-                                "/common/analytics/check-in-funnel"
+                                "/common/health/ready"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

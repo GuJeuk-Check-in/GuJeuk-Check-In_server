@@ -6,6 +6,8 @@ import com.example.gujeuck_server.domain.common.presentation.funnel.dto.request.
 import com.example.gujeuck_server.domain.common.presentation.funnel.dto.request.CheckInFunnelEventsRequest;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
+import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.exception.UserAccessDeniedException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -24,6 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,6 +41,9 @@ class CreateCheckInFunnelEventServiceTest {
     @Mock
     private LogRepository logRepository;
 
+    @Mock
+    private UserRepository userRepository;
+
     @InjectMocks
     private CreateCheckInFunnelEventService createCheckInFunnelEventService;
 
@@ -44,9 +51,10 @@ class CreateCheckInFunnelEventServiceTest {
     void 요청_내_중복_clientEventId는_한_번만_insert를_시도한다() {
         UUID newClientEventId = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
+        when(userRepository.existsByIdAndOrganId(10L, 1L)).thenReturn(true);
         when(logRepository.countByUserId(10L)).thenReturn(4L);
 
-        createCheckInFunnelEventService.execute(new CheckInFunnelEventsRequest(List.of(
+        createCheckInFunnelEventService.execute(1L, new CheckInFunnelEventsRequest(List.of(
                 event(newClientEventId, 10L),
                 event(newClientEventId, 10L)
         )));
@@ -58,10 +66,11 @@ class CreateCheckInFunnelEventServiceTest {
     void userId가_없으면_방문횟수_계산값을_null로_저장한다() {
         UUID clientEventId = UUID.fromString("33333333-3333-3333-3333-333333333333");
 
-        createCheckInFunnelEventService.execute(new CheckInFunnelEventsRequest(List.of(
+        createCheckInFunnelEventService.execute(1L, new CheckInFunnelEventsRequest(List.of(
                 event(clientEventId, null)
         )));
 
+        verifyNoInteractions(userRepository);
         verify(logRepository, never()).countByUserId(any());
         verifyInserted(clientEventId, null, null, null, null);
     }
@@ -72,11 +81,14 @@ class CreateCheckInFunnelEventServiceTest {
         UUID returningClientEventId = UUID.fromString("55555555-5555-5555-5555-555555555555");
         UUID loyalClientEventId = UUID.fromString("66666666-6666-6666-6666-666666666666");
 
+        when(userRepository.existsByIdAndOrganId(1L, 1L)).thenReturn(true);
+        when(userRepository.existsByIdAndOrganId(2L, 1L)).thenReturn(true);
+        when(userRepository.existsByIdAndOrganId(3L, 1L)).thenReturn(true);
         when(logRepository.countByUserId(1L)).thenReturn(1L);
         when(logRepository.countByUserId(2L)).thenReturn(3L);
         when(logRepository.countByUserId(3L)).thenReturn(10L);
 
-        createCheckInFunnelEventService.execute(new CheckInFunnelEventsRequest(List.of(
+        createCheckInFunnelEventService.execute(1L, new CheckInFunnelEventsRequest(List.of(
                 event(firstVisitClientEventId, 1L),
                 event(returningClientEventId, 2L),
                 event(loyalClientEventId, 3L)
@@ -91,11 +103,38 @@ class CreateCheckInFunnelEventServiceTest {
     void 이미_저장된_clientEventId는_repository의_noop_upsert로_성공_처리한다() {
         UUID duplicateClientEventId = UUID.fromString("77777777-7777-7777-7777-777777777777");
 
-        createCheckInFunnelEventService.execute(new CheckInFunnelEventsRequest(List.of(
+        createCheckInFunnelEventService.execute(1L, new CheckInFunnelEventsRequest(List.of(
                 event(duplicateClientEventId, null)
         )));
 
         verifyInserted(duplicateClientEventId, null, null, null, null);
+    }
+
+    @Test
+    void userId가_인증된_기관에_속하지_않으면_저장하지_않는다() {
+        UUID clientEventId = UUID.fromString("88888888-8888-8888-8888-888888888888");
+
+        when(userRepository.existsByIdAndOrganId(10L, 1L)).thenReturn(false);
+
+        assertThatThrownBy(() -> createCheckInFunnelEventService.execute(1L, new CheckInFunnelEventsRequest(List.of(
+                event(clientEventId, 10L)
+        )))).isSameAs(UserAccessDeniedException.EXCEPTION);
+
+        verifyNoInteractions(logRepository);
+        verify(checkInFunnelEventRepository, never()).insertKeepingExistingClientEvent(
+                anyString(),
+                anyString(),
+                anyString(),
+                any(),
+                anyLong(),
+                anyLong(),
+                anyString(),
+                anyString(),
+                any(),
+                any(),
+                any(),
+                any()
+        );
     }
 
     private CheckInFunnelEventRequest event(UUID clientEventId, Long userId) {

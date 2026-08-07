@@ -5,6 +5,8 @@ import com.example.gujeuck_server.domain.common.domain.funnel.repository.CheckIn
 import com.example.gujeuck_server.domain.common.presentation.funnel.dto.request.CheckInFunnelEventRequest;
 import com.example.gujeuck_server.domain.common.presentation.funnel.dto.request.CheckInFunnelEventsRequest;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
+import com.example.gujeuck_server.domain.user.exception.UserAccessDeniedException;
 import com.example.gujeuck_server.global.utility.TimeProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,16 @@ import java.util.stream.Collectors;
 public class CreateCheckInFunnelEventService {
     private final CheckInFunnelEventRepository checkInFunnelEventRepository;
     private final LogRepository logRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public void execute(CheckInFunnelEventsRequest request) {
+    public void execute(Long organId, CheckInFunnelEventsRequest request) {
         List<CheckInFunnelEventRequest> uniqueEvents = uniqueByClientEventId(request.events());
         if (uniqueEvents.isEmpty()) {
             return;
         }
+
+        validateUserOwnership(organId, uniqueEvents);
 
         Map<Long, Long> visitCountsByUserId = uniqueEvents.stream()
                 .map(CheckInFunnelEventRequest::userId)
@@ -46,6 +51,18 @@ public class CreateCheckInFunnelEventService {
         return events.stream()
                 .filter(event -> seenClientEventIds.add(event.clientEventId()))
                 .toList();
+    }
+
+    private void validateUserOwnership(Long organId, List<CheckInFunnelEventRequest> events) {
+        boolean hasInvalidUser = events.stream()
+                .map(CheckInFunnelEventRequest::userId)
+                .filter(userId -> userId != null)
+                .distinct()
+                .anyMatch(userId -> !userRepository.existsByIdAndOrganId(userId, organId));
+
+        if (hasInvalidUser) {
+            throw UserAccessDeniedException.EXCEPTION;
+        }
     }
 
     private void insertKeepingExistingClientEvent(CheckInFunnelEventRequest request, Map<Long, Long> visitCountsByUserId) {
