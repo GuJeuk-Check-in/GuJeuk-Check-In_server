@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.common.service;
+package com.example.gujeuck_server.domain.common.service.healthCheck;
 
-import com.example.gujeuck_server.domain.common.presentation.dto.response.ReadyHealthResponse;
+import com.example.gujeuck_server.domain.common.presentation.healthCheck.dto.response.ReadyHealthResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

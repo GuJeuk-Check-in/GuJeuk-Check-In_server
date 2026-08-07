@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.common.analytics.domain;
+package com.example.gujeuck_server.domain.common.domain.funnel;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
@@ -11,7 +11,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QCheckInFunnelEvent extends EntityPathBase<CheckInFunnelEvent> {
 
-    private static final long serialVersionUID = -281770639L;
+    private static final long serialVersionUID = -515816627L;
 
     public static final QCheckInFunnelEvent checkInFunnelEvent = new QCheckInFunnelEvent("checkInFunnelEvent");
 
@@ -43,7 +43,7 @@ public class QCheckInFunnelEvent extends EntityPathBase<CheckInFunnelEvent> {
 
     public final NumberPath<Long> visitCount = createNumber("visitCount", Long.class);
 
-    public final EnumPath<com.example.gujeuck_server.domain.common.analytics.domain.enums.VisitCountBucket> visitCountBucket = createEnum("visitCountBucket", com.example.gujeuck_server.domain.common.analytics.domain.enums.VisitCountBucket.class);
+    public final EnumPath<com.example.gujeuck_server.domain.common.domain.funnel.enums.VisitCountBucket> visitCountBucket = createEnum("visitCountBucket", com.example.gujeuck_server.domain.common.domain.funnel.enums.VisitCountBucket.class);
 
     public QCheckInFunnelEvent(String variable) {
         super(CheckInFunnelEvent.class, forVariable(variable));

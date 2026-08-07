@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.common.analytics.presentation.dto.request;
+package com.example.gujeuck_server.domain.common.presentation.funnel.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

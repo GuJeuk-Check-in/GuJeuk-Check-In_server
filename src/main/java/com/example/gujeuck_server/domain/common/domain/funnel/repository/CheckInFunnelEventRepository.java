@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.common.analytics.domain.repository;
+package com.example.gujeuck_server.domain.common.domain.funnel.repository;
 
-import com.example.gujeuck_server.domain.common.analytics.domain.CheckInFunnelEvent;
+import com.example.gujeuck_server.domain.common.domain.funnel.CheckInFunnelEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

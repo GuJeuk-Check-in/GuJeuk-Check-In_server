@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.common.analytics.presentation.dto.request;
+package com.example.gujeuck_server.domain.common.presentation.funnel.dto.request;
 
-import com.example.gujeuck_server.domain.common.analytics.domain.enums.CheckInFunnelEventName;
+import com.example.gujeuck_server.domain.common.domain.funnel.enums.CheckInFunnelEventName;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;

@@ -1,9 +1,9 @@
-package com.example.gujeuck_server.domain.common.analytics.service;
+package com.example.gujeuck_server.domain.common.service.funnel;
 
-import com.example.gujeuck_server.domain.common.analytics.domain.enums.VisitCountBucket;
-import com.example.gujeuck_server.domain.common.analytics.domain.repository.CheckInFunnelEventRepository;
-import com.example.gujeuck_server.domain.common.analytics.presentation.dto.request.CheckInFunnelEventRequest;
-import com.example.gujeuck_server.domain.common.analytics.presentation.dto.request.CheckInFunnelEventsRequest;
+import com.example.gujeuck_server.domain.common.domain.funnel.enums.VisitCountBucket;
+import com.example.gujeuck_server.domain.common.domain.funnel.repository.CheckInFunnelEventRepository;
+import com.example.gujeuck_server.domain.common.presentation.funnel.dto.request.CheckInFunnelEventRequest;
+import com.example.gujeuck_server.domain.common.presentation.funnel.dto.request.CheckInFunnelEventsRequest;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

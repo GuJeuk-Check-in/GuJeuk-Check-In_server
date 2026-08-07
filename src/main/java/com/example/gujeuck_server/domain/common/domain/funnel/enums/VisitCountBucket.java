@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.common.analytics.domain.enums;
+package com.example.gujeuck_server.domain.common.domain.funnel.enums;
 
 public enum VisitCountBucket {
     FIRST_VISIT,

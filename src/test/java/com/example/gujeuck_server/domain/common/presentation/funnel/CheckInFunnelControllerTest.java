@@ -1,8 +1,6 @@
-package com.example.gujeuck_server.domain.common.presentation;
+package com.example.gujeuck_server.domain.common.presentation.funnel;
 
-import com.example.gujeuck_server.domain.common.analytics.service.CreateCheckInFunnelEventService;
-import com.example.gujeuck_server.domain.common.presentation.dto.response.ReadyHealthResponse;
-import com.example.gujeuck_server.domain.common.service.QueryHealthCheckService;
+import com.example.gujeuck_server.domain.common.service.funnel.CreateCheckInFunnelEventService;
 import com.example.gujeuck_server.global.error.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,18 +16,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-class CommonControllerTest {
-
-    @Mock
-    private QueryHealthCheckService queryHealthCheckService;
+class CheckInFunnelControllerTest {
 
     @Mock
     private CreateCheckInFunnelEventService createCheckInFunnelEventService;
@@ -40,32 +32,10 @@ class CommonControllerTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
-        mockMvc = MockMvcBuilders.standaloneSetup(new CommonController(queryHealthCheckService, createCheckInFunnelEventService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new CheckInFunnelController(createCheckInFunnelEventService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
                 .build();
-    }
-
-    @Test
-    void ready가_UP이면_200으로_반환한다() throws Exception {
-        when(queryHealthCheckService.ready()).thenReturn(ReadyHealthResponse.up());
-
-        mockMvc.perform(get("/common/health/ready"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("UP"))
-                .andExpect(jsonPath("$.db").value("UP"))
-                .andExpect(jsonPath("$.up").doesNotExist());
-    }
-
-    @Test
-    void ready가_DOWN이면_503으로_반환한다() throws Exception {
-        when(queryHealthCheckService.ready()).thenReturn(ReadyHealthResponse.down());
-
-        mockMvc.perform(get("/common/health/ready"))
-                .andExpect(status().isServiceUnavailable())
-                .andExpect(jsonPath("$.status").value("DOWN"))
-                .andExpect(jsonPath("$.db").value("DOWN"))
-                .andExpect(jsonPath("$.up").doesNotExist());
     }
 
     @Test

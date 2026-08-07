@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.common.analytics.domain;
+package com.example.gujeuck_server.domain.common.domain.funnel;
 
-import com.example.gujeuck_server.domain.common.analytics.domain.enums.VisitCountBucket;
+import com.example.gujeuck_server.domain.common.domain.funnel.enums.VisitCountBucket;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.global.entity.BaseIdEntity;
 import jakarta.persistence.Column;

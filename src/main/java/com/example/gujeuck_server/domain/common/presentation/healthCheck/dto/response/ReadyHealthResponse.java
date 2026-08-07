@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.common.presentation.dto.response;
+package com.example.gujeuck_server.domain.common.presentation.healthCheck.dto.response;
 
 public record ReadyHealthResponse(
         String status,
