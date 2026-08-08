@@ -67,6 +67,8 @@ public enum ErrorCode {
     RESIDENCE_NOT_FOUND(404, "존재하지 않는 거주지 입니다."),
     RESIDENCE_ACCESS_DENIED(403, "해당 거주지에 관한 권한이 없습니다."),
 
+    INVALID_CHECK_IN_FUNNEL_EVENT_NAME(400, "유효하지 않은 체크인 퍼널 이벤트 이름입니다."),
+
     // general
     BAD_REQUEST(400, "잘못된 요청입니다."),
     INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다.");

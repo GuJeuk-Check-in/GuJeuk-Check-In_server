@@ -1,5 +1,6 @@
 package com.example.gujeuck_server.domain.common.funnel.domain.enums;
 
+import com.example.gujeuck_server.domain.common.funnel.exception.InvalidCheckInFunnelEventNameException;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum CheckInFunnelEventName {
@@ -30,7 +31,7 @@ public enum CheckInFunnelEventName {
             }
         }
 
-        throw new IllegalArgumentException("Invalid check-in funnel eventName: " + value);
+        throw InvalidCheckInFunnelEventNameException.EXCEPTION;
     }
 
     public String value() {
