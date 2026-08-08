@@ -3,9 +3,11 @@ package com.example.gujeuck_server.domain.common.funnel.presentation.dto.respons
 import com.example.gujeuck_server.domain.common.funnel.domain.CheckInFunnelEvent;
 import com.example.gujeuck_server.domain.common.funnel.domain.enums.VisitCountBucket;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
+@Builder
 public record CheckInFunnelEventResponse(
         Long id,
         String clientEventId,
@@ -22,22 +24,22 @@ public record CheckInFunnelEventResponse(
         VisitCountBucket visitCountBucket,
         LocalDateTime createdAt
 ) {
-    public CheckInFunnelEventResponse(CheckInFunnelEvent event) {
-        this(
-                event.getId(),
-                event.getClientEventId(),
-                event.getSessionId(),
-                event.getEventName(),
-                event.getOccurredAt(),
-                event.getElapsedMsFromStart(),
-                event.getUserId(),
-                event.getAgeGroup(),
-                event.getPurpose(),
-                event.getFailureReason(),
-                event.getIsExistingUser(),
-                event.getVisitCount(),
-                event.getVisitCountBucket(),
-                event.getCreatedAt()
-        );
+    public static CheckInFunnelEventResponse from(CheckInFunnelEvent event) {
+        return CheckInFunnelEventResponse.builder()
+                .id(event.getId())
+                .clientEventId(event.getClientEventId())
+                .sessionId(event.getSessionId())
+                .eventName(event.getEventName())
+                .occurredAt(event.getOccurredAt())
+                .elapsedMsFromStart(event.getElapsedMsFromStart())
+                .userId(event.getUserId())
+                .ageGroup(event.getAgeGroup())
+                .purpose(event.getPurpose())
+                .failureReason(event.getFailureReason())
+                .isExistingUser(event.getIsExistingUser())
+                .visitCount(event.getVisitCount())
+                .visitCountBucket(event.getVisitCountBucket())
+                .createdAt(event.getCreatedAt())
+                .build();
     }
 }

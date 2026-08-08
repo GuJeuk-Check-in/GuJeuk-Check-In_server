@@ -16,6 +16,6 @@ public class QueryCheckInFunnelEventService {
     @Transactional(readOnly = true)
     public Slice<CheckInFunnelEventResponse> execute(Pageable pageable) {
         return checkInFunnelEventRepository.findAllByOrderByCreatedAtDescIdDesc(pageable)
-                .map(CheckInFunnelEventResponse::new);
+                .map(CheckInFunnelEventResponse::from);
     }
 }
