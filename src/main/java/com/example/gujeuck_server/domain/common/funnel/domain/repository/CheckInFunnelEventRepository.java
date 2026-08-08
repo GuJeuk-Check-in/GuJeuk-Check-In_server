@@ -1,8 +1,6 @@
 package com.example.gujeuck_server.domain.common.funnel.domain.repository;
 
 import com.example.gujeuck_server.domain.common.funnel.domain.CheckInFunnelEvent;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,8 +9,6 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 
 public interface CheckInFunnelEventRepository extends JpaRepository<CheckInFunnelEvent, Long> {
-    Slice<CheckInFunnelEvent> findAllByOrderByCreatedAtDescIdDesc(Pageable pageable);
-
     @Modifying
     @Query(value = """
             INSERT INTO check_in_funnel_event (

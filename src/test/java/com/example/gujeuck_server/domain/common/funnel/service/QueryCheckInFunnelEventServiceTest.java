@@ -10,9 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
@@ -33,7 +35,13 @@ class QueryCheckInFunnelEventServiceTest {
 
     @Test
     void 체크인_퍼널_이벤트_원본을_최신순으로_조회한다() {
-        PageRequest pageable = PageRequest.of(0, 30);
+        PageRequest requestPageable = PageRequest.of(0, 30);
+        Pageable sortedPageable = PageRequest.of(
+                0,
+                30,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+                        .and(Sort.by(Sort.Direction.DESC, "id"))
+        );
         CheckInFunnelEvent event = CheckInFunnelEvent.builder()
                 .clientEventId("11111111-1111-1111-1111-111111111111")
                 .sessionId("22222222-2222-2222-2222-222222222222")
@@ -50,10 +58,10 @@ class QueryCheckInFunnelEventServiceTest {
                 .build();
         ReflectionTestUtils.setField(event, "id", 1L);
 
-        when(checkInFunnelEventRepository.findAllByOrderByCreatedAtDescIdDesc(pageable))
-                .thenReturn(new SliceImpl<>(List.of(event), pageable, false));
+        when(checkInFunnelEventRepository.findAll(sortedPageable))
+                .thenReturn(new PageImpl<>(List.of(event), sortedPageable, 1));
 
-        Slice<CheckInFunnelEventResponse> response = queryCheckInFunnelEventService.execute(pageable);
+        Slice<CheckInFunnelEventResponse> response = queryCheckInFunnelEventService.execute(requestPageable);
 
         assertThat(response.getContent()).hasSize(1);
         CheckInFunnelEventResponse eventResponse = response.getContent().get(0);
@@ -62,6 +70,6 @@ class QueryCheckInFunnelEventServiceTest {
         assertThat(eventResponse.eventName()).isEqualTo("check_in_completed_view");
         assertThat(eventResponse.occurredAt()).isEqualTo(LocalDateTime.of(2026, 8, 5, 19, 17, 30));
         assertThat(eventResponse.visitCountBucket()).isEqualTo(VisitCountBucket.RETURNING_4_9);
-        verify(checkInFunnelEventRepository).findAllByOrderByCreatedAtDescIdDesc(pageable);
+        verify(checkInFunnelEventRepository).findAll(sortedPageable);
     }
 }

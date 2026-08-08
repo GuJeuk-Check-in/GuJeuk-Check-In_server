@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,7 +37,7 @@ public class CheckInFunnelController {
 
     @GetMapping("/check-in-funnel/events")
     public Slice<CheckInFunnelEventResponse> queryCheckInFunnelEvents(
-            @PageableDefault(size = 30, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC)
+            @PageableDefault(size = 30)
             Pageable pageable
     ) {
         return queryCheckInFunnelEventService.execute(pageable);
