@@ -1,7 +1,7 @@
-package com.example.gujeuck_server.domain.common.presentation;
+package com.example.gujeuck_server.domain.common.healthCheck.presentation;
 
-import com.example.gujeuck_server.domain.common.presentation.dto.response.ReadyHealthResponse;
-import com.example.gujeuck_server.domain.common.service.QueryHealthCheckService;
+import com.example.gujeuck_server.domain.common.healthCheck.presentation.dto.response.ReadyHealthResponse;
+import com.example.gujeuck_server.domain.common.healthCheck.service.QueryHealthCheckService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-class CommonControllerTest {
+class HealthCheckControllerTest {
 
     @Mock
     private QueryHealthCheckService queryHealthCheckService;
@@ -25,7 +25,8 @@ class CommonControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new CommonController(queryHealthCheckService)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new HealthCheckController(queryHealthCheckService))
+                .build();
     }
 
     @Test

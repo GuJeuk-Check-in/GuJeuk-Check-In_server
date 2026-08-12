@@ -24,6 +24,8 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     long countByOrganIdAndResidenceNotIn(Long organId, List<String> residences);
 
+    boolean existsByIdAndOrganId(Long id, Long organId);
+
     Optional<User> findByNameAndPhone(String name, String phone);
 
     @Query(
