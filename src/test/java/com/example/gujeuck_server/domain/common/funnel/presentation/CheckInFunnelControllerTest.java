@@ -173,7 +173,6 @@ class CheckInFunnelControllerTest {
     private Organ organ() {
         Organ organ = Organ.builder()
                 .organName("구즉청소년문화의집")
-                .password("password")
                 .build();
         ReflectionTestUtils.setField(organ, "id", 1L);
         return organ;
