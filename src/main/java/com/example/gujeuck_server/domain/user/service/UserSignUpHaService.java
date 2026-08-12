@@ -42,18 +42,10 @@ public class UserSignUpHaService {
     }
 
     private User findOrCreateUser(Organ organ, HaDataSignUpRequest request) {
-        String normalizedPhone = normalizePhone(request.phone());
+        List<User> foundUsers = userRepository.findAllByName(request.name());
 
-        if (!normalizedPhone.isEmpty()) {
-            List<User> foundUsers =
-                userRepository.findAllByNameAndNormalizedPhone(
-                    request.name(),
-                    normalizedPhone
-                );
-
-            if (!foundUsers.isEmpty()) {
-                return foundUsers.get(0);
-            }
+        if (!foundUsers.isEmpty()) {
+            return foundUsers.get(0);
         }
 
         User newUser = User.builder()
@@ -68,9 +60,5 @@ public class UserSignUpHaService {
             .build();
 
         return userRepository.save(newUser);
-    }
-
-    private String normalizePhone(String phone) {
-        return phone == null ? "" : phone.replaceAll("\\D", "");
     }
 }
