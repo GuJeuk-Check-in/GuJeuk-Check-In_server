@@ -16,7 +16,7 @@ public class QueryCheckInFunnelEventService {
     private final CheckInFunnelEventRepository checkInFunnelEventRepository;
 
     @Transactional(readOnly = true)
-    public Slice<CheckInFunnelEventResponse> execute(Pageable p) {
+    public Slice<CheckInFunnelEventResponse> execute(Long organId, Pageable p) {
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),
                 p.getPageSize(),
@@ -24,7 +24,7 @@ public class QueryCheckInFunnelEventService {
                         .and(Sort.by(Sort.Direction.DESC, "id"))
         );
 
-        return checkInFunnelEventRepository.findAll(pageable)
+        return checkInFunnelEventRepository.findAllByOrganId(pageable, organId)
                 .map(CheckInFunnelEventResponse::from);
     }
 }

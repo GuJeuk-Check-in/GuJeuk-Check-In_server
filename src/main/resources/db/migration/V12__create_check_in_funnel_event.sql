@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS check_in_funnel_event (
     id BIGINT NOT NULL AUTO_INCREMENT,
+    organ_id BIGINT NOT NULL,
     client_event_id VARCHAR(36) NOT NULL,
     session_id VARCHAR(36) NOT NULL,
     event_name VARCHAR(60) NOT NULL,
@@ -14,5 +15,6 @@ CREATE TABLE IF NOT EXISTS check_in_funnel_event (
     visit_count_bucket VARCHAR(30) NULL,
     created_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     PRIMARY KEY (id),
+    KEY idx_check_in_funnel_event_organ_created_id (organ_id, created_at, id),
     UNIQUE KEY uk_check_in_funnel_event_client_event_id (client_event_id)
 );

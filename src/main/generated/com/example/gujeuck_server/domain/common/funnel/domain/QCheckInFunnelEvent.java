@@ -35,6 +35,8 @@ public class QCheckInFunnelEvent extends EntityPathBase<CheckInFunnelEvent> {
 
     public final DateTimePath<java.time.LocalDateTime> occurredAt = createDateTime("occurredAt", java.time.LocalDateTime.class);
 
+    public final NumberPath<Long> organId = createNumber("organId", Long.class);
+
     public final StringPath purpose = createString("purpose");
 
     public final StringPath sessionId = createString("sessionId");

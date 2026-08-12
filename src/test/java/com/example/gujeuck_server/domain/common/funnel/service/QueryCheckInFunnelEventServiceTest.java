@@ -43,6 +43,7 @@ class QueryCheckInFunnelEventServiceTest {
                         .and(Sort.by(Sort.Direction.DESC, "id"))
         );
         CheckInFunnelEvent event = CheckInFunnelEvent.builder()
+                .organId(1L)
                 .clientEventId("11111111-1111-1111-1111-111111111111")
                 .sessionId("22222222-2222-2222-2222-222222222222")
                 .eventName("check_in_completed_view")
@@ -58,10 +59,10 @@ class QueryCheckInFunnelEventServiceTest {
                 .build();
         ReflectionTestUtils.setField(event, "id", 1L);
 
-        when(checkInFunnelEventRepository.findAll(sortedPageable))
+        when(checkInFunnelEventRepository.findAllByOrganId(sortedPageable, 1L))
                 .thenReturn(new PageImpl<>(List.of(event), sortedPageable, 1));
 
-        Slice<CheckInFunnelEventResponse> response = queryCheckInFunnelEventService.execute(requestPageable);
+        Slice<CheckInFunnelEventResponse> response = queryCheckInFunnelEventService.execute(1L, requestPageable);
 
         assertThat(response.getContent()).hasSize(1);
         CheckInFunnelEventResponse eventResponse = response.getContent().get(0);
@@ -70,6 +71,6 @@ class QueryCheckInFunnelEventServiceTest {
         assertThat(eventResponse.eventName()).isEqualTo("check_in_completed_view");
         assertThat(eventResponse.occurredAt()).isEqualTo(LocalDateTime.of(2026, 8, 5, 19, 17, 30));
         assertThat(eventResponse.visitCountBucket()).isEqualTo(VisitCountBucket.RETURNING_4_9);
-        verify(checkInFunnelEventRepository).findAll(sortedPageable);
+        verify(checkInFunnelEventRepository).findAllByOrganId(sortedPageable, 1L);
     }
 }

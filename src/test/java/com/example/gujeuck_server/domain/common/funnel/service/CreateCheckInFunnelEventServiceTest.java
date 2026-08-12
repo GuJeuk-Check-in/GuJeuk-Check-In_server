@@ -122,6 +122,7 @@ class CreateCheckInFunnelEventServiceTest {
 
         verifyNoInteractions(logRepository);
         verify(checkInFunnelEventRepository, never()).insertKeepingExistingClientEvent(
+                anyLong(),
                 anyString(),
                 anyString(),
                 anyString(),
@@ -159,6 +160,7 @@ class CreateCheckInFunnelEventServiceTest {
             String visitCountBucket
     ) {
         verify(checkInFunnelEventRepository).insertKeepingExistingClientEvent(
+                eq(1L),
                 eq(clientEventId.toString()),
                 anyString(),
                 anyString(),

@@ -1,6 +1,8 @@
 package com.example.gujeuck_server.domain.common.funnel.domain.repository;
 
 import com.example.gujeuck_server.domain.common.funnel.domain.CheckInFunnelEvent;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,9 +11,12 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 
 public interface CheckInFunnelEventRepository extends JpaRepository<CheckInFunnelEvent, Long> {
+    Slice<CheckInFunnelEvent> findAllByOrganId(Pageable pageable, Long organId);
+
     @Modifying
     @Query(value = """
             INSERT INTO check_in_funnel_event (
+                organ_id,
                 client_event_id,
                 session_id,
                 event_name,
@@ -26,6 +31,7 @@ public interface CheckInFunnelEventRepository extends JpaRepository<CheckInFunne
                 visit_count_bucket
             )
             VALUES (
+                :organId,
                 :clientEventId,
                 :sessionId,
                 :eventName,
@@ -42,6 +48,7 @@ public interface CheckInFunnelEventRepository extends JpaRepository<CheckInFunne
             ON DUPLICATE KEY UPDATE client_event_id = client_event_id
             """, nativeQuery = true)
     void insertKeepingExistingClientEvent(
+            @Param("organId") Long organId,
             @Param("clientEventId") String clientEventId,
             @Param("sessionId") String sessionId,
             @Param("eventName") String eventName,

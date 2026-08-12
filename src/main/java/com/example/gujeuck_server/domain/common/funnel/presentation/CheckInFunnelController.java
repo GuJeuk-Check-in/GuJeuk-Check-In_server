@@ -37,9 +37,10 @@ public class CheckInFunnelController {
 
     @GetMapping("/check-in-funnel/events")
     public Slice<CheckInFunnelEventResponse> queryCheckInFunnelEvents(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 30)
             Pageable pageable
     ) {
-        return queryCheckInFunnelEventService.execute(pageable);
+        return queryCheckInFunnelEventService.execute(userDetails.organ().getId(), pageable);
     }
 }

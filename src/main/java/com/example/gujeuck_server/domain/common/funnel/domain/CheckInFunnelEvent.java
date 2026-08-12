@@ -33,6 +33,9 @@ import java.time.LocalDateTime;
 )
 public class CheckInFunnelEvent extends BaseIdEntity {
 
+    @Column(name = "organ_id", nullable = false)
+    private Long organId;
+
     @Column(name = "client_event_id", nullable = false, length = 36)
     private String clientEventId;
 

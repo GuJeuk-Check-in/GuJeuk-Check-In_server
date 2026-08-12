@@ -42,7 +42,7 @@ public class CreateCheckInFunnelEventService {
                 .distinct()
                 .collect(Collectors.toMap(Function.identity(), logRepository::countByUserId));
 
-        uniqueEvents.forEach(event -> insertKeepingExistingClientEvent(event, visitCountsByUserId));
+        uniqueEvents.forEach(event -> insertKeepingExistingClientEvent(organId, event, visitCountsByUserId));
     }
 
     private List<CheckInFunnelEventRequest> uniqueByClientEventId(List<CheckInFunnelEventRequest> events) {
@@ -65,11 +65,12 @@ public class CreateCheckInFunnelEventService {
         }
     }
 
-    private void insertKeepingExistingClientEvent(CheckInFunnelEventRequest request, Map<Long, Long> visitCountsByUserId) {
+    private void insertKeepingExistingClientEvent(Long organId, CheckInFunnelEventRequest request, Map<Long, Long> visitCountsByUserId) {
         Long visitCount = request.userId() == null ? null : visitCountsByUserId.get(request.userId());
         VisitCountBucket visitCountBucket = visitCount == null ? null : bucketOf(visitCount);
 
         checkInFunnelEventRepository.insertKeepingExistingClientEvent(
+                organId,
                 request.clientEventId().toString(),
                 request.sessionId().toString(),
                 request.eventName().value(),

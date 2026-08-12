@@ -128,7 +128,7 @@ class CheckInFunnelControllerTest {
                 LocalDateTime.of(2026, 8, 5, 19, 18, 0)
         );
 
-        when(queryCheckInFunnelEventService.execute(any()))
+        when(queryCheckInFunnelEventService.execute(eq(1L), any()))
                 .thenReturn(new SliceImpl<>(List.of(response), PageRequest.of(0, 30), false));
 
         mockMvc.perform(get("/common/analytics/check-in-funnel/events"))
@@ -140,7 +140,7 @@ class CheckInFunnelControllerTest {
                 .andExpect(jsonPath("$.content[0].isExistingUser").value(true))
                 .andExpect(jsonPath("$.content[0].visitCountBucket").value("RETURNING_4_9"));
 
-        verify(queryCheckInFunnelEventService).execute(any());
+        verify(queryCheckInFunnelEventService).execute(eq(1L), any());
     }
 
     @Test
