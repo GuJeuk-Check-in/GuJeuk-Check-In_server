@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.common.service;
+package com.example.gujeuck_server.domain.common.healthCheck.service;
 
-import com.example.gujeuck_server.domain.common.presentation.dto.response.ReadyHealthResponse;
+import com.example.gujeuck_server.domain.common.healthCheck.presentation.dto.response.ReadyHealthResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

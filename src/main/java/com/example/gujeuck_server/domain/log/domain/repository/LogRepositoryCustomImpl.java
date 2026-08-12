@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
+import com.example.gujeuck_server.domain.log.domain.MonthlyOperationCount;
 import com.example.gujeuck_server.domain.log.domain.QLog;
 import com.example.gujeuck_server.domain.log.domain.VisitStatisticsCount;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
@@ -14,6 +15,7 @@ import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,15 +64,15 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
     }
 
     @Override
-    public Optional<Log> findByUserIdAndVisitTime(Long userId, String visitDate, String visitTime) {
+    public Optional<Log> findByUserIdAndVisitAt(Long userId, LocalDateTime visitAt, String purpose) {
 
         return Optional.ofNullable(
                 jpaQueryFactory
                         .selectFrom(qLog)
                         .where(
                                 qLog.user.id.eq(userId),
-                                qLog.visitDate.eq(visitDate),
-                                qLog.visitTime.eq(visitTime)
+                                qLog.visitAt.eq(visitAt),
+                                qLog.purpose.eq(purpose)
                         )
                         .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                         .fetchOne()
@@ -148,5 +150,29 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
 
     private long valueOrZero(Long value) {
         return value == null ? 0 : value;
+    }
+
+    @Override
+    public MonthlyOperationCount findMonthlyOperationCount(Long organId, String yearMonth) {
+        Tuple result = jpaQueryFactory
+                .select(qLog.visitDate.countDistinct(), qLog.maleCount.sum().add(qLog.femaleCount.sum()))
+                .from(qLog)
+                .where(
+                        qLog.organ.id.eq(organId),
+                        qLog.visitDate.startsWith(yearMonth)
+                )
+                .fetchOne();
+
+        if (result == null) {
+            return new MonthlyOperationCount(0, 0);
+        }
+
+        Long operatingDays = result.get(0, Long.class);
+        Integer totalVisitors = result.get(1, Integer.class);
+
+        return new MonthlyOperationCount(
+                operatingDays == null ? 0 : operatingDays,
+                totalVisitors == null ? 0 : totalVisitors
+        );
     }
 }

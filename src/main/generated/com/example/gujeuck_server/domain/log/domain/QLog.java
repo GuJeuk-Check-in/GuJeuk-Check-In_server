@@ -26,6 +26,8 @@ public class QLog extends EntityPathBase<Log> {
 
     public final EnumPath<com.example.gujeuck_server.domain.user.domain.enums.Age> age = createEnum("age", com.example.gujeuck_server.domain.user.domain.enums.Age.class);
 
+    public final StringPath clientRecordId = createString("clientRecordId");
+
     public final NumberPath<Integer> femaleCount = createNumber("femaleCount", Integer.class);
 
     //inherited
@@ -44,6 +46,8 @@ public class QLog extends EntityPathBase<Log> {
     public final StringPath purpose = createString("purpose");
 
     public final com.example.gujeuck_server.domain.user.domain.QUser user;
+
+    public final DateTimePath<java.time.LocalDateTime> visitAt = createDateTime("visitAt", java.time.LocalDateTime.class);
 
     public final StringPath visitDate = createString("visitDate");
 

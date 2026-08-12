@@ -23,28 +23,25 @@ public class UserSignUpHaService {
     private static final Long HARDCODED_ORGAN_ID = 1L;
 
     @Transactional
-    public void execute(List<HaDataSignUpRequest> requests) {
+    public void execute(HaDataSignUpRequest request) {
         Organ organ = organRepository.findById(HARDCODED_ORGAN_ID)
                 .orElseThrow(() -> new RuntimeException("Organ not found"));
 
-        for (HaDataSignUpRequest request : requests) {
+        User user = findOrCreateUser(organ, request);
 
-            User user = findOrCreateUser(organ, request);
+        UserCheckInRequest checkInRequest = UserCheckInRequest.create(
+            user.getId(),
+            request.maleCount(),
+            request.femaleCount(),
+            request.purpose(),
+            request.visitTime(),
+            request.clientRecordId()
+        );
 
-            UserCheckInRequest checkInRequest = UserCheckInRequest.create(
-                user.getId(),
-                request.maleCount(),
-                request.femaleCount(),
-                request.purpose(),
-                request.visitTime()
-            );
-
-            userCheckInService.execute(checkInRequest);
-        }
+        userCheckInService.execute(checkInRequest);
     }
 
     private User findOrCreateUser(Organ organ, HaDataSignUpRequest request) {
-
         String normalizedPhone = normalizePhone(request.phone());
 
         if (!normalizedPhone.isEmpty()) {

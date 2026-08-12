@@ -24,15 +24,19 @@ public record UserCheckInRequest (
     String purpose,
 
     @NotNull(message = "방문시각을 비워둘 수 없습니다.")
-    LocalDateTime visitTime
+    LocalDateTime visitTime,
+
+    // HA 경로에서만 전달됨. 일반 check-in 요청은 null.
+    String clientRecordId
 ) {
-    public static UserCheckInRequest create(Long userId, Integer maleCount, Integer femaleCount, String purpose, LocalDateTime visitTime) {
+    public static UserCheckInRequest create(Long userId, Integer maleCount, Integer femaleCount, String purpose, LocalDateTime visitTime, String clientRecordId) {
         return UserCheckInRequest.builder()
             .userId(userId)
             .maleCount(maleCount)
             .femaleCount(femaleCount)
             .purpose(purpose)
             .visitTime(visitTime)
+            .clientRecordId(clientRecordId)
             .build();
     }
 }

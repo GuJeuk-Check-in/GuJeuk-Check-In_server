@@ -2,6 +2,7 @@ package com.example.gujeuck_server.domain.user.service;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
+import com.example.gujeuck_server.domain.log.exception.ClientRecordIdMismatchException;
 import com.example.gujeuck_server.domain.log.exception.DuplicateLogException;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.example.gujeuck_server.domain.log.domain.QLog.log;
 
@@ -33,6 +36,19 @@ public class UserCheckInService {
 
     @Transactional
     public void execute(UserCheckInRequest request) {
+
+        // HA 경로의 재요청(네트워크 실패 후 재전송 등)은 clientRecordId로 이미 처리된 요청인지 먼저 확인해
+        // 기존 중복검사 없이 멱등하게 성공 처리한다. 단, 같은 clientRecordId인데 요청 내용이 다르면
+        // 클라이언트 쪽 ID 재사용 버그일 수 있으므로 정합성 오류로 막는다.
+        if (request.clientRecordId() != null) {
+            Optional<Log> existingLog = logRepository.findByClientRecordId(request.clientRecordId());
+            if (existingLog.isPresent()) {
+                if (isSameRequest(existingLog.get(), request)) {
+                    return;
+                }
+                throw ClientRecordIdMismatchException.EXCEPTION;
+            }
+        }
 
         User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
@@ -50,16 +66,26 @@ public class UserCheckInService {
         log.info("포멧팅 한 후의 시간 : ", visitTime);
         int year = visitDateTime.getYear();
 
-        // 같은 유저가 같은 시각에 이미 체크인했는지 확인한다.
-        if (logRepository.findByUserIdAndVisitTime(user.getId(), visitDate, visitTime).isPresent()) {
+        // 같은 유저가 같은 순간(초 단위)에 이미 체크인했는지 확인한다.
+        if (logRepository.findByUserIdAndVisitAt(user.getId(), visitDateTime, purpose.getPurposeName()).isPresent()) {
             throw DuplicateLogException.EXCEPTION;
         }
 
         user.increaseCount();
 
-        Log log = createLog(user, organ, purpose.getPurposeName(), request, visitDate, visitTime, year);
+        Log log = createLog(user, organ, purpose.getPurposeName(), request, visitDate, visitTime, visitDateTime, year);
 
         logRepository.save(log);
+    }
+
+    private boolean isSameRequest(Log existingLog, UserCheckInRequest request) {
+        Long existingUserId = existingLog.getUser() != null ? existingLog.getUser().getId() : null;
+
+        return Objects.equals(existingUserId, request.userId())
+                && existingLog.getPurpose().equals(request.purpose())
+                && existingLog.getVisitAt().equals(request.visitTime())
+                && existingLog.getMaleCount() == request.maleCount()
+                && existingLog.getFemaleCount() == request.femaleCount();
     }
 
     private Log createLog(
@@ -69,6 +95,7 @@ public class UserCheckInService {
             UserCheckInRequest request,
             String visitDate,
             String visitTime,
+            LocalDateTime visitAt,
             int year
     ) {
         return Log.builder()
@@ -81,9 +108,11 @@ public class UserCheckInService {
                 .privacyAgreed(user.isPrivacyAgreed())
                 .visitDate(visitDate)
                 .visitTime(visitTime)
+                .visitAt(visitAt)
                 .year(year)
                 .user(user)
                 .organ(organ)
+                .clientRecordId(request.clientRecordId())
                 .build();
     }
 }

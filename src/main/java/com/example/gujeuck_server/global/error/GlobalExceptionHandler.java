@@ -23,7 +23,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handClimException(GujeukException e) {
 
         ErrorCode errorCode = e.getErrorCode();
-        ErrorResponse response = ErrorResponse.of(errorCode, errorCode.getErrorMessage());
+        String description = e.getMessage() != null ? e.getMessage() : errorCode.getErrorMessage();
+        ErrorResponse response = ErrorResponse.of(errorCode, description);
         e.printStackTrace();
 
         return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatusCode()));
