@@ -1,0 +1,54 @@
+name: 🧑🏻‍💻 기능 추가
+description: 새로운 기능을 개발합니다
+title: "[FEAT] "
+labels: ["🧑🏻‍💻 feat"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **브랜치** `feat/#이슈번호-브랜치네임` · **커밋** `feat(#이슈번호) :: 메시지`
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 📋 기능 설명
+      description: 무엇을 만드는지 한두 문장으로 적어주세요.
+      placeholder: 관리자가 연도 단위로 시설 이용률을 조회할 수 있는 API를 추가합니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: 🤔 배경
+      description: 왜 필요한지, 어떤 요청에서 나왔는지 적어주세요.
+      placeholder: 기관 방문 회의에서 연간 실적 보고용 집계가 필요하다는 요청이 있었습니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: todo
+    attributes:
+      label: 🚧 작업 내용
+      value: |
+        - [ ]
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: textarea
+    id: api
+    attributes:
+      label: 🔗 API 명세
+      description: 신규·변경되는 엔드포인트가 있다면 적어주세요. 없으면 비워두세요.
+      value: |
+        | Method | Endpoint | 설명 |
+        | ------ | -------- | ---- |
+        |        |          |      |
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: 📎 참고 자료
+      description: 관련 이슈·PR·문서·디자인 링크를 남겨주세요.

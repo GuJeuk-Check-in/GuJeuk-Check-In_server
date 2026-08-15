@@ -1,0 +1,46 @@
+name: 🧪 핫픽스
+description: 운영 중 발생한 치명적인 오류를 즉시 수정합니다
+title: "[HOTFIX] "
+labels: ["🧪 HotFix"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **브랜치** `hotfix/#이슈번호-브랜치네임` · **커밋** `hotfix(#이슈번호) :: 메시지`
+        >
+        > 핫픽스는 `main` 기준으로 분기하고, 배포 후 `develop` 에도 반영해주세요.
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: 🚨 현재 영향
+      description: 지금 무엇이 안 되고 있는지, 누가 영향을 받는지 적어주세요.
+      placeholder: 구즉 기관 단말에서 체크인이 전부 실패하고 있습니다. 현장은 수기로 대응 중입니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: cause
+    attributes:
+      label: 🔍 원인
+      description: 파악된 원인을 적어주세요. 조사 중이라면 그렇게 적어도 됩니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: action
+    attributes:
+      label: 🛠️ 조치 내용
+      value: |
+        - [ ] 원인 파악
+        - [ ] 수정 및 배포
+        - [ ] `develop` 반영
+        - [ ] 재발 방지 조치
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 📄 로그
+      render: shell

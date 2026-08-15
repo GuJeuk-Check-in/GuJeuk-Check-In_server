@@ -1,0 +1,57 @@
+name: 🐞 버그 리포트
+description: 동작하지 않는 기능을 보고합니다
+title: "[BUG] "
+labels: ["🐞 bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **브랜치** `fix/#이슈번호-브랜치네임` · **커밋** `fix(#이슈번호) :: 메시지`
+        >
+        > 운영 중인 서비스가 멈춘 상황이라면 **🧪 핫픽스** 템플릿을 사용해주세요.
+
+  - type: textarea
+    id: describe
+    attributes:
+      label: 🐛 발생한 문제
+      description: 어떤 문제가 일어나는지 적어주세요.
+      placeholder: 동행인 수를 0으로 입력하면 체크인 기록이 생성되지 않습니다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 🔁 재현 방법
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: ✅ 기대한 동작
+      placeholder: 동행인 수가 0이어도 대표자 1명의 체크인 기록이 생성되어야 합니다.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: 🌍 발생 환경
+      options:
+        - local
+        - dev
+        - prod (운영)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 📄 로그 · 스크린샷
+      description: 에러 로그나 응답 본문을 붙여주세요. 자동으로 코드 블록으로 표시됩니다.
+      render: shell
