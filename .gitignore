@@ -1,8 +1,16 @@
 HELP.md
 .env
 .env.*
+# `gujeuk-check-in-server.prod.env` 처럼 접두어가 붙은 형태는 위 두 패턴에 걸리지 않는다.
+*.env
 !.env.example
 !.env.stag.example
+!*.env.example
+
+# DB 덤프/백업은 개인정보와 자격증명을 포함하므로 절대 커밋하지 않는다.
+backups/
+*.dump
+dump.rdb
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
