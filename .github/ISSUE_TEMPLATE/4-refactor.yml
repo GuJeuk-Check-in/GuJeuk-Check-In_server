@@ -1,0 +1,43 @@
+name: ♻️ 리팩토링
+description: 동작은 그대로 두고 코드 구조를 개선합니다
+title: "[REFACTOR] "
+labels: ["♻️ refactor"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **브랜치** `refactor/#이슈번호-브랜치네임` · **커밋** `refactor(#이슈번호) :: 메시지`
+
+  - type: textarea
+    id: target
+    attributes:
+      label: 🎯 대상
+      description: 어떤 클래스·패키지·계층을 손볼지 적어주세요.
+      placeholder: domain/user/service/UserCheckInWithNamesakesService
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 😵 현재 문제
+      description: 지금 구조의 어떤 점이 불편한지 적어주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: plan
+    attributes:
+      label: 🚧 개선 방향
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: no-behavior-change
+    attributes:
+      label: ⚠️ 동작 변경 여부
+      options:
+        - label: 이 작업으로 외부 동작(API 응답·DB 스키마)이 바뀌지 않습니다
