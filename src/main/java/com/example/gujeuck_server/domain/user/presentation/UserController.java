@@ -18,7 +18,7 @@ public class UserController {
 
     private final SignupService signupService;
     private final UserExistsService userExistsService;
-    private final UserCheckInWithNamesakesService userCheckInWithNamesakesService;
+    private final UserCheckInService userCheckInService;
     private final UserLogHaService userLogHaService;
     private final UserSignUpHaService userSignUpHaService;
 
@@ -36,7 +36,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/check-in")
     public void checkIn(@RequestBody @Valid UserCheckInRequest request) {
-        userCheckInWithNamesakesService.execute(request);
+        userCheckInService.execute(request);
     }
 
     @PostMapping("/ha-log")
