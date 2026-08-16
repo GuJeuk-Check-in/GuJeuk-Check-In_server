@@ -1,12 +1,10 @@
 package com.example.gujeuck_server.domain.user.presentation.dto.response;
 
-import java.util.List;
-
 public record UserExistsResponse(
         boolean userExists,
-        List<Long> userIds
+        Long userId
 ) {
-    public static UserExistsResponse of(boolean userExists, List<Long> userIds) {
-        return new UserExistsResponse(userExists, userIds);
+    public static UserExistsResponse of(boolean userExists, Long userId) {
+        return new UserExistsResponse(userExists, userId);
     }
 }
