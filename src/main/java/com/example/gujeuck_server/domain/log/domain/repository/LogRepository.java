@@ -21,6 +21,8 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
 
   Optional<Log> findByClientRecordId(String clientRecordId);
 
+  Optional<Log> findFirstByNameAndUserIsNotNullOrderByIdDesc(String name);
+
   long countByUserId(Long userId);
 
   boolean existsByOrganIdAndNameAndAgeAndPurposeAndVisitDateAndVisitTime(
