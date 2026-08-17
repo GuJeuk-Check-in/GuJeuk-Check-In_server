@@ -177,13 +177,16 @@ jobs:
             docker compose --env-file .env pull app
             docker compose --env-file .env up -d
 
-            for i in $(seq 1 10); do
+            # Flyway 마이그레이션과 JPA 초기화까지 포함해 기동에 70~80초가 걸린다.
+            # 기존 30초(10회x3s)로는 앱이 정상인데도 실패로 판정됐다. 120초까지 기다린다.
+            for i in $(seq 1 40); do
               if curl -fs "http://localhost:${LOCAL_PORT}/purpose/all" >/dev/null; then
-                echo "local health check OK"
+                echo "local health check OK (${i}번째 시도, 약 $((i * 3))초)"
                 break
               fi
-              if [ "$i" = "10" ]; then
-                echo "local health check FAILED"
+              if [ "$i" = "40" ]; then
+                echo "local health check FAILED (120초 대기 후에도 응답 없음)"
+                docker compose --env-file .env logs --tail 50 app || true
                 exit 1
               fi
               sleep 3
@@ -194,13 +197,13 @@ jobs:
       - name: Public health check
         run: |
           set -euo pipefail
-          for i in $(seq 1 10); do
+          for i in $(seq 1 40); do
             STATUS=$(curl -fs -o /dev/null -w "%{http_code}" "${{ steps.target.outputs.public_health_url }}" || echo "000")
             if [ "$STATUS" = "200" ]; then
-              echo "public health check OK"
+              echo "public health check OK (${i}번째 시도, 약 $((i * 3))초)"
               exit 0
             fi
             sleep 3
           done
-          echo "public health check FAILED (last status: $STATUS)"
+          echo "public health check FAILED (120초 대기 후 마지막 상태: $STATUS)"
           exit 1
