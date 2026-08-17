@@ -63,7 +63,6 @@ services:
     networks:
       - monitoring
       - gujeuk-aws-prod_default
-      - gujeuk-aws-stag_default
 
 volumes:
   prometheus_data:
@@ -73,6 +72,4 @@ networks:
   monitoring:
     name: monitoring
   gujeuk-aws-prod_default:
-    external: true
-  gujeuk-aws-stag_default:
     external: true

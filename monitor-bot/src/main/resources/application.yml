@@ -24,20 +24,21 @@ monitor:
     guild-id: ${DISCORD_GUILD_ID:}
     channel-id: ${DISCORD_CHANNEL_ID:}
     webhook-url: ${DISCORD_WEBHOOK_URL:}
-  report-cron: ${REPORT_CRON:0 0 * * * *}
+
+  # stag 는 감시 대상에서 제외한다. prod 만 본다.
   targets:
     - name: prod
       health-check-url: ${PROD_HEALTH_CHECK_URL:http://gujeuk-app-prod:8080/common/health/ready}
       app-container: gujeuk-app-prod
       db-container: gujeuk-mysql-prod
       redis-container: gujeuk-redis-prod
-    - name: stag
-      health-check-url: ${STAG_HEALTH_CHECK_URL:http://gujeuk-app-stag:8080/common/health/ready}
-      app-container: gujeuk-app-stag
-      db-container: gujeuk-mysql-stag
-      redis-container: gujeuk-redis-stag
   extra-containers: gujeuk-aws-caddy
   health-check-timeout-seconds: 3
+
+  # 외부 관점 점검 대상. 임계치 판단과 알림은 Grafana 알림 규칙이 담당한다.
+  probe:
+    public-health-url: ${PUBLIC_HEALTH_URL:https://aws-api.oijwef098234.com/common/health/ready}
+    public-api-url: ${PUBLIC_API_URL:https://aws-api.oijwef098234.com/purpose/all}
 
 logging:
   level:
