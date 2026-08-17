@@ -17,13 +17,21 @@ public class DockerStatusService {
     public ContainerStatus inspect(String containerName) {
         try {
             InspectContainerResponse response = dockerClient.inspectContainerCmd(containerName).exec();
-            return new ContainerStatus(containerName, resolveState(response), resolveHealth(response));
+            return new ContainerStatus(containerName, resolveState(response), resolveHealth(response), resolveRestartCount(response), resolveOomKilled(response));
         } catch (NotFoundException e) {
-            return new ContainerStatus(containerName, ContainerState.NOT_FOUND, HealthState.NOT_FOUND);
+            return new ContainerStatus(containerName, ContainerState.NOT_FOUND, HealthState.NOT_FOUND, 0, false);
         } catch (Exception e) {
             log.warn("컨테이너 상태 조회 실패: {}", containerName, e);
-            return new ContainerStatus(containerName, ContainerState.NOT_FOUND, HealthState.NOT_FOUND);
+            return new ContainerStatus(containerName, ContainerState.NOT_FOUND, HealthState.NOT_FOUND, 0, false);
         }
+    }
+
+    private int resolveRestartCount(InspectContainerResponse response) {
+        return response.getRestartCount() == null ? 0 : response.getRestartCount();
+    }
+
+    private boolean resolveOomKilled(InspectContainerResponse response) {
+        return response.getState() != null && Boolean.TRUE.equals(response.getState().getOOMKilled());
     }
 
     private ContainerState resolveState(InspectContainerResponse response) {
