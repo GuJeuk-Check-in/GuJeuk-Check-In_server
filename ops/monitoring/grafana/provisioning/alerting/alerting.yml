@@ -22,6 +22,16 @@ policies:
     # 같은 장애가 계속되는 동안 6시간마다 한 번만 다시 알린다.
     repeat_interval: 6h
 
+# 프로비저닝은 파일에서 규칙을 지워도 Grafana DB 에서 자동으로 없애지 않는다.
+# 아래에 명시해야 실제로 삭제된다.
+deleteRules:
+  # isEc2Online() 이 항상 true 라 한 번도 발동할 수 없던 규칙.
+  - orgId: 1
+    uid: gujeuk-alert-ec2-offline
+  # MySQL 은 database_up 과 중복이고, Redis 는 전용 규칙으로 분리했다.
+  - orgId: 1
+    uid: gujeuk-alert-container-unhealthy
+
 groups:
   - orgId: 1
     name: gujeuk-status-alerts

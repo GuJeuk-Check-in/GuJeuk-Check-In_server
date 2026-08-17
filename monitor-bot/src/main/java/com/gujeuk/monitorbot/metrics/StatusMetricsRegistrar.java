@@ -13,7 +13,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Supplier;
 
 /**
  * 값 규칙: 정상 1 / 비정상 0 / 확인 불가 -1.
@@ -101,38 +100,36 @@ public class StatusMetricsRegistrar {
      * 내부 헬스체크가 통과해도 사용자는 못 쓰는 구간(DNS·Caddy·인증서)을 잡기 위한 외부 관점 지표.
      */
     private void registerExternalGauges() {
-        registerProbeGauge("public_endpoint_up",
-                "외부 도메인 접근 가능 여부 (1=OK). DNS·프록시·TLS 경로를 포함한다",
-                endpointProbe::publicHealth,
-                result -> result.isSuccess() ? 1 : 0);
+        // Gauge 는 대상 객체를 약한 참조로 잡는다. 람다를 넘기면 GC 되어 NaN 이 되므로
+        // 반드시 스프링 빈(endpointProbe, tlsCertificateProbe)을 직접 넘긴다.
+        Gauge.builder("public_endpoint_up", endpointProbe,
+                        p -> upValue(p.publicHealth()))
+                .description("외부 도메인 접근 가능 여부 (1=OK). DNS·프록시·TLS 경로를 포함한다")
+                .register(meterRegistry);
 
-        registerProbeGauge("public_endpoint_latency_ms",
-                "외부 도메인 응답 시간(ms). 실패 시 -1",
-                endpointProbe::publicHealth,
-                result -> result.isSuccess() ? result.latencyMs() : UNKNOWN);
+        Gauge.builder("public_endpoint_latency_ms", endpointProbe,
+                        p -> {
+                            HttpProbe.Result result = p.publicHealth();
+                            return result != null && result.isSuccess() ? result.latencyMs() : UNKNOWN;
+                        })
+                .description("외부 도메인 응답 시간(ms). 실패 시 -1")
+                .register(meterRegistry);
 
-        registerProbeGauge("public_api_up",
-                "외부에서 실제 조회 API 호출 성공 여부 (1=OK). 라우팅·시큐리티 설정 오류를 잡는다",
-                endpointProbe::publicApi,
-                result -> result.isSuccess() ? 1 : 0);
+        Gauge.builder("public_api_up", endpointProbe,
+                        p -> upValue(p.publicApi()))
+                .description("외부에서 실제 조회 API 호출 성공 여부 (1=OK). 라우팅·시큐리티 설정 오류를 잡는다")
+                .register(meterRegistry);
 
         Gauge.builder("tls_cert_days_remaining", tlsCertificateProbe, TlsCertificateProbe::daysRemaining)
                 .description("TLS 인증서 만료까지 남은 일수. 확인 불가 시 -1")
                 .register(meterRegistry);
     }
 
-    private void registerProbeGauge(
-            String name,
-            String description,
-            Supplier<HttpProbe.Result> probe,
-            java.util.function.ToDoubleFunction<HttpProbe.Result> valueOf
-    ) {
-        Gauge.builder(name, probe, p -> {
-                    HttpProbe.Result result = p.get();
-                    return result == null ? UNKNOWN : valueOf.applyAsDouble(result);
-                })
-                .description(description)
-                .register(meterRegistry);
+    private double upValue(HttpProbe.Result result) {
+        if (result == null) {
+            return UNKNOWN;
+        }
+        return result.isSuccess() ? 1 : 0;
     }
 
     private double runningValue(ContainerState state) {
