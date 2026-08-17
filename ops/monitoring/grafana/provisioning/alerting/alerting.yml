@@ -1,5 +1,8 @@
 apiVersion: 1
 
+# 문제가 생겼을 때만 디스코드로 알린다. 정기 보고는 보내지 않는다.
+# 알림 문구는 "무엇이 언제부터 잘못됐는지" 한 줄로만 남긴다.
+
 contactPoints:
   - orgId: 1
     name: discord-alerts
@@ -14,9 +17,10 @@ policies:
   - orgId: 1
     receiver: discord-alerts
     group_by: ["alertname"]
-    group_wait: 10s
-    group_interval: 1m
-    repeat_interval: 1h
+    group_wait: 30s
+    group_interval: 5m
+    # 같은 장애가 계속되는 동안 6시간마다 한 번만 다시 알린다.
+    repeat_interval: 6h
 
 groups:
   - orgId: 1
@@ -24,17 +28,19 @@ groups:
     folder: 구즉 상태
     interval: 1m
     rules:
-      - uid: gujeuk-alert-ec2-offline
-        title: "EC2 OFFLINE"
+      # ── 서비스 전체 ────────────────────────────────────────────────
+      - uid: gujeuk-alert-public-down
+        title: "서비스 접속 불가"
         condition: B
-        for: 1m
+        # 배포 중 재시작으로 잠깐 끊기는 건 넘긴다.
+        for: 2m
         noDataState: OK
         execErrState: Alerting
         data:
           - refId: A
-            relativeTimeRange: { from: 120, to: 0 }
+            relativeTimeRange: { from: 300, to: 0 }
             datasourceUid: gujeuk-prometheus
-            model: { refId: A, expr: "ec2_online == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+            model: { refId: A, expr: "public_endpoint_up == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
           - refId: B
             relativeTimeRange: { from: 0, to: 0 }
             datasourceUid: __expr__
@@ -45,17 +51,67 @@ groups:
               conditions:
                 - evaluator: { type: gt, params: [-999] }
         labels: { severity: critical }
-        annotations: { summary: "EC2 인스턴스가 OFFLINE 상태입니다." }
+        annotations:
+          summary: "외부에서 API 도메인에 접속되지 않습니다. (DNS·Caddy·인증서·앱 중 하나)"
 
-      - uid: gujeuk-alert-spring-down
-        title: "Spring API DOWN"
+      - uid: gujeuk-alert-public-api-fail
+        title: "조회 API 실패"
         condition: B
-        for: 1m
+        for: 2m
         noDataState: OK
         execErrState: Alerting
         data:
           - refId: A
-            relativeTimeRange: { from: 120, to: 0 }
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: gujeuk-prometheus
+            model: { refId: A, expr: "public_api_up == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [-999] }
+        labels: { severity: critical }
+        annotations:
+          summary: "도메인은 살아있는데 실제 조회 API가 실패합니다."
+
+      - uid: gujeuk-alert-latency
+        title: "응답 지연"
+        condition: B
+        for: 5m
+        noDataState: OK
+        execErrState: OK
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: gujeuk-prometheus
+            model: { refId: A, expr: "public_endpoint_latency_ms > 3000", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [-999] }
+        labels: { severity: warning }
+        annotations:
+          summary: "API 응답이 3초를 넘고 있습니다. ({{ $values.A }}ms)"
+
+      # ── 앱 / DB ───────────────────────────────────────────────────
+      - uid: gujeuk-alert-spring-down
+        title: "앱 DOWN"
+        condition: B
+        for: 2m
+        noDataState: OK
+        execErrState: Alerting
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
             datasourceUid: gujeuk-prometheus
             model: { refId: A, expr: "spring_api_up == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
           - refId: B
@@ -68,7 +124,8 @@ groups:
               conditions:
                 - evaluator: { type: gt, params: [-999] }
         labels: { severity: critical }
-        annotations: { summary: "{{ $labels.target }} Spring API가 DOWN 상태입니다." }
+        annotations:
+          summary: "앱 헬스체크 실패. 앱이 죽었거나 DB 커넥션이 끊겼습니다."
 
       - uid: gujeuk-alert-db-down
         title: "DB DOWN"
@@ -78,7 +135,7 @@ groups:
         execErrState: Alerting
         data:
           - refId: A
-            relativeTimeRange: { from: 120, to: 0 }
+            relativeTimeRange: { from: 300, to: 0 }
             datasourceUid: gujeuk-prometheus
             model: { refId: A, expr: "database_up == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
           - refId: B
@@ -91,17 +148,50 @@ groups:
               conditions:
                 - evaluator: { type: gt, params: [-999] }
         labels: { severity: critical }
-        annotations: { summary: "{{ $labels.target }} DB 연결이 DOWN 상태입니다." }
+        annotations:
+          summary: "MySQL 이 응답하지 않습니다."
 
-      - uid: gujeuk-alert-container-stopped
-        title: "컨테이너 중지/재시작"
+      # database_up 은 MySQL 컨테이너 healthcheck 와 같은 값이라 별도 규칙을 두지 않는다.
+      # Redis 는 어느 규칙에도 안 걸려서 따로 본다. (토큰 저장소라 죽으면 로그인이 막힌다)
+      - uid: gujeuk-alert-redis-down
+        title: "Redis DOWN"
         condition: B
-        for: 1m
+        for: 2m
         noDataState: OK
         execErrState: Alerting
         data:
           - refId: A
-            relativeTimeRange: { from: 120, to: 0 }
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: gujeuk-prometheus
+            model:
+              refId: A
+              expr: 'docker_container_healthy{container="gujeuk-redis-prod"} == 0'
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 100
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [-999] }
+        labels: { severity: critical }
+        annotations:
+          summary: "Redis 가 응답하지 않습니다. 관리자 로그인이 막힐 수 있습니다."
+
+      # ── 인프라 ────────────────────────────────────────────────────
+      - uid: gujeuk-alert-container-stopped
+        title: "컨테이너 중지"
+        condition: B
+        for: 2m
+        noDataState: OK
+        execErrState: Alerting
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
             datasourceUid: gujeuk-prometheus
             model: { refId: A, expr: "docker_container_running == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
           - refId: B
@@ -114,19 +204,20 @@ groups:
               conditions:
                 - evaluator: { type: gt, params: [-999] }
         labels: { severity: critical }
-        annotations: { summary: "컨테이너 {{ $labels.container }} 가 RUNNING 상태가 아닙니다." }
+        annotations:
+          summary: "{{ $labels.container }} 가 실행 중이 아닙니다."
 
-      - uid: gujeuk-alert-container-unhealthy
-        title: "컨테이너 Healthcheck 실패"
+      - uid: gujeuk-alert-container-restarting
+        title: "컨테이너 반복 재시작"
         condition: B
-        for: 1m
+        for: 0m
         noDataState: OK
-        execErrState: Alerting
+        execErrState: OK
         data:
           - refId: A
-            relativeTimeRange: { from: 120, to: 0 }
+            relativeTimeRange: { from: 900, to: 0 }
             datasourceUid: gujeuk-prometheus
-            model: { refId: A, expr: "docker_container_healthy == 0", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+            model: { refId: A, expr: "increase(docker_container_restart_count[10m]) >= 2", instant: true, intervalMs: 1000, maxDataPoints: 100 }
           - refId: B
             relativeTimeRange: { from: 0, to: 0 }
             datasourceUid: __expr__
@@ -137,4 +228,54 @@ groups:
               conditions:
                 - evaluator: { type: gt, params: [-999] }
         labels: { severity: warning }
-        annotations: { summary: "컨테이너 {{ $labels.container }} Healthcheck가 UNHEALTHY 상태입니다." }
+        annotations:
+          summary: "{{ $labels.container }} 가 10분 내 2회 이상 재시작했습니다. (크래시 루프 의심)"
+
+      - uid: gujeuk-alert-container-oom
+        title: "메모리 부족 종료"
+        condition: B
+        for: 0m
+        noDataState: OK
+        execErrState: OK
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: gujeuk-prometheus
+            model: { refId: A, expr: "docker_container_oom_killed == 1", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [-999] }
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.container }} 가 메모리 부족(OOM)으로 종료됐습니다."
+
+      - uid: gujeuk-alert-cert-expiring
+        title: "인증서 만료 임박"
+        condition: B
+        for: 10m
+        noDataState: OK
+        execErrState: OK
+        data:
+          - refId: A
+            relativeTimeRange: { from: 3600, to: 0 }
+            datasourceUid: gujeuk-prometheus
+            # -1 은 확인 불가라서 제외한다.
+            model: { refId: A, expr: "tls_cert_days_remaining >= 0 and tls_cert_days_remaining <= 14", instant: true, intervalMs: 1000, maxDataPoints: 100 }
+          - refId: B
+            relativeTimeRange: { from: 0, to: 0 }
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator: { type: gt, params: [-999] }
+        labels: { severity: warning }
+        annotations:
+          summary: "TLS 인증서 만료까지 {{ $values.A }}일 남았습니다."
