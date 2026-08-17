@@ -6,6 +6,11 @@ on:
     paths-ignore:
       - "docs/**"
       - "**/*.md"
+      # 앱 배포와 무관한 경로. 여기만 바뀐 푸시는 앱을 재빌드·재배포하지 않는다.
+      # ops/aws 는 배포 job 이 docker-compose.aws.yml 을 EC2 로 복사하므로 제외하지 않는다.
+      - "monitor-bot/**"
+      - "ops/monitoring/**"
+      - ".github/ISSUE_TEMPLATE/**"
   pull_request:
     branches: ["main", "develop"]
   workflow_dispatch:
