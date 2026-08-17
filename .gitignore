@@ -49,3 +49,7 @@ out/
 .vscode/
 src/main/resources/application*.yml
 .env.stag
+
+# macOS 잡파일
+.DS_Store
+**/.DS_Store
