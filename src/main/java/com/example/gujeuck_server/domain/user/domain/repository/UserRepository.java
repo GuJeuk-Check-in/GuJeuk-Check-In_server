@@ -38,8 +38,5 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     Optional<User> findByPhone(String phone);
 
-    @Query("select u from User u where replace(replace(u.phone, '-', ''), ' ', '') = :phone")
-    List<User> findAllByNormalizedPhone(@Param("phone") String phone);
-
     List<User> findAllByOrganIdOrderByIdAsc(Long organId);
 }
