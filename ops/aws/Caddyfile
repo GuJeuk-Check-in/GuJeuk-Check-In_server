@@ -5,3 +5,9 @@ aws-api.oijwef098234.com, api.taisu.site {
 aws-stag.oijwef098234.com, api-stag.taisu.site {
     reverse_proxy host.docker.internal:8081
 }
+
+# 게임 서버. 앱과 DB는 GuJeuk-Game-FE 레포의 server/ 에서 배포된다.
+# 체크인과 포트·DB가 완전히 분리되어 있다.
+game-api.oijwef098234.com {
+    reverse_proxy host.docker.internal:8090
+}
