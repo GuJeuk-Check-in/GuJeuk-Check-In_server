@@ -20,7 +20,7 @@ public class CreateResidenceService {
     public void execute(ResidenceRequest residenceRequest) {
         Organ organ = organFacade.currentOrgan();
 
-        if(residenceRepository.findByOrganIdAndResidenceName(organ.getId(), residenceRequest.getResidenceName()).isPresent()) {
+        if(residenceRepository.findByOrganIdAndResidenceName(organ.getId(), residenceRequest.residenceName()).isPresent()) {
             throw ResidenceAlreadyException.EXCEPTION;
         }
 
@@ -28,7 +28,7 @@ public class CreateResidenceService {
 
         residenceRepository.save(
                 Residence.builder()
-                        .residenceName(residenceRequest.getResidenceName())
+                        .residenceName(residenceRequest.residenceName())
                         .residenceIndex(residenceIndex)
                         .organ(organ)
                         .build()

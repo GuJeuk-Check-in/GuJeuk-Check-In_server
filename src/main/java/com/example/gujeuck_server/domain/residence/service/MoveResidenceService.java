@@ -25,8 +25,8 @@ public class MoveResidenceService {
     public void execute(ResidenceMoveRequest residenceMoveRequest) {
         Organ organ = organFacade.currentOrgan();
 
-        List<Long> residencesId = residenceMoveRequest.getResidenceId();
-        List<Residence> residences = residenceRepository.findAllById(residenceMoveRequest.getResidenceId());
+        List<Long> residencesId = residenceMoveRequest.residenceId();
+        List<Residence> residences = residenceRepository.findAllById(residenceMoveRequest.residenceId());
 
         if(residencesId.size() != residences.size()) {
             throw ResidenceNotFoundException.EXCEPTION;
@@ -35,8 +35,8 @@ public class MoveResidenceService {
         Map<Long, Residence> residenceMap = residences.stream()
                 .collect(Collectors.toMap(Residence::getId, residence -> residence));
 
-        for(int i = 0; i < residenceMoveRequest.getResidenceId().size(); i++) {
-            Residence residence = residenceMap.get(residenceMoveRequest.getResidenceId().get(i));
+        for(int i = 0; i < residenceMoveRequest.residenceId().size(); i++) {
+            Residence residence = residenceMap.get(residenceMoveRequest.residenceId().get(i));
 
             if(residence == null) {
                 throw ResidenceNotFoundException.EXCEPTION;

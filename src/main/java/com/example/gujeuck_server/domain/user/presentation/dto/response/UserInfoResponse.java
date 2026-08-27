@@ -1,38 +1,29 @@
 package com.example.gujeuck_server.domain.user.presentation.dto.response;
 
 import com.example.gujeuck_server.domain.user.domain.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserInfoResponse {
-    private Long id;
-    private String name;
-    private String age;
-    private String gender;
-    private String phone;
-    private String birthYMD;
-    private String residence;
-    private boolean privacyAgreed;
-    private int count;
-
-    public static UserInfoResponse from(User u) {
-        return UserInfoResponse.builder()
-                .id(u.getId())
-                .name(u.getName())
-                .age(u.getAge().getLabel())
-                .gender(u.getGender().name())
-                .phone(u.getPhone())
-                .birthYMD(u.getBirthYMD())
-                .residence(u.getResidence())
-                .privacyAgreed(u.isPrivacyAgreed())
-                .count(u.getCount())
-                .build();
+public record UserInfoResponse(
+        Long id,
+        String name,
+        String age,
+        String gender,
+        String phone,
+        String birthYMD,
+        String residence,
+        boolean privacyAgreed,
+        int count
+) {
+    public static UserInfoResponse from(User user) {
+        return new UserInfoResponse(
+                user.getId(),
+                user.getName(),
+                user.getAge().getLabel(),
+                user.getGender().name(),
+                user.getPhone(),
+                user.getBirthYMD(),
+                user.getResidence(),
+                user.isPrivacyAgreed(),
+                user.getCount()
+        );
     }
 }
-

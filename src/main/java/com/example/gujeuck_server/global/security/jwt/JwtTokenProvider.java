@@ -107,11 +107,11 @@ public class JwtTokenProvider {
         organRepository.findByOrganName(organName)
                 .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
 
-        return TokenResponse.builder()
-                .accessToken(createAccessToken(organName))
-                .refreshToken(createRefreshToken(organName))
-                .organName(organName)
-                .build();
+        return TokenResponse.of(
+                createAccessToken(organName),
+                createRefreshToken(organName),
+                organName
+        );
     }
 
     public String resolveToken(HttpServletRequest request) {

@@ -39,9 +39,9 @@ public class SignupService {
         Organ organ = organRepository.findById(HARDCODED_ORGAN_ID)
                 .orElseThrow(() -> new RuntimeException("Organ not found"));
 
-        Age age = calculateAgeService.getAge(request.getBirthYMD());
+        Age age = calculateAgeService.getAge(request.birthYMD());
 
-        LocalDateTime visitDateTime = request.getVisitTime();
+        LocalDateTime visitDateTime = request.visitTime();
 
         String visitDate = DateFormatter.toVisitDate(visitDateTime);
 
@@ -49,18 +49,18 @@ public class SignupService {
 
         int currentYear = visitDateTime.getYear();
 
-        residenceRepository.findByOrganIdAndResidenceName(organ.getId(), request.getResidence())
+        residenceRepository.findByOrganIdAndResidenceName(organ.getId(), request.residence())
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
-        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.getPurpose());
+        Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.purpose());
 
-        User user = userRepository.findAllByName(request.getName()).stream()
+        User user = userRepository.findAllByName(request.name()).stream()
                 .findFirst()
-                .orElseGet(() -> userRepository.save(createUser(request, age, request.getResidence(), organ)));
+                .orElseGet(() -> userRepository.save(createUser(request, age, request.residence(), organ)));
 
         user.increaseCount();
 
-        Log log = createLog(request, age, purpose.getPurposeName(), visitDate, visitTime, visitDateTime, currentYear, request.getResidence(), user, organ);
+        Log log = createLog(request, age, purpose.getPurposeName(), visitDate, visitTime, visitDateTime, currentYear, request.residence(), user, organ);
 
         logRepository.save(log);
     }
@@ -68,12 +68,12 @@ public class SignupService {
     private User createUser(SignupRequest request, Age age, String residence, Organ organ) {
 
         return User.builder()
-                .name(request.getName())
-                .phone(request.getPhone())
-                .gender(request.getGender())
-                .birthYMD(request.getBirthYMD())
+                .name(request.name())
+                .phone(request.phone())
+                .gender(request.gender())
+                .birthYMD(request.birthYMD())
                 .residence(residence)
-                .privacyAgreed(request.getPrivacyAgreed())
+                .privacyAgreed(request.privacyAgreed())
                 .age(age)
                 .organ(organ)
                 .build();
@@ -81,13 +81,13 @@ public class SignupService {
 
     private Log createLog(SignupRequest request, Age age, String purpose, String visitDate, String visitTime, LocalDateTime visitAt, int year, String residence, User user, Organ organ) {
         return Log.builder()
-                .name(request.getName())
-                .phone(request.getPhone())
+                .name(request.name())
+                .phone(request.phone())
                 .age(age)
-                .maleCount(request.getMaleCount())
-                .femaleCount(request.getFemaleCount())
+                .maleCount(request.maleCount())
+                .femaleCount(request.femaleCount())
                 .purpose(purpose)
-                .privacyAgreed(request.getPrivacyAgreed())
+                .privacyAgreed(request.privacyAgreed())
                 .visitDate(visitDate)
                 .visitTime(visitTime)
                 .visitAt(visitAt)

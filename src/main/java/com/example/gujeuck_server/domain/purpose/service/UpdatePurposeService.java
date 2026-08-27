@@ -22,6 +22,6 @@ public class UpdatePurposeService {
 
         Purpose purpose = purposeFacade.getPurposeById(id);
 
-        purpose.updatePurpose(purposeRequest.getPurpose());
+        purpose.updatePurpose(purposeRequest.purpose());
     }
 }

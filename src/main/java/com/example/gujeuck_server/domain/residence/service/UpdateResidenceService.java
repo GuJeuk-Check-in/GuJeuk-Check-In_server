@@ -25,6 +25,6 @@ public class UpdateResidenceService {
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
 
-        residence.updateResidence(residenceRequest.getResidenceName());
+        residence.updateResidence(residenceRequest.residenceName());
     }
 }
