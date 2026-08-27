@@ -3,6 +3,7 @@ package com.example.gujeuck_server.domain.user.presentation.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public record UserCheckInRequest (
     Integer femaleCount,
 
     @NotBlank(message = "방문목적을 입력해주세요.")
+    @Size(max = 30, message = "방문목적은 30자 이하로 입력해주세요.")
     String purpose,
 
     @NotNull(message = "방문시각을 비워둘 수 없습니다.")

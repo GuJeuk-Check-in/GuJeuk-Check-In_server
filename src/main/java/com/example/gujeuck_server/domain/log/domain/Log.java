@@ -43,7 +43,12 @@ public class Log extends BaseIdEntity {
     @Column(nullable = false)
     private boolean privacyAgreed;
 
-    @Column(nullable = false, length = 10)
+    /*
+     * 운영 DB는 varchar(30)이다. 선언이 10으로 남아 있어 새로 만든 DB만
+     * varchar(10)이 되고, 실제로 존재하는 12자 이름을 넣지 못했다.
+     * 운영과 같은 값으로 맞춘다.
+     */
+    @Column(nullable = false, length = 30)
     private String name;
 
     @Column(nullable = false, length = 15)
@@ -55,13 +60,13 @@ public class Log extends BaseIdEntity {
     @Column(nullable = false)
     private int femaleCount;
 
-    @Column(nullable = false,  length = 11)
+    @Column(nullable = false, length = 11)
     private String visitDate;
 
     @Column(nullable = false)
     private int year;
 
-    @Column(nullable = false,  length = 5)
+    @Column(nullable = false, length = 5)
     private String visitTime;
 
     // 중복 체크인 판단 전용(초 단위까지 포함). 화면/엑셀 표시는 여전히 visitDate/visitTime(분 단위)을 사용한다.

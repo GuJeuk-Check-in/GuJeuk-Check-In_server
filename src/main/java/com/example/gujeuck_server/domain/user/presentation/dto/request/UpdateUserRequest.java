@@ -10,15 +10,19 @@ public record UpdateUserRequest(
         @Size(max = 30, message = "이름은 30자 이하로 입력해주세요.")
         String name,
 
+        @NotBlank(message = "전화번호를 입력해주세요.")
+        @Size(max = 20, message = "전화번호는 20자 이하로 입력해주세요.")
         String phone,
 
         @NotNull(message = "성별을 선택해주세요.")
         Gender gender,
 
         @NotBlank(message = "생년월일을 입력해주세요.")
+        @Size(max = 20, message = "생년월일 형식이 유효하지 않습니다.")
         String birthYMD,
 
         @NotBlank(message = "거주지를 선택해주세요.")
+        @Size(max = 30, message = "거주지는 30자 이하로 입력해주세요.")
         String residence
 ) {
 }
