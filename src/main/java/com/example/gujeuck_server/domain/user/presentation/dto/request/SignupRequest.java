@@ -18,6 +18,8 @@ public record SignupRequest(
         @NotNull(message = "성별을 입력해주세요.")
         Gender gender,
 
+        @NotBlank(message = "전화번호를 입력해주세요.")
+        @Size(max = 20, message = "전화번호는 20자 이하로 입력해주세요.")
         String phone,
 
         @NotNull(message = "남자 동행인 수는 null일 수 없습니다.")
@@ -33,6 +35,7 @@ public record SignupRequest(
         String birthYMD,
 
         @NotBlank(message = "거주지를 입력해주세요.")
+        @Size(max = 30, message = "거주지는 30자 이하로 입력해주세요.")
         String residence,
 
         @NotNull(message = "개인정보 동의 여부를 입력해주세요.")
@@ -40,6 +43,7 @@ public record SignupRequest(
         Boolean privacyAgreed,
 
         @NotBlank(message = "방문목적을 입력해주세요.")
+        @Size(max = 30, message = "방문목적은 30자 이하로 입력해주세요.")
         String purpose,
 
         @NotNull(message = "방문시각을 비워둘 수 없습니다.")

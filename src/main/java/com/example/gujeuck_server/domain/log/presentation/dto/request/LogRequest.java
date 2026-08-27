@@ -6,15 +6,14 @@ import jakarta.validation.constraints.*;
 public record LogRequest (
 
     @NotBlank(message = "이름은 필수 입력 항목입니다.")
-    @Size(max = 10, message = "이름은 10자 이하로 입력해주세요.")
+    @Size(max = 30, message = "이름은 30자 이하로 입력해주세요.")
     String name,
 
     @NotNull(message = "나이를 선택해주세요.")
-    @Size(max = 6, message = "나이 입력값이 유효하지 않습니다.")
     Age age,
 
     @NotBlank(message = "전화번호를 입력해주세요.")
-    @Size(max = 15, message = "전화번호를 15자 미만으로 입력해주세요.")
+    @Size(max = 20, message = "전화번호는 20자 이하로 입력해주세요.")
     String phone,
 
     @NotNull(message = "남자 동행인 수는 null일 수 없습니다.")
