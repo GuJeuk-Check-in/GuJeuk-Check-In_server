@@ -60,8 +60,6 @@ public class SecurityConfig {
                                 "/common/analytics/check-in-funnel/**"
                         ).hasRole("ORGAN")
                         .requestMatchers(
-                                "/auth/login",
-                                "/api/pet-game/login",
                                 "/user",
                                 "/user/**",
                                 "/organ/create",
@@ -104,7 +102,6 @@ public class SecurityConfig {
         addOrigins(origins, stagUrl);
         addOrigins(origins, vercelUrl);
         addOrigins(origins, testUrl);
-        addOrigins(origins, "https://gujuck-pet-game.vercel.app/");
 
         return origins;
     }
