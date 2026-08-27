@@ -11,12 +11,6 @@ import org.springframework.stereotype.Component;
 public class LogFacade {
     private final LogRepository logRepository;
 
-    public Log getLogById(Long logId) {
-
-        return logRepository.findById(logId)
-                .orElseThrow(() -> LogNotFountException.EXCEPTION);
-    }
-
     public Log getLogByIdAndOrganId(Long logId, Long organId) {
         return logRepository.findByIdAndOrganId(logId, organId)
                 .orElseThrow(() -> LogNotFountException.EXCEPTION);
