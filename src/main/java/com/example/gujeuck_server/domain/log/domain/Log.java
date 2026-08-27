@@ -33,19 +33,20 @@ import java.time.LocalDateTime;
 )
 public class Log extends BaseIdEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 30)
     private String purpose;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 6)
     private Age age;
 
     @Column(nullable = false)
     private boolean privacyAgreed;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 10)
     private String name;
 
+    @Column(nullable = false, length = 15)
     private String phone;
 
     @Column(nullable = false)
@@ -54,13 +55,13 @@ public class Log extends BaseIdEntity {
     @Column(nullable = false)
     private int femaleCount;
 
-    @Column(nullable = false)
+    @Column(nullable = false,  length = 11)
     private String visitDate;
 
     @Column(nullable = false)
     private int year;
 
-    @Column(nullable = false)
+    @Column(nullable = false,  length = 5)
     private String visitTime;
 
     // 중복 체크인 판단 전용(초 단위까지 포함). 화면/엑셀 표시는 여전히 visitDate/visitTime(분 단위)을 사용한다.
