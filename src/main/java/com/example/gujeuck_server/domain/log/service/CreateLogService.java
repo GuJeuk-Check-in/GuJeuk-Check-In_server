@@ -22,15 +22,15 @@ public class CreateLogService {
 
     @Transactional
     public void execute(Organ organ, LogRequest request) {
-        String name = request.getName().trim();
-        String purposeName = request.getPurpose().trim();
-        String visitDate = request.getVisitDate();
-        String visitTime = request.getVisitTime();
+        String name = request.name().trim();
+        String purposeName = request.purpose().trim();
+        String visitDate = request.visitDate();
+        String visitTime = request.visitTime();
         int year = extractYear(visitDate);
 
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), purposeName);
 
-        validateDuplicateLog(organ.getId(), name, request.getAge(), purpose.getPurposeName(), visitDate, visitTime);
+        validateDuplicateLog(organ.getId(), name, request.age(), purpose.getPurposeName(), visitDate, visitTime);
 
         Log log = createUseLog(request, name, purpose, visitDate, visitTime, year, organ);
 
@@ -68,15 +68,15 @@ public class CreateLogService {
     ) {
         return Log.builder()
                 .name(name)
-                .age(request.getAge())
-                .phone(request.getPhone())
-                .maleCount(request.getMaleCount())
-                .femaleCount(request.getFemaleCount())
+                .age(request.age())
+                .phone(request.phone())
+                .maleCount(request.maleCount())
+                .femaleCount(request.femaleCount())
                 .purpose(purpose.getPurposeName())
                 .visitTime(time)
                 .visitDate(date)
                 .year(year)
-                .privacyAgreed(request.isPrivacyAgreed())
+                .privacyAgreed(request.privacyAgreed())
                 .organ(organ)
                 .build();
     }

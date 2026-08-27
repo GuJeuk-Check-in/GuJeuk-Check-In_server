@@ -25,8 +25,8 @@ public class MovePurposeService {
     public void execute(PurposeMoveRequest purposeMoveRequest) {
         organFacade.currentOrgan();
 
-        List<Long> purposesId = purposeMoveRequest.getPurposeId();
-        List<Purpose> purposes = purposeRepository.findAllById(purposeMoveRequest.getPurposeId());
+        List<Long> purposesId = purposeMoveRequest.purposeId();
+        List<Purpose> purposes = purposeRepository.findAllById(purposeMoveRequest.purposeId());
 
         if(purposesId.size() != purposes.size()) {
             throw PurposeNotFoundException.EXCEPTION;
@@ -35,8 +35,8 @@ public class MovePurposeService {
         Map<Long, Purpose> purposeMap = purposes.stream()
                 .collect(Collectors.toMap(Purpose::getId, purpose -> purpose));
 
-        for(int i = 0; i < purposeMoveRequest.getPurposeId().size(); i++) {
-            Purpose purpose = purposeMap.get(purposeMoveRequest.getPurposeId().get(i));
+        for(int i = 0; i < purposeMoveRequest.purposeId().size(); i++) {
+            Purpose purpose = purposeMap.get(purposeMoveRequest.purposeId().get(i));
 
             if(purpose == null) {
                 throw PurposeNotFoundException.EXCEPTION;

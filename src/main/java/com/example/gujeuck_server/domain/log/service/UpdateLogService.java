@@ -22,15 +22,15 @@ public class UpdateLogService {
     @Transactional
     public void execute(Long organId, Long logId, LogRequest request) {
         Log log = logFacade.getLogByIdAndOrganId(logId, organId);
-        String name = request.getName().trim();
-        Purpose purpose = purposeFacade.getPurpose(organId, request.getPurpose().trim());
-        String visitDate = request.getVisitDate();
-        String visitTime = request.getVisitTime();
+        String name = request.name().trim();
+        Purpose purpose = purposeFacade.getPurpose(organId, request.purpose().trim());
+        String visitDate = request.visitDate();
+        String visitTime = request.visitTime();
 
         validateDuplicateLog(
                 organId,
                 name,
-                request.getAge(),
+                request.age(),
                 purpose.getPurposeName(),
                 visitDate,
                 visitTime,
@@ -39,14 +39,14 @@ public class UpdateLogService {
 
         log.updateLog(
                 name,
-                request.getAge(),
-                request.getPhone(),
-                request.getMaleCount(),
-                request.getFemaleCount(),
+                request.age(),
+                request.phone(),
+                request.maleCount(),
+                request.femaleCount(),
                 purpose.getPurposeName(),
                 visitDate,
                 visitTime,
-                request.isPrivacyAgreed()
+                request.privacyAgreed()
         );
     }
 

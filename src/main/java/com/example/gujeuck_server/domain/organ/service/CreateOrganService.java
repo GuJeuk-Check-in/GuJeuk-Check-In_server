@@ -18,13 +18,13 @@ public class CreateOrganService {
     @Transactional
     public void execute(CreateOrganRequest request) {
 
-        if (organRepository.findByOrganName(request.getOrganName()).isPresent()) {
+        if (organRepository.findByOrganName(request.organName()).isPresent()) {
             throw OrganAlreadyExistException.EXCEPTION;
         }
 
         Organ organ = Organ.builder()
-                .organName(request.getOrganName())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .organName(request.organName())
+                .password(passwordEncoder.encode(request.password()))
                 .build();
 
         organRepository.save(organ);

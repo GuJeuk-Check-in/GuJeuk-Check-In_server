@@ -22,10 +22,10 @@ public class LoginOrganService {
     @Transactional
     public TokenResponse execute(LoginOrganRequest request) {
 
-        Organ organ = organRepository.findByOrganName(request.getOrganName())
+        Organ organ = organRepository.findByOrganName(request.organName())
                 .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
 
-        if (!passwordEncoder.matches(request.getPassword(), organ.getPassword())) {
+        if (!passwordEncoder.matches(request.password(), organ.getPassword())) {
             throw PasswordMismatchException.EXCEPTION;
         }
 

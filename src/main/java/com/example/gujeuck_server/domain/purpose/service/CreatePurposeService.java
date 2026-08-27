@@ -20,7 +20,7 @@ public class CreatePurposeService {
     public void execute(PurposeRequest request) {
         Organ organ = organFacade.currentOrgan();
 
-        if(purposeRepository.findByOrganIdAndPurposeName(organ.getId(), request.getPurpose()).isPresent()) {
+        if(purposeRepository.findByOrganIdAndPurposeName(organ.getId(), request.purpose()).isPresent()) {
             throw PurposeAlreadyExistException.EXCEPTION;
         }
 
@@ -28,7 +28,7 @@ public class CreatePurposeService {
 
         purposeRepository.save(
                 Purpose.builder()
-                        .purposeName(request.getPurpose())
+                        .purposeName(request.purpose())
                         .purposeIndex(purposeIndex)
                         .organ(organ)
                         .build()

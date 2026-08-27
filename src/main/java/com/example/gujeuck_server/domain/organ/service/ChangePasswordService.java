@@ -21,14 +21,14 @@ public class ChangePasswordService {
 
         Organ organ = organFacade.currentOrgan();
 
-        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+        if (!request.newPassword().equals(request.confirmNewPassword())) {
             throw InvalidPasswordConfirmException.EXCEPTION;
         }
 
-        if (passwordEncoder.matches(request.getNewPassword(), organ.getPassword())) {
+        if (passwordEncoder.matches(request.newPassword(), organ.getPassword())) {
             throw SameOldPasswordException.EXCEPTION;
         }
 
-        organ.changePassword(passwordEncoder.encode(request.getNewPassword()));
+        organ.changePassword(passwordEncoder.encode(request.newPassword()));
     }
 }
