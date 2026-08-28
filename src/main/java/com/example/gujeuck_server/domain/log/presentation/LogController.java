@@ -79,6 +79,6 @@ public class LogController {
             @PathVariable("date") String date,
             Pageable pageable
     ) {
-        return queryLogListByDateService.queryLogListByResidence(userDetails.organ().getId(), date, pageable);
+        return queryLogListByDateService.execute(userDetails.organ().getId(), date, pageable);
     }
 }

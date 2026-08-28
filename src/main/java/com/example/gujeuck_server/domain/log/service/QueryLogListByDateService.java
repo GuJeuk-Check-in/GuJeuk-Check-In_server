@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public class QueryLogListByDateService {
     private final LogRepository logRepository;
 
-    public LogSliceWithTotalResponse queryLogListByResidence(Long organId, String yearMonth, Pageable p) {
+    public LogSliceWithTotalResponse execute(Long organId, String yearMonth, Pageable p) {
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),
                 p.getPageSize(),
@@ -32,10 +32,7 @@ public class QueryLogListByDateService {
 
         long total = logRepository.countByYearMonth(organId, date);
 
-        return LogSliceWithTotalResponse.builder()
-                .slice(slice)
-                .totalCount(total)
-                .build();
+        return LogSliceWithTotalResponse.of(total, slice);
     }
 
     private String toYearMonthPrefix(String yearMonth) {
