@@ -83,7 +83,7 @@ public class Log extends BaseIdEntity {
     @JoinColumn(name = "organ_id", nullable = false)
     private Organ organ;
 
-    public void updateLog(String name, Age age, String phone, int maleCount, int femaleCount, String purpose, String visitDate, String visitTime, boolean privacyAgreed) {
+    public void updateLog(String name, Age age, String phone, int maleCount, int femaleCount, String purpose, String visitDate, String visitTime, LocalDateTime visitAt, boolean privacyAgreed) {
         this.name = name;
         this.age = age;
         this.phone = phone;
@@ -92,6 +92,7 @@ public class Log extends BaseIdEntity {
         this.purpose = purpose;
         this.visitDate = visitDate;
         this.visitTime = visitTime;
+        this.visitAt = visitAt;
         this.privacyAgreed = privacyAgreed;
     }
 }
