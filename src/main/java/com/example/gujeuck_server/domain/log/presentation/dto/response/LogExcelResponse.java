@@ -6,7 +6,6 @@ import lombok.Builder;
 
 @Builder
 public record LogExcelResponse(
-
         String visitDate,
         String visitTime,
         String name,
@@ -17,7 +16,6 @@ public record LogExcelResponse(
         String purpose,
         boolean privacyAgreed
 ) {
-    // Log 엔티티 -> LogResponse 로 바꿔주는 정적 메서드
     public static LogExcelResponse from(Log log) {
         return LogExcelResponse.builder()
                 .name(log.getName())

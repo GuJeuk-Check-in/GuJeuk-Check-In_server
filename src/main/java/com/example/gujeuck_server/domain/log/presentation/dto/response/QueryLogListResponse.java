@@ -5,7 +5,6 @@ import lombok.Builder;
 
 @Builder
 public record QueryLogListResponse(
-
         Long id,
         String name,
         int maleCount,
