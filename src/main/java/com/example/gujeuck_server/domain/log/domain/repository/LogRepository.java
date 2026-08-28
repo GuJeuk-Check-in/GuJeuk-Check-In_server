@@ -5,6 +5,8 @@ import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -39,5 +41,36 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
           String visitDate,
           String visitTime,
           Long id
+  );
+
+  /**
+   * 같은 방문이 이미 있는지.
+   *
+   * 수정할 때는 자기 자신이 걸리므로 제외해야 한다. 그렇지 않으면 다른 필드만
+   * 고쳐도 중복으로 잡혀 아무것도 저장할 수 없다. 생성할 때는 제외할 대상이
+   * 없으므로 excludedId 에 null 을 넘긴다.
+   *
+   * 파생 쿼리(...AndIdNot)로는 이 둘을 한 메서드로 묶을 수 없다. null 을 넘기면
+   * `id <> null` 이 되어 어떤 행도 매치되지 않고, 생성 시 중복 검사가 조용히
+   * 무력화된다. 그래서 JPQL 로 직접 쓴다.
+   */
+  @Query("""
+          select count(l) > 0 from Log l
+          where l.organ.id = :organId
+            and l.name = :name
+            and l.age = :age
+            and l.purpose = :purpose
+            and l.visitDate = :visitDate
+            and l.visitTime = :visitTime
+            and (:excludedId is null or l.id <> :excludedId)
+          """)
+  boolean existsDuplicate(
+          @Param("organId") Long organId,
+          @Param("name") String name,
+          @Param("age") Age age,
+          @Param("purpose") String purpose,
+          @Param("visitDate") String visitDate,
+          @Param("visitTime") String visitTime,
+          @Param("excludedId") Long excludedId
   );
 }
