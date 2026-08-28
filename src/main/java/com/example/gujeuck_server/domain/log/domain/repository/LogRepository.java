@@ -24,25 +24,6 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
 
   long countByUserId(Long userId);
 
-  boolean existsByOrganIdAndNameAndAgeAndPurposeAndVisitDateAndVisitTime(
-          Long organId,
-          String name,
-          Age age,
-          String purpose,
-          String visitDate,
-          String visitTime
-  );
-
-  boolean existsByOrganIdAndNameAndAgeAndPurposeAndVisitDateAndVisitTimeAndIdNot(
-          Long organId,
-          String name,
-          Age age,
-          String purpose,
-          String visitDate,
-          String visitTime,
-          Long id
-  );
-
   /**
    * 같은 방문이 이미 있는지.
    *
