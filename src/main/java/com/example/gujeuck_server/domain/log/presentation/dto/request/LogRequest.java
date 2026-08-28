@@ -4,7 +4,6 @@ import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import jakarta.validation.constraints.*;
 
 public record LogRequest (
-
     @NotBlank(message = "이름은 필수 입력 항목입니다.")
     @Size(max = 30, message = "이름은 30자 이하로 입력해주세요.")
     String name,
