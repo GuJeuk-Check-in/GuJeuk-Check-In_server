@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCustom {
@@ -27,6 +28,10 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
   /**
    * 같은 방문이 이미 있는지.
    *
+   * 판정은 visitAt(초 단위)으로 한다. 예전에는 visitDate·visitTime 문자열을
+   * 비교했는데 visitTime 이 분 단위("HH:mm")라, 같은 분에 초만 다른 방문이
+   * 중복으로 막혔다. 실제로 운영에 38초·55초로 나뉜 기록이 있다.
+   *
    * 수정할 때는 자기 자신이 걸리므로 제외해야 한다. 그렇지 않으면 다른 필드만
    * 고쳐도 중복으로 잡혀 아무것도 저장할 수 없다. 생성할 때는 제외할 대상이
    * 없으므로 excludedId 에 null 을 넘긴다.
@@ -41,8 +46,7 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
             and l.name = :name
             and l.age = :age
             and l.purpose = :purpose
-            and l.visitDate = :visitDate
-            and l.visitTime = :visitTime
+            and l.visitAt = :visitAt
             and (:excludedId is null or l.id <> :excludedId)
           """)
   boolean existsDuplicate(
@@ -50,8 +54,7 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
           @Param("name") String name,
           @Param("age") Age age,
           @Param("purpose") String purpose,
-          @Param("visitDate") String visitDate,
-          @Param("visitTime") String visitTime,
+          @Param("visitAt") LocalDateTime visitAt,
           @Param("excludedId") Long excludedId
   );
 }
