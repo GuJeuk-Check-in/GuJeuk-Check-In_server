@@ -5,6 +5,9 @@ import com.example.gujeuck_server.domain.log.domain.VisitStatisticsCount;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import lombok.Builder;
+
+@Builder
 public record VisitPeriodStatisticsResponse(
         long total,
         VisitGroupStatisticsResponse youth,
@@ -16,21 +19,21 @@ public record VisitPeriodStatisticsResponse(
         long otherTotal = count.otherMale() + count.otherFemale();
         long total = youthTotal + otherTotal;
 
-        return new VisitPeriodStatisticsResponse(
-                total,
-                new VisitGroupStatisticsResponse(
+        return VisitPeriodStatisticsResponse.builder()
+                .total(total)
+                .youth(VisitGroupStatisticsResponse.of(
                         count.youthMale(),
                         count.youthFemale(),
                         youthTotal,
                         calculateRate(youthTotal, total)
-                ),
-                new VisitGroupStatisticsResponse(
+                ))
+                .other(VisitGroupStatisticsResponse.of(
                         count.otherMale(),
                         count.otherFemale(),
                         otherTotal,
                         calculateRate(otherTotal, total)
-                )
-        );
+                ))
+                .build();
     }
 
     private static double calculateRate(long count, long total) {

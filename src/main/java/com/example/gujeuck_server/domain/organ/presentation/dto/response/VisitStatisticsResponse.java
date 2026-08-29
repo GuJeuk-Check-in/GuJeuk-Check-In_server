@@ -2,6 +2,9 @@ package com.example.gujeuck_server.domain.organ.presentation.dto.response;
 
 import com.example.gujeuck_server.domain.log.domain.VisitStatisticsCount;
 
+import lombok.Builder;
+
+@Builder
 public record VisitStatisticsResponse(
         int year,
         int month,
@@ -15,11 +18,11 @@ public record VisitStatisticsResponse(
             VisitStatisticsCount cumulative,
             VisitStatisticsCount monthly
     ) {
-        return new VisitStatisticsResponse(
-                year,
-                month,
-                VisitPeriodStatisticsResponse.from(cumulative),
-                VisitPeriodStatisticsResponse.from(monthly)
-        );
+        return VisitStatisticsResponse.builder()
+                .year(year)
+                .month(month)
+                .cumulative(VisitPeriodStatisticsResponse.from(cumulative))
+                .monthly(VisitPeriodStatisticsResponse.from(monthly))
+                .build();
     }
 }

@@ -3,6 +3,9 @@ package com.example.gujeuck_server.domain.user.presentation.dto.response;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 
+import lombok.Builder;
+
+@Builder
 public record UserDetailResponse(
         Long id,
         String name,
@@ -12,13 +15,13 @@ public record UserDetailResponse(
         String residence
 ) {
     public static UserDetailResponse from(User user) {
-        return new UserDetailResponse(
-                user.getId(),
-                user.getName(),
-                user.getGender(),
-                user.getPhone(),
-                user.getBirthYMD(),
-                user.getResidence()
-        );
+        return UserDetailResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .gender(user.getGender())
+                .phone(user.getPhone())
+                .birthYMD(user.getBirthYMD())
+                .residence(user.getResidence())
+                .build();
     }
 }
