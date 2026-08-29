@@ -36,10 +36,6 @@ public class UserExistsService {
     }
 
     private User pickNextInRotation(List<User> namesakes, String name) {
-        // 회원가입 시 방문 기록이 함께 생성되므로 보통은 직전 기록이 존재한다.
-        // 다만 관리자가 이용 기록을 삭제하면(DeleteLogService) 기록이 0건이 될 수 있어,
-        // 그 경우에는 예외 대신 첫 번째 사람부터 순번을 다시 시작한다.
-        // 이번 방문으로 기록이 다시 쌓이면 순번은 자연히 복구된다.
         Long lastUserId = logRepository.findFirstByNameAndUserIsNotNullOrderByIdDesc(name)
                 .map(Log::getUser)
                 .map(User::getId)

@@ -16,7 +16,7 @@ public record CustomUserDetails(Organ organ) implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {    //사용자의 권한 목록을 반환
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return new ArrayList<>(Collections.singleton(new SimpleGrantedAuthority("ROLE_ORGAN")));
     }
 

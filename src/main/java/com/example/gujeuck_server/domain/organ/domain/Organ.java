@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@AllArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class Organ extends BaseIdEntity {
 
     @Column(nullable = false, unique = true)

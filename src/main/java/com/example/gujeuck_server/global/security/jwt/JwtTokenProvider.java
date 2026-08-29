@@ -34,35 +34,32 @@ public class JwtTokenProvider {
     private static final String ACCESS_TYPE = "access";
     private static final String REFRESH_TYPE = "refresh";
     private static final int MILLISECONDS = 1000;
-    private static final long ORGAN_ACCESS_EXPIRATION = 7200L; // 2시간
+    private static final long ORGAN_ACCESS_EXPIRATION = 7200L;
 
-    //access token 생성
     public String createAccessToken(String organName) {
 
         Date now = new Date();
 
         return Jwts.builder()
                 .setSubject(organName)
-                .claim(CLAIM_TYPE, ACCESS_TYPE) // 액세스 토큰임을 나타냄
-                .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + ORGAN_ACCESS_EXPIRATION * MILLISECONDS)) // 토큰의 만료 시간 설정
+                .claim(CLAIM_TYPE, ACCESS_TYPE)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + ORGAN_ACCESS_EXPIRATION * MILLISECONDS))
                 .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecretKey())
                 .compact();
 
     }
 
-    //refresh token 생성
     public String createRefreshToken(String organName) {
 
         Date now = new Date();
 
         String refreshToken = Jwts.builder()
-                .claim(CLAIM_TYPE, REFRESH_TYPE)  //refresh 토큰임을 나타냄
+                .claim(CLAIM_TYPE, REFRESH_TYPE)
                 .setIssuedAt(now)
                 .setExpiration(new java.sql.Timestamp(now.getTime() + jwtProperties.getRefreshExpiration() * MILLISECONDS))
                 .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecretKey())
                 .compact();
-
 
         refreshTokenRepository.save(
                 RefreshToken.builder()
@@ -75,7 +72,6 @@ public class JwtTokenProvider {
         return refreshToken;
     }
 
-    // 토큰에 담겨 있는 userId로 SpringSecurity Authentication 정보를 반환 하는 메서드
     public Authentication getAuthentication(String token) {
 
         Claims claims = getClaims(token);
@@ -89,7 +85,7 @@ public class JwtTokenProvider {
 
         try {
             return Jwts
-                    .parser() //JWT parser 생성
+                    .parser()
                     .setSigningKey(jwtProperties.getSecretKey())
                     .parseClaimsJws(token)
                     .getBody();
