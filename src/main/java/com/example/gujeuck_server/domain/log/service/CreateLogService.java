@@ -34,7 +34,6 @@ public class CreateLogService {
 
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), purposeName);
 
-        // 생성이라 제외할 기록이 없다.
         logFacade.validateNotDuplicated(
                 organ.getId(), name, request.age(), purpose.getPurposeName(), visitAt, null);
 

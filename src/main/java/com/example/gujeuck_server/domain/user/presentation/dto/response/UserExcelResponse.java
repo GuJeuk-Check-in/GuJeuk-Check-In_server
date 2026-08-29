@@ -16,7 +16,6 @@ public record UserExcelResponse(
         boolean privacyAgreed,
         int count
 ) {
-    // User 엔티티 -> UserExcelResponse 로 변환하는 정적 메서드
     public static UserExcelResponse from(User user) {
         return UserExcelResponse.builder()
                 .name(user.getName())

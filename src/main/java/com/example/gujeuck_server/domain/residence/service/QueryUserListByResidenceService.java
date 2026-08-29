@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.residence.service;
 
-
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.exception.InvalidResidenceException;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;

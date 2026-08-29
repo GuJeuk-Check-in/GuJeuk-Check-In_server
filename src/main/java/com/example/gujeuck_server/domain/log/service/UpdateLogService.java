@@ -27,8 +27,6 @@ public class UpdateLogService {
         String visitTime = request.visitTime();
         LocalDateTime visitAt = DateFormatter.toVisitAt(visitDate, visitTime);
 
-        // 고치는 기록 자신은 검사에서 뺀다. 그렇지 않으면 다른 필드만 바꿔도
-        // 자기 자신이 중복으로 잡혀 저장할 수 없다.
         logFacade.validateNotDuplicated(
                 organId, name, request.age(), purpose.getPurposeName(), visitAt, logId);
 
