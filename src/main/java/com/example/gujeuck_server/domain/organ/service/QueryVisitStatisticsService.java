@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.organ.service;
 
-import com.example.gujeuck_server.domain.log.domain.VisitStatisticsCount;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.VisitStatisticsCount;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.exception.InvalidLogDateException;
 import com.example.gujeuck_server.domain.organ.domain.Organ;

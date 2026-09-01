@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.organ.presentation.dto.response;
 
-import com.example.gujeuck_server.domain.log.domain.VisitStatisticsCount;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.VisitStatisticsCount;
 
 import lombok.Builder;
 
