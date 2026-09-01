@@ -17,7 +17,6 @@ public class CreateOrganService {
 
     @Transactional
     public void execute(CreateOrganRequest request) {
-
         if (organRepository.findByOrganName(request.organName()).isPresent()) {
             throw OrganAlreadyExistException.EXCEPTION;
         }

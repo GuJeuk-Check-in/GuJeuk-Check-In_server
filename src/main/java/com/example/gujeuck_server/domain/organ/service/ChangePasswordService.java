@@ -18,7 +18,6 @@ public class ChangePasswordService {
 
     @Transactional
     public void execute(ChangePasswordRequest request) {
-
         Organ organ = organFacade.currentOrgan();
 
         if (!request.newPassword().equals(request.confirmNewPassword())) {
