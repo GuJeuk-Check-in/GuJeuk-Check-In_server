@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.domain.organ.service;
 
-import com.example.gujeuck_server.domain.log.domain.MonthlyOperationCount;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.MonthlyOperationCount;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;

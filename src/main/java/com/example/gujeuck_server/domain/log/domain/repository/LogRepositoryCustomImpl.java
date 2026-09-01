@@ -1,9 +1,9 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
-import com.example.gujeuck_server.domain.log.domain.MonthlyOperationCount;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.MonthlyOperationCount;
 import com.example.gujeuck_server.domain.log.domain.QLog;
-import com.example.gujeuck_server.domain.log.domain.VisitStatisticsCount;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.VisitStatisticsCount;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.querydsl.core.Tuple;
