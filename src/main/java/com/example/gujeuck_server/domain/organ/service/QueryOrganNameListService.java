@@ -16,7 +16,6 @@ public class QueryOrganNameListService {
 
     @Transactional(readOnly = true)
     public List<OrganResponse> execute() {
-
         List<OrganResponse> organResponses = organRepository.findAll()
                 .stream()
                 .map(OrganResponse::from)
