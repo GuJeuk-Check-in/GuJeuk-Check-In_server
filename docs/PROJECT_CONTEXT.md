@@ -6,7 +6,6 @@
 ## 1. 문서 사용 방법
 
 - 이 문서는 **현재 상태와 앞으로의 판단 기준**을 요약한다.
-- 상세 구축 이력과 장애 대응 방법은 `docs/HOME_SERVER_OPERATIONS.md`를 참고한다.
 - 라이브 서버 상태처럼 변할 수 있는 정보는 문서만 믿지 말고 실제로 확인한다.
 - 라이브 확인 결과가 문서와 다르면 실제 상태를 우선하고 이 문서를 갱신한다.
 
@@ -671,7 +670,7 @@ docker compose logs --tail=200 grafana prometheus loki alloy
 - DB dump 복원
 - credential rotation
 
-상세 명령과 장애 이력은 `docs/HOME_SERVER_OPERATIONS.md`에 기록하고, 이 문서에는 현재 판단에 필요한 핵심만 유지한다.
+이 문서에는 현재 판단에 필요한 핵심만 유지한다.
 
 ## 18. AWS 이전 상태
 
