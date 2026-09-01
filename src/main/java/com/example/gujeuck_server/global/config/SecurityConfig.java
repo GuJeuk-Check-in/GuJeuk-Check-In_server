@@ -64,7 +64,6 @@ public class SecurityConfig {
                                 "/organ/excel/user",
                                 "/purpose/all",
                                 "/residence/all",
-                                "/public/**",
                                 "/user/ha-log", "/user/ha-sign-up",
                                 "/common/health/ready"
                         ).permitAll()
