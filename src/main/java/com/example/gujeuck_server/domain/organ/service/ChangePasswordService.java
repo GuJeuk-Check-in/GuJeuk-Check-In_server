@@ -20,12 +20,12 @@ public class ChangePasswordService {
     public void execute(ChangePasswordRequest request) {
         Organ organ = organFacade.currentOrgan();
 
-        if (!request.newPassword().equals(request.confirmNewPassword())) {
-            throw InvalidPasswordConfirmException.EXCEPTION;
-        }
-
         if (passwordEncoder.matches(request.newPassword(), organ.getPassword())) {
             throw SameOldPasswordException.EXCEPTION;
+        }
+
+        if (!request.newPassword().equals(request.confirmNewPassword())) {
+            throw InvalidPasswordConfirmException.EXCEPTION;
         }
 
         organ.changePassword(passwordEncoder.encode(request.newPassword()));
