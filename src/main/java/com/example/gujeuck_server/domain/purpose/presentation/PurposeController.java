@@ -18,7 +18,6 @@ public class PurposeController {
     private final CreatePurposeService createPurposeService;
     private final UpdatePurposeService updatePurposeService;
     private final DeletePurposeService deletePurposeService;
-    private final QueryPurposeDetailService queryPurposeDetailService;
     private final QueryPurposeListService queryPurposeListService;
     private final MovePurposeService movePurposeService;
 
@@ -36,11 +35,6 @@ public class PurposeController {
     @DeleteMapping("/{id}")
     public void deletePurpose(@PathVariable Long id) {
         deletePurposeService.execute(id);
-    }
-
-    @GetMapping("/{id}")
-    public PurposeResponse queryPurpose(@PathVariable Long id) {
-        return queryPurposeDetailService.execute(id);
     }
 
     @GetMapping("/all")
