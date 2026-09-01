@@ -32,7 +32,7 @@ public class DeletePurposeService {
         List<Purpose> purposes = purposeRepository.findAllByOrganIdAndPurposeIndexGreaterThan(organ.getId(), purposeIndex);
 
         for (Purpose p : purposes) {
-            p.setPurposeIndex(p.getPurposeIndex() - 1);
+            p.updatePurposeIndex(p.getPurposeIndex() - 1);
         }
     }
 }

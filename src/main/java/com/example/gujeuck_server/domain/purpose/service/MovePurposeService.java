@@ -42,7 +42,7 @@ public class MovePurposeService {
                 throw PurposeNotFoundException.EXCEPTION;
             }
 
-            purpose.setPurposeIndex(i + 1);
+            purpose.updatePurposeIndex(i + 1);
         }
     }
 }
