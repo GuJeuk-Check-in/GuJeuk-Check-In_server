@@ -4,7 +4,6 @@ import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
-import com.example.gujeuck_server.domain.purpose.exception.PurposeAccessDeniedException;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

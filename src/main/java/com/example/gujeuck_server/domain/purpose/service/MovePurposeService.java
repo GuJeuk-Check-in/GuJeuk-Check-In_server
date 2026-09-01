@@ -1,10 +1,8 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
-import com.example.gujeuck_server.domain.purpose.exception.PurposeAccessDeniedException;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeMoveRequest;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
 import lombok.RequiredArgsConstructor;

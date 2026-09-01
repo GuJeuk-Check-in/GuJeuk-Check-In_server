@@ -1,8 +1,6 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
-import com.example.gujeuck_server.domain.purpose.exception.PurposeAccessDeniedException;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeRequest;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
