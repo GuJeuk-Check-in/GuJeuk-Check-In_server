@@ -16,7 +16,6 @@ public class ResidenceController {
     private final CreateResidenceService createResidenceService;
     private final DeleteResidenceService deleteResidenceService;
     private final UpdateResidenceService updateResidenceService;
-    private final QueryResidenceDetailService queryResidenceDetailService;
     private final QueryResidenceListService queryResidenceListService;
     private final MoveResidenceService moveResidenceService;
 
@@ -28,11 +27,6 @@ public class ResidenceController {
     @GetMapping("/all")
     public List<ResidenceResponse> execute(){
         return queryResidenceListService.execute();
-    }
-
-    @GetMapping("/{id}")
-    public ResidenceResponse execute(@PathVariable Long id){
-        return queryResidenceDetailService.execute(id);
     }
 
     @PatchMapping("/{id}")
