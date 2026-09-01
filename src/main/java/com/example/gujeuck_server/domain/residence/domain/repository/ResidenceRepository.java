@@ -10,8 +10,6 @@ import java.util.Optional;
 public interface ResidenceRepository extends JpaRepository<Residence, Long>, ResidenceRepositoryCustom {
     Optional<Residence> findByOrganIdAndResidenceName(Long organId, String residenceName);
 
-    List<Residence> findAllByOrganIdOrderByResidenceIndexAsc(Long organId);
-
     List<Residence> findAllByOrganIdAndResidenceIndexGreaterThan(Long organId, int residenceIndex);
 
     @Query("select r.residenceName from Residence r where r.organ.id = :organId")
