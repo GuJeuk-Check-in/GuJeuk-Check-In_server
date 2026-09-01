@@ -38,10 +38,6 @@ public class MovePurposeService {
         for(int i = 0; i < purposeMoveRequest.purposeId().size(); i++) {
             Purpose purpose = purposeMap.get(purposeMoveRequest.purposeId().get(i));
 
-            if(purpose == null) {
-                throw PurposeNotFoundException.EXCEPTION;
-            }
-
             purpose.updatePurposeIndex(i + 1);
         }
     }
