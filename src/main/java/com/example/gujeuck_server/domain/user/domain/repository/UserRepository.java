@@ -4,11 +4,8 @@ import com.example.gujeuck_server.domain.user.domain.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 
@@ -26,17 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     boolean existsByIdAndOrganId(Long id, Long organId);
 
-    Optional<User> findByNameAndPhone(String name, String phone);
-
     List<User> findAllByName(String name);
-
-    @Query(
-            value = "select * from `user` where name = :name and regexp_replace(phone, '[^0-9]', '') = :phone",
-            nativeQuery = true
-    )
-    List<User> findAllByNameAndNormalizedPhone(@Param("name") String name, @Param("phone") String phone);
-
-    Optional<User> findByPhone(String phone);
 
     List<User> findAllByOrganIdOrderByIdAsc(Long organId);
 }
