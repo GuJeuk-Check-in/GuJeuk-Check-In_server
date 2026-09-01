@@ -12,17 +12,13 @@
    - 사용 금지 기능
    - 보안 위험
    - 다음 우선 작업
-2. `docs/HOME_SERVER_OPERATIONS.md`
-   - 상세 구축 이력
-   - 운영 명령
-   - 장애 원인과 복구 절차
 
 문서 적용 원칙:
 
 - `PROJECT_CONTEXT.md`의 현재 지침이 과거 작업 이력보다 우선합니다.
 - API, 서버 전원, 네트워크, 배포 상태처럼 변할 수 있는 정보는 실제로 확인한 뒤 판단합니다.
 - 실제 상태가 문서와 다르면 실제 상태를 우선하고 관련 문서를 갱신합니다.
-- 인프라·배포·네트워크·DB·운영 명령을 변경한 경우 `docs/PROJECT_CONTEXT.md`와 `docs/HOME_SERVER_OPERATIONS.md`도 함께 갱신합니다.
+- 인프라·배포·네트워크·DB·운영 명령을 변경한 경우 `docs/PROJECT_CONTEXT.md`도 함께 갱신합니다.
 
 ## 운영 안전 지침
 
