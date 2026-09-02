@@ -7,6 +7,7 @@ import com.example.gujeuck_server.domain.log.facade.LogFacade;
 import com.example.gujeuck_server.domain.log.exception.InvalidLogDateException;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
+import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +23,10 @@ public class CreateLogService {
     private final LogRepository logRepository;
     private final LogFacade logFacade;
     private final PurposeFacade purposeFacade;
+    private final OrganFacade organFacade;
 
     @Transactional
-    public void execute(Organ organ, LogRequest request) {
+    public void execute(Long organId, LogRequest request) {
         String name = request.name().trim();
         String purposeName = request.purpose().trim();
         String visitDate = request.visitDate();
@@ -32,12 +34,13 @@ public class CreateLogService {
         int year = extractYear(visitDate);
         LocalDateTime visitAt = DateFormatter.toVisitAt(visitDate, visitTime);
 
-        Purpose purpose = purposeFacade.getPurpose(organ.getId(), purposeName);
+        Purpose purpose = purposeFacade.getPurpose(organId, purposeName);
 
         logFacade.validateNotDuplicated(
-                organ.getId(), name, request.age(), purpose.getPurposeName(), visitAt, null);
+                organId, name, request.age(), purpose.getPurposeName(), visitAt, null);
 
-        logRepository.save(createUseLog(request, name, purpose, visitDate, visitTime, visitAt, year, organ));
+        logRepository.save(createUseLog(
+                request, name, purpose, visitDate, visitTime, visitAt, year, organFacade.getOrganReference(organId)));
     }
 
     private Log createUseLog(

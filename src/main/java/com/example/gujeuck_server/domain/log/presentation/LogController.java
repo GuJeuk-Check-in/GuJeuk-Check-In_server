@@ -36,7 +36,7 @@ public class LogController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid LogRequest request
     ) {
-        createLogService.execute(userDetails.organ(), request);
+        createLogService.execute(userDetails.organ().getId(), request);
     }
 
     @DeleteMapping("/{log-id}")
