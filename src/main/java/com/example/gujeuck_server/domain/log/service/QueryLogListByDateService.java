@@ -36,15 +36,15 @@ public class QueryLogListByDateService {
     }
 
     private String toYearMonthPrefix(String yearMonth) {
+        if (!yearMonth.matches("\\d{4}-\\d{2}")) {
+            throw InvalidLogDateException.EXCEPTION;
+        }
+
         String[] parts = yearMonth.split("-");
         LocalDate now = LocalDate.now();
 
         String year = parts[0];
         String month = parts[1];
-
-        if (!yearMonth.matches("\\d{4}-\\d{2}")) {
-            throw InvalidLogDateException.EXCEPTION;
-        }
 
         if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1 || Integer.parseInt(year) > now.getYear()) {
             throw InvalidLogDateException.EXCEPTION;
