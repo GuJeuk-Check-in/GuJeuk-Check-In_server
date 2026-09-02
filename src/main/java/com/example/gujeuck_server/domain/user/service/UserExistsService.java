@@ -45,21 +45,12 @@ public class UserExistsService {
             return namesakes.get(0);
         }
 
-        int lastIndex = indexOfUserId(namesakes, lastUserId);
+        int lastIndex = namesakes.stream().map(User::getId).toList().indexOf(lastUserId);
 
         if (lastIndex < 0) {
             return namesakes.get(0);
         }
 
         return namesakes.get((lastIndex + 1) % namesakes.size());
-    }
-
-    private int indexOfUserId(List<User> namesakes, Long userId) {
-        for (int i = 0; i < namesakes.size(); i++) {
-            if (namesakes.get(i).getId().equals(userId)) {
-                return i;
-            }
-        }
-        return -1;
     }
 }
