@@ -34,7 +34,6 @@ public class JwtTokenProvider {
     private static final String ACCESS_TYPE = "access";
     private static final String REFRESH_TYPE = "refresh";
     private static final int MILLISECONDS = 1000;
-    private static final long ORGAN_ACCESS_EXPIRATION = 7200L;
 
     public String createAccessToken(String organName) {
 
@@ -44,7 +43,7 @@ public class JwtTokenProvider {
                 .setSubject(organName)
                 .claim(CLAIM_TYPE, ACCESS_TYPE)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + ORGAN_ACCESS_EXPIRATION * MILLISECONDS))
+                .setExpiration(new Date(now.getTime() + jwtProperties.getAccessExpiration() * MILLISECONDS))
                 .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecretKey())
                 .compact();
 
