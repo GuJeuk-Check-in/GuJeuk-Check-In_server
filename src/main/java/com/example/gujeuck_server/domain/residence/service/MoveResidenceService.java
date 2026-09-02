@@ -1,10 +1,7 @@
 package com.example.gujeuck_server.domain.residence.service;
 
-import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.residence.domain.Residence;
 import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRepository;
-import com.example.gujeuck_server.domain.residence.exception.ResidenceAccessDeniedException;
 import com.example.gujeuck_server.domain.residence.exception.ResidenceNotFoundException;
 import com.example.gujeuck_server.domain.residence.presentation.dto.request.ResidenceMoveRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +16,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MoveResidenceService {
     private final ResidenceRepository residenceRepository;
-    private final OrganFacade organFacade;
 
     @Transactional
     public void execute(ResidenceMoveRequest residenceMoveRequest) {
-        Organ organ = organFacade.currentOrgan();
-
         List<Long> residencesId = residenceMoveRequest.residenceId();
         List<Residence> residences = residenceRepository.findAllById(residenceMoveRequest.residenceId());
 
