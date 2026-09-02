@@ -4,7 +4,10 @@ import com.example.gujeuck_server.domain.residence.presentation.dto.request.Resi
 import com.example.gujeuck_server.domain.residence.presentation.dto.request.ResidenceRequest;
 import com.example.gujeuck_server.domain.residence.presentation.dto.response.ResidenceResponse;
 import com.example.gujeuck_server.domain.residence.service.*;
+import com.example.gujeuck_server.global.security.auth.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,8 +23,11 @@ public class ResidenceController {
     private final MoveResidenceService moveResidenceService;
 
     @PostMapping
-    public void createResidence(@RequestBody ResidenceRequest residenceRequest){
-        createResidenceService.execute(residenceRequest);
+    public void createResidence(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid ResidenceRequest residenceRequest
+    ) {
+        createResidenceService.execute(userDetails.organ().getId(), residenceRequest);
     }
 
     @GetMapping("/all")
@@ -30,17 +36,20 @@ public class ResidenceController {
     }
 
     @PatchMapping("/{id}")
-    public void updateResidence(@PathVariable Long id, @RequestBody ResidenceRequest residenceRequest){
+    public void updateResidence(@PathVariable Long id, @RequestBody @Valid ResidenceRequest residenceRequest){
         updateResidenceService.execute(id, residenceRequest);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteResidence(@PathVariable Long id){
-        deleteResidenceService.execute(id);
+    public void deleteResidence(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id
+    ) {
+        deleteResidenceService.execute(userDetails.organ().getId(), id);
     }
 
     @PatchMapping("/move")
-    public void moveResidence(@RequestBody ResidenceMoveRequest residenceMoveRequest) {
+    public void moveResidence(@RequestBody @Valid ResidenceMoveRequest residenceMoveRequest) {
         moveResidenceService.execute(residenceMoveRequest);
     }
 }

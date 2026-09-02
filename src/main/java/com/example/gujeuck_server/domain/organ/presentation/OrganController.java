@@ -14,6 +14,7 @@ import com.example.gujeuck_server.domain.user.service.QueryUserDetailService;
 import com.example.gujeuck_server.domain.residence.service.QueryUserListByResidenceService;
 import com.example.gujeuck_server.domain.user.service.QueryUserListService;
 import com.example.gujeuck_server.domain.user.service.UpdateUserService;
+import com.example.gujeuck_server.global.security.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -43,24 +45,36 @@ public class OrganController {
 
     @GetMapping("/user/all")
     public UserSliceWithTotalResponse queryAllUserList(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 30, sort = {"id"}, direction = Sort.Direction.DESC)
             Pageable pageable) {
-        return queryUserListService.execute(pageable);
+        return queryUserListService.execute(userDetails.organ().getId(), pageable);
     }
 
     @GetMapping("/user")
-    public UserSliceWithTotalResponse queryAllUserByResidenceList(@RequestParam String residence, Pageable pageable) {
-        return queryUserListByResidenceService.execute(residence, pageable);
+    public UserSliceWithTotalResponse queryAllUserByResidenceList(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam String residence,
+            Pageable pageable
+    ) {
+        return queryUserListByResidenceService.execute(userDetails.organ().getId(), residence, pageable);
     }
 
     @GetMapping("/user/{id}")
-    public UserDetailResponse queryUserDetail(@PathVariable Long id) {
-        return queryUserDetailService.execute(id);
+    public UserDetailResponse queryUserDetail(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id
+    ) {
+        return queryUserDetailService.execute(userDetails.organ().getId(), id);
     }
 
     @PatchMapping("/user/{id}")
-    public void updateUser(@PathVariable Long id, @RequestBody @Valid UpdateUserRequest request) {
-        updateUserService.execute(id, request);
+    public void updateUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateUserRequest request
+    ) {
+        updateUserService.execute(userDetails.organ().getId(), id, request);
     }
 
     @PostMapping("/login")
@@ -74,18 +88,24 @@ public class OrganController {
     }
 
     @PatchMapping("/change")
-    public void changeOrgan(@RequestBody @Valid ChangePasswordRequest request) {
-        changePasswordService.execute(request);
+    public void changeOrgan(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid ChangePasswordRequest request
+    ) {
+        changePasswordService.execute(userDetails.organ().getId(), request);
     }
 
     @GetMapping("/excel/log/{yearMonth}")
-    public ResponseEntity<byte[]> exportLogExcel(@PathVariable String yearMonth) {
-        return logExcelOutPutService.execute(yearMonth);
+    public ResponseEntity<byte[]> exportLogExcel(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable String yearMonth
+    ) {
+        return logExcelOutPutService.execute(userDetails.organ().getId(), yearMonth);
     }
 
     @GetMapping("/excel/user")
-    public ResponseEntity<byte[]> exportUserExcel() {
-        return userExcelOutPutService.execute();
+    public ResponseEntity<byte[]> exportUserExcel(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return userExcelOutPutService.execute(userDetails.organ().getId());
     }
 
     @PatchMapping("/re-issue")
@@ -95,14 +115,18 @@ public class OrganController {
 
     @GetMapping("/statistics/visits")
     public VisitStatisticsResponse queryVisitStatistics(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam int year,
             @RequestParam int month
     ) {
-        return queryVisitStatisticsService.execute(year, month);
+        return queryVisitStatisticsService.execute(userDetails.organ().getId(), year, month);
     }
 
     @GetMapping("/usage")
-    public SystemUsageResponse querySystemUsage(@RequestParam int year) {
-        return systemUsageService.execute(year);
+    public SystemUsageResponse querySystemUsage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam int year
+    ) {
+        return systemUsageService.execute(userDetails.organ().getId(), year);
     }
 }

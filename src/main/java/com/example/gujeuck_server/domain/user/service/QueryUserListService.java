@@ -1,7 +1,5 @@
 package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
@@ -17,21 +15,18 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QueryUserListService {
     private final UserRepository userRepository;
-    private final OrganFacade organFacade;
 
     @Transactional(readOnly = true)
-    public UserSliceWithTotalResponse execute(Pageable p) {
-        Organ organ = organFacade.currentOrgan();
-
+    public UserSliceWithTotalResponse execute(Long organId, Pageable p) {
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),
                 p.getPageSize(),
                 Sort.by(Sort.Direction.DESC, "id")
         );
 
-        long total = userRepository.countByOrganId(organ.getId());
+        long total = userRepository.countByOrganId(organId);
 
-        Slice<UserInfoResponse> slice = userRepository.findAllByOrganId(pageable, organ.getId())
+        Slice<UserInfoResponse> slice = userRepository.findAllByOrganId(pageable, organId)
                 .map(UserInfoResponse::from);
 
         return new UserSliceWithTotalResponse(total, slice);

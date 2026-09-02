@@ -1,7 +1,5 @@
 package com.example.gujeuck_server.domain.user.service;
 
-import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
@@ -16,18 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UpdateUserService {
-    private final OrganFacade organFacade;
     private final UserRepository userRepository;
     private final CalculateAgeService calculateAgeService;
 
     @Transactional
-    public void execute(Long id, UpdateUserRequest request) {
-        Organ organ = organFacade.currentOrgan();
-
+    public void execute(Long organId, Long id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
-        if (!organ.getId().equals(user.getOrgan().getId())) {
+        if (!organId.equals(user.getOrgan().getId())) {
             throw UserAccessDeniedException.EXCEPTION;
         }
 

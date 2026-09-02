@@ -4,9 +4,11 @@ import com.example.gujeuck_server.domain.purpose.presentation.dto.request.Purpos
 import com.example.gujeuck_server.domain.purpose.presentation.dto.response.PurposeResponse;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeMoveRequest;
 import com.example.gujeuck_server.domain.purpose.service.*;
+import com.example.gujeuck_server.global.security.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,8 +25,11 @@ public class PurposeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createPurpose(@RequestBody @Valid PurposeRequest request) {
-        createPurposeService.execute(request);
+    public void createPurpose(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid PurposeRequest request
+    ) {
+        createPurposeService.execute(userDetails.organ().getId(), request);
     }
 
     @PatchMapping("/{id}")
@@ -33,8 +38,11 @@ public class PurposeController {
     }
 
     @DeleteMapping("/{id}")
-    public void deletePurpose(@PathVariable Long id) {
-        deletePurposeService.execute(id);
+    public void deletePurpose(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id
+    ) {
+        deletePurposeService.execute(userDetails.organ().getId(), id);
     }
 
     @GetMapping("/all")
