@@ -30,7 +30,7 @@ public class TimeProvider {
     }
 
     public static String nowDateFormatted() {
-        return DateFormatter.LocalDateForm(nowDate());
+        return DateFormatter.toVisitDate(nowDate());
     }
 
     public static String nowTimeFormatted() {
