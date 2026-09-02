@@ -1,10 +1,8 @@
 package com.example.gujeuck_server.domain.organ.service;
 
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
-import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.infrastructure.excel.exception.ExcelGenerationException;
 import com.example.gujeuck_server.infrastructure.excel.exception.InvalidDateException;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.infrastructure.excel.util.ExcelGenerator;
@@ -27,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LogExcelOutPutService {
     private final LogRepository logRepository;
-    private final OrganFacade organFacade;
 
     private static final String EXCEL_MEDIA_TYPE_NAME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final MediaType EXCEL_MEDIA_TYPE = MediaType.parseMediaType(EXCEL_MEDIA_TYPE_NAME);
@@ -35,13 +32,11 @@ public class LogExcelOutPutService {
     private static final DateTimeFormatter YEAR_MONTH = DateTimeFormatter.ofPattern("yyyy-MM");
     private static final DateTimeFormatter VISIT_DATE = DateTimeFormatter.ofPattern("yyyy년MM월");
 
-    public ResponseEntity<byte[]> execute(String yearMonth) {
-        Organ organ = organFacade.currentOrgan();
-
+    public ResponseEntity<byte[]> execute(Long organId, String yearMonth) {
         try {
             String visitDate = toVisitDate(yearMonth);
 
-            List<Log> logs = logRepository.findAllByOrganIdAndVisitDateStartingWithOrderByDateTime(organ.getId(), visitDate);
+            List<Log> logs = logRepository.findAllByOrganIdAndVisitDateStartingWithOrderByDateTime(organId, visitDate);
 
             List<LogExcelResponse> responses = logs.stream()
                     .map(LogExcelResponse::from)

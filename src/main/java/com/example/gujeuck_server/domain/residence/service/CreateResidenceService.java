@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.residence.service;
 
-import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.residence.domain.Residence;
 import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRepository;
@@ -17,20 +16,18 @@ public class CreateResidenceService {
     private final OrganFacade organFacade;
 
     @Transactional
-    public void execute(ResidenceRequest residenceRequest) {
-        Organ organ = organFacade.currentOrgan();
-
-        if(residenceRepository.findByOrganIdAndResidenceName(organ.getId(), residenceRequest.residenceName()).isPresent()) {
+    public void execute(Long organId, ResidenceRequest residenceRequest) {
+        if(residenceRepository.findByOrganIdAndResidenceName(organId, residenceRequest.residenceName()).isPresent()) {
             throw ResidenceAlreadyException.EXCEPTION;
         }
 
-        int residenceIndex = residenceRepository.findMaxResidenceIndexByOrganId(organ.getId()) + 1;
+        int residenceIndex = residenceRepository.findMaxResidenceIndexByOrganId(organId) + 1;
 
         residenceRepository.save(
                 Residence.builder()
                         .residenceName(residenceRequest.residenceName())
                         .residenceIndex(residenceIndex)
-                        .organ(organ)
+                        .organ(organFacade.getOrganReference(organId))
                         .build()
         );
     }

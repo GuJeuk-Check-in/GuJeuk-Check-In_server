@@ -1,7 +1,5 @@
 package com.example.gujeuck_server.domain.organ.service;
 
-import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.presentation.dto.response.UserExcelResponse;
@@ -23,17 +21,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserExcelOutPutService {
     private final UserRepository userRepository;
-    private final OrganFacade organFacade;
 
     private static final String EXCEL_MEDIA_TYPE_NAME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     private static final MediaType EXCEL_MEDIA_TYPE = MediaType.parseMediaType(EXCEL_MEDIA_TYPE_NAME);
     private static final String FILE_NAME = "%d년 %d월 %d일 회원 목록.xlsx";
 
-    public ResponseEntity<byte[]> execute() {
-        Organ organ = organFacade.currentOrgan();
-
+    public ResponseEntity<byte[]> execute(Long organId) {
         try {
-            List<User> users = userRepository.findAllByOrganIdOrderByIdAsc(organ.getId());
+            List<User> users = userRepository.findAllByOrganIdOrderByIdAsc(organId);
 
             List<UserExcelResponse> responses = users.stream()
                     .map(UserExcelResponse::from)

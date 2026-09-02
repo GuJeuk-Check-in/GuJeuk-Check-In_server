@@ -2,8 +2,6 @@ package com.example.gujeuck_server.domain.organ.service;
 
 import com.example.gujeuck_server.domain.log.presentation.dto.response.MonthlyOperationCount;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
-import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.SystemUsageOneResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.SystemUsageResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +17,13 @@ public class SystemUsageService {
     private static final int CAPACITY = 75;
 
     private final LogRepository logRepository;
-    private final OrganFacade organFacade;
 
     @Transactional(readOnly = true)
-    public SystemUsageResponse execute(int year) {
-        Organ organ = organFacade.currentOrgan();
-
+    public SystemUsageResponse execute(Long organId, int year) {
         List<SystemUsageOneResponse> months = new ArrayList<>();
         for (int month = 1; month <= 12; month++) {
             String yearMonth = String.format("%d년%02d월", year, month);
-            MonthlyOperationCount count = logRepository.findMonthlyOperationCount(organ.getId(), yearMonth);
+            MonthlyOperationCount count = logRepository.findMonthlyOperationCount(organId, yearMonth);
 
             months.add(toResponse(count));
         }

@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeAlreadyExistException;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeRequest;
@@ -17,20 +16,18 @@ public class CreatePurposeService {
     private final OrganFacade organFacade;
 
     @Transactional
-    public void execute(PurposeRequest request) {
-        Organ organ = organFacade.currentOrgan();
-
-        if(purposeRepository.findByOrganIdAndPurposeName(organ.getId(), request.purpose()).isPresent()) {
+    public void execute(Long organId, PurposeRequest request) {
+        if(purposeRepository.findByOrganIdAndPurposeName(organId, request.purpose()).isPresent()) {
             throw PurposeAlreadyExistException.EXCEPTION;
         }
 
-        int purposeIndex = purposeRepository.findMaxPurposeIndexByOrganId(organ.getId()) + 1;
+        int purposeIndex = purposeRepository.findMaxPurposeIndexByOrganId(organId) + 1;
 
         purposeRepository.save(
                 Purpose.builder()
                         .purposeName(request.purpose())
                         .purposeIndex(purposeIndex)
-                        .organ(organ)
+                        .organ(organFacade.getOrganReference(organId))
                         .build()
         );
     }
