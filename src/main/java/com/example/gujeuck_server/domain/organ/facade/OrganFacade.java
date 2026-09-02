@@ -22,4 +22,13 @@ public class OrganFacade {
         return organRepository.findByOrganName(organName)
                 .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
     }
+
+    public Organ getOrganById(Long organId) {
+        return organRepository.findById(organId)
+                .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
+    }
+
+    public Organ getOrganReference(Long organId) {
+        return organRepository.getReferenceById(organId);
+    }
 }
