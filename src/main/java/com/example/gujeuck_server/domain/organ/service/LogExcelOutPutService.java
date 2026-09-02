@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -32,6 +33,7 @@ public class LogExcelOutPutService {
     private static final DateTimeFormatter YEAR_MONTH = DateTimeFormatter.ofPattern("yyyy-MM");
     private static final DateTimeFormatter VISIT_DATE = DateTimeFormatter.ofPattern("yyyy년MM월");
 
+    @Transactional(readOnly = true)
     public ResponseEntity<byte[]> execute(Long organId, String yearMonth) {
         try {
             String visitDate = toVisitDate(yearMonth);

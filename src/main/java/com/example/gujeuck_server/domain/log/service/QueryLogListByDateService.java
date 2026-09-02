@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 public class QueryLogListByDateService {
     private final LogRepository logRepository;
 
+    @Transactional(readOnly = true)
     public LogSliceWithTotalResponse execute(Long organId, String yearMonth, Pageable p) {
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),

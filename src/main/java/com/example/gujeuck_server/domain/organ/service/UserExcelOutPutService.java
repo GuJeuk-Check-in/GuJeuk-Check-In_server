@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -26,6 +27,7 @@ public class UserExcelOutPutService {
     private static final MediaType EXCEL_MEDIA_TYPE = MediaType.parseMediaType(EXCEL_MEDIA_TYPE_NAME);
     private static final String FILE_NAME = "%d년 %d월 %d일 회원 목록.xlsx";
 
+    @Transactional(readOnly = true)
     public ResponseEntity<byte[]> execute(Long organId) {
         try {
             List<User> users = userRepository.findAllByOrganIdOrderByIdAsc(organId);
