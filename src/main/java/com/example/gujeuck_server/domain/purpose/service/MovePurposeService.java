@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeMoveRequest;
@@ -17,12 +16,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MovePurposeService {
     private final PurposeRepository purposeRepository;
-    private final OrganFacade organFacade;
 
     @Transactional
     public void execute(PurposeMoveRequest purposeMoveRequest) {
-        organFacade.currentOrgan();
-
         List<Long> purposesId = purposeMoveRequest.purposeId();
         List<Purpose> purposes = purposeRepository.findAllById(purposeMoveRequest.purposeId());
 

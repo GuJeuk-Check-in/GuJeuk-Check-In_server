@@ -1,10 +1,7 @@
 package com.example.gujeuck_server.domain.residence.service;
 
-import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.residence.domain.Residence;
 import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRepository;
-import com.example.gujeuck_server.domain.residence.exception.ResidenceAccessDeniedException;
 import com.example.gujeuck_server.domain.residence.exception.ResidenceNotFoundException;
 import com.example.gujeuck_server.domain.residence.presentation.dto.request.ResidenceRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UpdateResidenceService {
     private final ResidenceRepository residenceRepository;
-    private final OrganFacade organFacade;
 
     @Transactional
     public void execute(Long id, ResidenceRequest residenceRequest) {
-        Organ organ = organFacade.currentOrgan();
-
         Residence residence = residenceRepository.findById(id)
                 .orElseThrow(() -> ResidenceNotFoundException.EXCEPTION);
 
