@@ -50,8 +50,8 @@ public class QueryVisitStatisticsService {
     ) {
         return logRepository.summarizeVisits(
                 organId,
-                DateFormatter.LocalDateForm(startDate),
-                DateFormatter.LocalDateForm(endDate)
+                DateFormatter.toVisitDate(startDate),
+                DateFormatter.toVisitDate(endDate)
         );
     }
 
