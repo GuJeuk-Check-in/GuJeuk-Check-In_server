@@ -13,8 +13,6 @@ import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
 import com.example.gujeuck_server.domain.user.presentation.dto.request.UserCheckInRequest;
 import com.example.gujeuck_server.global.utility.DateFormatter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.web.SortArgumentResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,17 +20,13 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.example.gujeuck_server.domain.log.domain.QLog.log;
-
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class UserCheckInService {
 
     private final UserRepository userRepository;
     private final LogRepository logRepository;
     private final PurposeFacade purposeFacade;
-    private final SortArgumentResolver sortArgumentResolver;
 
     @Transactional
     public void execute(UserCheckInRequest request) {
@@ -55,11 +49,9 @@ public class UserCheckInService {
         Purpose purpose = purposeFacade.getPurpose(organ.getId(), request.purpose());
 
         LocalDateTime visitDateTime = request.visitTime();
-        log.info("포멧팅 하기 전 시각 : ", visitDateTime.toString());
         String visitDate = DateFormatter.toVisitDate(visitDateTime);
         String visitTime = DateFormatter.toVisitTime(visitDateTime);
-        log.info("포멧팅 한 후의 날짜 : ", visitDate);
-        log.info("포멧팅 한 후의 시간 : ", visitTime);
+
         int year = visitDateTime.getYear();
 
         if (logRepository.findByUserIdAndVisitAt(user.getId(), visitDateTime, purpose.getPurposeName()).isPresent()) {
