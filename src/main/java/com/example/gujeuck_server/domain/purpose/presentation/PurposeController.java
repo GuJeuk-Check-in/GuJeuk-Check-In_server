@@ -51,7 +51,7 @@ public class PurposeController {
     }
 
     @PatchMapping("/move")
-    public void movePurpose(@RequestBody PurposeMoveRequest PurposeMoveRequest) {
+    public void movePurpose(@RequestBody @Valid PurposeMoveRequest PurposeMoveRequest) {
         movePurposeService.execute(PurposeMoveRequest);
     }
 }
