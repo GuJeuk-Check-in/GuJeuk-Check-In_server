@@ -46,7 +46,7 @@ public class OrganController {
     @GetMapping("/user/all")
     public UserSliceWithTotalResponse queryAllUserList(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PageableDefault(size = 30, sort = {"id"}, direction = Sort.Direction.DESC)
+            @PageableDefault(size = 30, sort = "id", direction = Sort.Direction.DESC)
             Pageable pageable) {
         return queryUserListService.execute(userDetails.organ().getId(), pageable);
     }
