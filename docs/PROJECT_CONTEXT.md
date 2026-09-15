@@ -1,6 +1,6 @@
 # GuJeuk 프로젝트 현재 상황
 
-> 최종 갱신: 2026-07-20 KST
+> 최종 갱신: 2026-09-15 KST
 > 목적: 새로운 Codex 대화에서도 현재 서비스·배포·운영 상황을 빠르게 파악하기 위한 기준 문서
 
 ## 1. 문서 사용 방법
@@ -516,7 +516,6 @@ projectsilmoo_gujeuk_prod_synced_20260603_153552.sql.zip
 
 - `PROD_BASE_URL`
 - `STAG_BASE_URL`
-- `VERCEL_URL`
 - `TEST_URL`
 
 추가 요청으로 허용한 origin:
@@ -540,6 +539,15 @@ origin은 쉼표로 여러 개를 전달할 수 있고 후행 `/`는 코드에�
 - oijwef prod/stag `.env`의 CORS origin에 `https://gujeuk.com`, `https://www.gujeuk.com`, `https://taisu.site`, 기존 Cloudflare Pages/Prototype origin을 포함했다.
 - `https://www.gujeuk.com`, `https://gujeuk.com`, `https://taisu.site` Origin의 `OPTIONS https://api.taisu.site/purpose/all` preflight가 HTTP 200을 반환한다.
 - `https://www.gujeuk.com` Origin의 `OPTIONS https://gujeuk-api.oijwef098234.com/purpose/all`와 `OPTIONS https://api.oijwef098234.com/purpose/all`도 HTTP 200을 반환한다.
+
+2026-09-15 KST AWS 환경 정리:
+
+- prod/stag `.env`의 CORS origin은 `PROD_BASE_URL`, `STAG_BASE_URL`, `TEST_URL`만 사용한다.
+- `PROD_BASE_URL=https://gujeuk-check-in-fe.pages.dev`
+- `STAG_BASE_URL=https://gujeuk-check-in-develop.pages.dev`
+- `TEST_URL=http://localhost:5173,http://localhost:5174`
+- AWS prod/stag Compose에서 `VERCEL_URL` 전달을 제거했다.
+- 기존 실행 컨테이너는 재생성 전까지 과거 CORS 환경변수를 유지한다. `VERCEL_URL`을 요구하는 기존 이미지로 재생성하지 말고, 세 변수만 사용하는 애플리케이션 이미지와 함께 배포한다.
 
 ## 12. 보안 긴급 사항
 

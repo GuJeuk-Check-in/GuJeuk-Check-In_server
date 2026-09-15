@@ -73,7 +73,6 @@ REDIS_HOST=localhost
 REDIS_PORT=6379
 PROD_BASE_URL=https://frontend.example.com
 STAG_BASE_URL=https://staging-frontend.example.com
-VERCEL_URL=https://alternate-frontend.example.com
 TEST_URL=http://localhost:5173
 ```
 
