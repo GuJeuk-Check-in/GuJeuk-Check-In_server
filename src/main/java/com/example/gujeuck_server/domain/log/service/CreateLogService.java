@@ -2,7 +2,6 @@ package com.example.gujeuck_server.domain.log.service;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
-import com.example.gujeuck_server.global.utility.DateFormatter;
 import com.example.gujeuck_server.domain.log.facade.LogFacade;
 import com.example.gujeuck_server.domain.log.exception.InvalidLogDateException;
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
@@ -13,7 +12,6 @@ import com.example.gujeuck_server.domain.purpose.facade.PurposeFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -32,15 +30,13 @@ public class CreateLogService {
         String visitDate = request.visitDate();
         String visitTime = request.visitTime();
         int year = extractYear(visitDate);
-        LocalDateTime visitAt = DateFormatter.toVisitAt(visitDate, visitTime);
-
         Purpose purpose = purposeFacade.getPurpose(organId, purposeName);
 
         logFacade.validateNotDuplicated(
-                organId, name, request.age(), purpose.getPurposeName(), visitAt, null);
+                organId, name, request.age(), purpose.getPurposeName(), visitDate, visitTime, null);
 
         logRepository.save(createUseLog(
-                request, name, purpose, visitDate, visitTime, visitAt, year, organFacade.getOrganReference(organId)));
+                request, name, purpose, visitDate, visitTime, year, organFacade.getOrganReference(organId)));
     }
 
     private Log createUseLog(
@@ -49,7 +45,6 @@ public class CreateLogService {
             Purpose purpose,
             String date,
             String time,
-            LocalDateTime visitAt,
             int year,
             Organ organ
     ) {
@@ -62,7 +57,6 @@ public class CreateLogService {
                 .purpose(purpose.getPurposeName())
                 .visitTime(time)
                 .visitDate(date)
-                .visitAt(visitAt)
                 .year(year)
                 .privacyAgreed(request.privacyAgreed())
                 .organ(organ)
