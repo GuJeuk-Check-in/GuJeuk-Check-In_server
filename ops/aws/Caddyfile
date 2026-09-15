@@ -5,3 +5,11 @@ aws-api.oijwef098234.com, api.taisu.site {
 aws-stag.oijwef098234.com, api-stag.taisu.site {
     reverse_proxy host.docker.internal:8081
 }
+
+# 게임 서버. 앱은 GuJeuk-Game-FE 레포의 server/ 에서 배포되고 ~/gujuck-game 에서 돈다.
+# MySQL은 새로 띄우지 않고 이 호스트의 prod MySQL에 별도 DB(gujuck_game)를 쓴다 —
+# 메모리 여유가 700MB 남짓이라 MySQL을 하나 더 올리면 prod 앱이 OOM으로 죽는다.
+# 8090 은 monitor-bot 이 쓰고 있어 8095 다.
+game-api.oijwef098234.com {
+    reverse_proxy host.docker.internal:8095
+}
