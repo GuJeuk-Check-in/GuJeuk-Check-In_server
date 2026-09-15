@@ -4,7 +4,6 @@ import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.exception.DuplicateLogException;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 
-import java.time.LocalDateTime;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.exception.LogNotFountException;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +24,17 @@ public class LogFacade {
             String name,
             Age age,
             String purpose,
-            LocalDateTime visitAt,
+            String visitDate,
+            String visitTime,
             Long excludedId
     ) {
-        if (logRepository.existsDuplicate(organId, name, age, purpose, visitAt, excludedId)) {
+        boolean duplicated = excludedId == null
+                ? logRepository.existsByOrganIdAndNameAndAgeAndPurposeAndVisitDateAndVisitTime(
+                        organId, name, age, purpose, visitDate, visitTime)
+                : logRepository.existsByOrganIdAndNameAndAgeAndPurposeAndVisitDateAndVisitTimeAndIdNot(
+                        organId, name, age, purpose, visitDate, visitTime, excludedId);
+
+        if (duplicated) {
             throw DuplicateLogException.EXCEPTION;
         }
     }

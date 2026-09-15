@@ -33,11 +33,11 @@ import java.time.LocalDateTime;
 )
 public class Log extends BaseIdEntity {
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false)
     private String purpose;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 6)
+    @Column(nullable = false)
     private Age age;
 
     @Column(nullable = false)
@@ -46,7 +46,6 @@ public class Log extends BaseIdEntity {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(nullable = false, length = 15)
     private String phone;
 
     @Column(nullable = false)
@@ -55,13 +54,13 @@ public class Log extends BaseIdEntity {
     @Column(nullable = false)
     private int femaleCount;
 
-    @Column(nullable = false, length = 11)
+    @Column(nullable = false)
     private String visitDate;
 
     @Column(nullable = false)
     private int year;
 
-    @Column(nullable = false, length = 5)
+    @Column(nullable = false)
     private String visitTime;
 
     private LocalDateTime visitAt;
@@ -76,7 +75,7 @@ public class Log extends BaseIdEntity {
     @JoinColumn(name = "organ_id", nullable = false)
     private Organ organ;
 
-    public void updateLog(String name, Age age, String phone, int maleCount, int femaleCount, String purpose, String visitDate, String visitTime, LocalDateTime visitAt, boolean privacyAgreed) {
+    public void updateLog(String name, Age age, String phone, int maleCount, int femaleCount, String purpose, String visitDate, String visitTime, boolean privacyAgreed) {
         this.name = name;
         this.age = age;
         this.phone = phone;
@@ -85,7 +84,6 @@ public class Log extends BaseIdEntity {
         this.purpose = purpose;
         this.visitDate = visitDate;
         this.visitTime = visitTime;
-        this.visitAt = visitAt;
         this.privacyAgreed = privacyAgreed;
     }
 }

@@ -3,11 +3,7 @@ package com.example.gujeuck_server.global.utility;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import com.example.gujeuck_server.domain.log.exception.InvalidLogDateException;
-
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -27,16 +23,5 @@ public class DateFormatter {
 
     public static String toVisitTime(LocalDateTime dateTime) {
         return dateTime.toLocalTime().format(TIME_FORMATTER);
-    }
-
-    public static LocalDateTime toVisitAt(String visitDate, String visitTime) {
-        try {
-            return LocalDateTime.of(
-                    LocalDate.parse(visitDate, DATE_FORMATTER),
-                    LocalTime.parse(visitTime, TIME_FORMATTER)
-            );
-        } catch (DateTimeParseException exception) {
-            throw InvalidLogDateException.EXCEPTION;
-        }
     }
 }
