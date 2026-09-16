@@ -1,10 +1,8 @@
 package com.example.gujeuck_server.domain.organ.service;
 
-import com.example.gujeuck_server.domain.log.domain.VisitStatisticsCount;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.VisitStatisticsCount;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.exception.InvalidLogDateException;
-import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.VisitStatisticsResponse;
 import com.example.gujeuck_server.global.utility.DateFormatter;
 import com.example.gujeuck_server.global.utility.TimeProvider;
@@ -21,21 +19,19 @@ import java.time.YearMonth;
 public class QueryVisitStatisticsService {
 
     private final LogRepository logRepository;
-    private final OrganFacade organFacade;
 
     @Transactional(readOnly = true)
-    public VisitStatisticsResponse execute(int year, int month) {
+    public VisitStatisticsResponse execute(Long organId, int year, int month) {
         YearMonth selectedMonth = resolveYearMonth(year, month);
-        Organ organ = organFacade.currentOrgan();
 
         VisitStatisticsCount monthly = queryStatistics(
-                organ.getId(),
+                organId,
                 selectedMonth.atDay(1),
                 selectedMonth.atEndOfMonth()
         );
 
         VisitStatisticsCount cumulative = queryStatistics(
-                organ.getId(),
+                organId,
                 selectedMonth.withMonth(1).atDay(1),
                 selectedMonth.atEndOfMonth()
         );
@@ -50,8 +46,8 @@ public class QueryVisitStatisticsService {
     ) {
         return logRepository.summarizeVisits(
                 organId,
-                DateFormatter.LocalDateForm(startDate),
-                DateFormatter.LocalDateForm(endDate)
+                DateFormatter.toVisitDate(startDate),
+                DateFormatter.toVisitDate(endDate)
         );
     }
 

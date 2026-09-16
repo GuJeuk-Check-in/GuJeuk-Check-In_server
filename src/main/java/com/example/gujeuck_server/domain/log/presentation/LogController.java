@@ -36,7 +36,7 @@ public class LogController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid LogRequest request
     ) {
-        createLogService.execute(userDetails.organ(), request);
+        createLogService.execute(userDetails.organ().getId(), request);
     }
 
     @DeleteMapping("/{log-id}")
@@ -79,6 +79,6 @@ public class LogController {
             @PathVariable("date") String date,
             Pageable pageable
     ) {
-        return queryLogListByDateService.queryLogListByResidence(userDetails.organ().getId(), date, pageable);
+        return queryLogListByDateService.execute(userDetails.organ().getId(), date, pageable);
     }
 }

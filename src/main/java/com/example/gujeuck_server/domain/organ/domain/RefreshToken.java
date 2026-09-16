@@ -12,8 +12,8 @@ import org.springframework.data.redis.core.index.Indexed;
 @RedisHash("RefreshToken")
 @Builder
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@AllArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class RefreshToken {
 
     @Id

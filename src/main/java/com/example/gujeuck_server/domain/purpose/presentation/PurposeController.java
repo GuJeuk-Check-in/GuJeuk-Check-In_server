@@ -4,9 +4,11 @@ import com.example.gujeuck_server.domain.purpose.presentation.dto.request.Purpos
 import com.example.gujeuck_server.domain.purpose.presentation.dto.response.PurposeResponse;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeMoveRequest;
 import com.example.gujeuck_server.domain.purpose.service.*;
+import com.example.gujeuck_server.global.security.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,14 +20,16 @@ public class PurposeController {
     private final CreatePurposeService createPurposeService;
     private final UpdatePurposeService updatePurposeService;
     private final DeletePurposeService deletePurposeService;
-    private final QueryPurposeDetailService queryPurposeDetailService;
     private final QueryPurposeListService queryPurposeListService;
     private final MovePurposeService movePurposeService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createPurpose(@RequestBody @Valid PurposeRequest request) {
-        createPurposeService.execute(request);
+    public void createPurpose(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid PurposeRequest request
+    ) {
+        createPurposeService.execute(userDetails.organ().getId(), request);
     }
 
     @PatchMapping("/{id}")
@@ -34,13 +38,11 @@ public class PurposeController {
     }
 
     @DeleteMapping("/{id}")
-    public void deletePurpose(@PathVariable Long id) {
-        deletePurposeService.execute(id);
-    }
-
-    @GetMapping("/{id}")
-    public PurposeResponse queryPurpose(@PathVariable Long id) {
-        return queryPurposeDetailService.execute(id);
+    public void deletePurpose(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long id
+    ) {
+        deletePurposeService.execute(userDetails.organ().getId(), id);
     }
 
     @GetMapping("/all")
@@ -49,7 +51,7 @@ public class PurposeController {
     }
 
     @PatchMapping("/move")
-    public void movePurpose(@RequestBody PurposeMoveRequest PurposeMoveRequest) {
+    public void movePurpose(@RequestBody @Valid PurposeMoveRequest PurposeMoveRequest) {
         movePurposeService.execute(PurposeMoveRequest);
     }
 }

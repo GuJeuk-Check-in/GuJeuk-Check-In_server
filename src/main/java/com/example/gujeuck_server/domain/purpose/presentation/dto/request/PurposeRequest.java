@@ -2,11 +2,10 @@ package com.example.gujeuck_server.domain.purpose.presentation.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
 
-@Getter
-public class PurposeRequest {
-    @Size(min = 1, max = 30)
-    @NotBlank
-    private String purpose;
+public record PurposeRequest(
+        @Size(min = 1, max = 30)
+        @NotBlank(message = "방문 목적을 입력해주세요.")
+        String purpose
+) {
 }

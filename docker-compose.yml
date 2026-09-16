@@ -12,7 +12,6 @@ services:
       REDIS_PORT: ${REDIS_PORT:-6379}
       PROD_BASE_URL: ${PROD_BASE_URL:?PROD_BASE_URL is required}
       STAG_BASE_URL: ${STAG_BASE_URL:?STAG_BASE_URL is required}
-      VERCEL_URL: ${VERCEL_URL:?VERCEL_URL is required}
       TEST_URL: ${TEST_URL:?TEST_URL is required}
       JAVA_OPTS: ${JAVA_OPTS:--Xms64m -Xmx128m}
       SPRING_JPA_SHOW_SQL: "false"

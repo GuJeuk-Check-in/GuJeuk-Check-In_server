@@ -7,7 +7,6 @@ import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,5 +24,9 @@ public class Purpose extends BaseIdEntity {
 
     public void updatePurpose(String purposeName) {
         this.purposeName = purposeName;
+    }
+
+    public void updatePurposeIndex(int purposeIndex) {
+        this.purposeIndex = purposeIndex;
     }
 }

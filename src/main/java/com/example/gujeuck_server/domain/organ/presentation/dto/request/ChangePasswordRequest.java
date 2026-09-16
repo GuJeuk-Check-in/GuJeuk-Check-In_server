@@ -1,19 +1,15 @@
 package com.example.gujeuck_server.domain.organ.presentation.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public class ChangePasswordRequest {
+public record ChangePasswordRequest(
+        @NotBlank(message = "기존 비밀번호를 입력해주세요.")
+        String oldPassword,
 
-    @NotBlank
-    private String oldPassword;
+        @NotBlank(message = "새 비밀번호를 입력해주세요.")
+        String newPassword,
 
-    @NotBlank
-    private String newPassword;
-
-    @NotBlank
-    private String confirmNewPassword;
+        @NotBlank(message = "새 비밀번호 확인을 입력해주세요.")
+        String confirmNewPassword
+) {
 }

@@ -4,7 +4,6 @@ import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.exception.OrganNotFoundException;
 import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,20 +11,12 @@ import org.springframework.stereotype.Component;
 public class OrganFacade {
     private final OrganRepository organRepository;
 
-    public Organ currentOrgan() {
-        String organName = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        return getOrganByName(organName);
-    }
-
-    public Organ getOrganByName(String organName) {
-        return organRepository.findByOrganName(organName)
-                .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
-    }
-
     public Organ getOrganById(Long organId) {
         return organRepository.findById(organId)
                 .orElseThrow(() -> OrganNotFoundException.EXCEPTION);
     }
 
+    public Organ getOrganReference(Long organId) {
+        return organRepository.getReferenceById(organId);
+    }
 }

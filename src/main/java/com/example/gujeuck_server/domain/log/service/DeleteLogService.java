@@ -15,7 +15,6 @@ public class DeleteLogService {
 
     @Transactional
     public void execute(Long organId, Long logId) {
-        Log log = logFacade.getLogByIdAndOrganId(logId, organId);
-        logRepository.delete(log);
+        logRepository.delete(logFacade.getLogByIdAndOrganId(logId, organId));
     }
 }

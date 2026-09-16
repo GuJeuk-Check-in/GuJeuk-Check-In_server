@@ -1,10 +1,7 @@
 package com.example.gujeuck_server.domain.purpose.service;
 
-import com.example.gujeuck_server.domain.organ.domain.Organ;
-import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
 import com.example.gujeuck_server.domain.purpose.domain.Purpose;
 import com.example.gujeuck_server.domain.purpose.domain.repository.PurposeRepository;
-import com.example.gujeuck_server.domain.purpose.exception.PurposeAccessDeniedException;
 import com.example.gujeuck_server.domain.purpose.presentation.dto.request.PurposeMoveRequest;
 import com.example.gujeuck_server.domain.purpose.exception.PurposeNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +16,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MovePurposeService {
     private final PurposeRepository purposeRepository;
-    private final OrganFacade organFacade;
 
     @Transactional
     public void execute(PurposeMoveRequest purposeMoveRequest) {
-        organFacade.currentOrgan();
-
-        List<Long> purposesId = purposeMoveRequest.getPurposeId();
-        List<Purpose> purposes = purposeRepository.findAllById(purposeMoveRequest.getPurposeId());
+        List<Long> purposesId = purposeMoveRequest.purposeId();
+        List<Purpose> purposes = purposeRepository.findAllById(purposeMoveRequest.purposeId());
 
         if(purposesId.size() != purposes.size()) {
             throw PurposeNotFoundException.EXCEPTION;
@@ -35,14 +29,10 @@ public class MovePurposeService {
         Map<Long, Purpose> purposeMap = purposes.stream()
                 .collect(Collectors.toMap(Purpose::getId, purpose -> purpose));
 
-        for(int i = 0; i < purposeMoveRequest.getPurposeId().size(); i++) {
-            Purpose purpose = purposeMap.get(purposeMoveRequest.getPurposeId().get(i));
+        for(int i = 0; i < purposeMoveRequest.purposeId().size(); i++) {
+            Purpose purpose = purposeMap.get(purposeMoveRequest.purposeId().get(i));
 
-            if(purpose == null) {
-                throw PurposeNotFoundException.EXCEPTION;
-            }
-
-            purpose.setPurposeIndex(i + 1);
+            purpose.updatePurposeIndex(i + 1);
         }
     }
 }
