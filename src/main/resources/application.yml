@@ -45,11 +45,9 @@ redis:
 
 logging:
   level:
-    org.springframework.data.redis: DEBUG
-    io.lettuce.core: DEBUG
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
-    root: DEBUG
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
 
 cors:
   allowed-origins:
