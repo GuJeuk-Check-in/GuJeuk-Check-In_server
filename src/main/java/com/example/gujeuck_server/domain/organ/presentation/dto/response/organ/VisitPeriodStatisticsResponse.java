@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.organ.presentation.dto.response;
+package com.example.gujeuck_server.domain.organ.presentation.dto.response.organ;
 
-import com.example.gujeuck_server.domain.log.presentation.dto.response.VisitStatisticsCount;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.VisitStatisticsCount;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.organ.presentation.dto.request;
+package com.example.gujeuck_server.domain.organ.presentation.dto.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.log.presentation.dto.response;
+package com.example.gujeuck_server.domain.organ.presentation.dto.response.organ;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;

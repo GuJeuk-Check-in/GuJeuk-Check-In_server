@@ -1,11 +1,11 @@
-package com.example.gujeuck_server.domain.residence.service;
+package com.example.gujeuck_server.domain.organ.service.residence;
 
 import com.example.gujeuck_server.domain.residence.domain.Residence;
 import com.example.gujeuck_server.domain.residence.domain.repository.ResidenceRepository;
 import com.example.gujeuck_server.domain.residence.exception.ResidenceNotFoundException;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.user.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.user.UserSliceWithTotalResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

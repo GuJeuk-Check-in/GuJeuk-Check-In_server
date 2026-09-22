@@ -1,7 +1,7 @@
-package com.example.gujeuck_server.domain.organ.service;
+package com.example.gujeuck_server.domain.organ.service.auth;
 
 import com.example.gujeuck_server.domain.organ.facade.OrganFacade;
-import com.example.gujeuck_server.domain.organ.presentation.dto.request.ChangePasswordRequest;
+import com.example.gujeuck_server.domain.organ.presentation.dto.request.auth.ChangePasswordRequest;
 import com.example.gujeuck_server.domain.organ.domain.Organ;
 import com.example.gujeuck_server.domain.organ.exception.InvalidPasswordConfirmException;
 import com.example.gujeuck_server.domain.organ.exception.SameOldPasswordException;

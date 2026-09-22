@@ -1,28 +1,29 @@
-package com.example.gujeuck_server.domain.user.presentation.dto.response;
+package com.example.gujeuck_server.domain.organ.presentation.dto.response.user;
 
 import com.example.gujeuck_server.domain.user.domain.User;
-import com.example.gujeuck_server.domain.user.domain.enums.Age;
-import com.example.gujeuck_server.domain.user.domain.enums.Gender;
+
 import lombok.Builder;
 
 @Builder
-public record UserExcelResponse(
+public record UserInfoResponse(
+        Long id,
         String name,
+        String age,
+        String gender,
         String phone,
-        Gender gender,
         String birthYMD,
-        Age age,
         String residence,
         boolean privacyAgreed,
         int count
 ) {
-    public static UserExcelResponse from(User user) {
-        return UserExcelResponse.builder()
+    public static UserInfoResponse from(User user) {
+        return UserInfoResponse.builder()
+                .id(user.getId())
                 .name(user.getName())
+                .age(user.getAge().getLabel())
+                .gender(user.getGender().name())
                 .phone(user.getPhone())
-                .gender(user.getGender())
                 .birthYMD(user.getBirthYMD())
-                .age(user.getAge())
                 .residence(user.getResidence())
                 .privacyAgreed(user.isPrivacyAgreed())
                 .count(user.getCount())
