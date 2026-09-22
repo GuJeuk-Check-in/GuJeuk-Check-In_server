@@ -1,0 +1,27 @@
+package com.example.gujeuck_server.domain.organ.service.auth;
+
+import com.example.gujeuck_server.domain.organ.domain.repository.RefreshTokenRepository;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.auth.TokenResponse;
+import com.example.gujeuck_server.domain.user.exception.RefreshTokenNotFoundException;
+import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class ReissueService {
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    @Transactional
+    public TokenResponse execute(Authentication authentication) {
+        String organName = authentication.getName();
+
+        refreshTokenRepository.findByOrganName(organName)
+                .orElseThrow(() -> RefreshTokenNotFoundException.EXCEPTION);
+
+        return jwtTokenProvider.receiveToken(organName);
+    }
+}

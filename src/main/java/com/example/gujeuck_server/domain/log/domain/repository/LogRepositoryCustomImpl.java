@@ -1,10 +1,10 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
-import com.example.gujeuck_server.domain.log.presentation.dto.response.MonthlyOperationCount;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.MonthlyOperationCount;
 import com.example.gujeuck_server.domain.log.domain.QLog;
-import com.example.gujeuck_server.domain.log.presentation.dto.response.VisitStatisticsCount;
-import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.VisitStatisticsCount;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.LogExcelResponse;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
@@ -37,31 +37,6 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
     LocalDate now = LocalDate.now();
     int currentYear = now.getYear();
     String currentYearMonth = String.format("%d년%02d월", currentYear, now.getMonthValue());
-
-    @Override
-    public List<LogExcelResponse> findAllByCurrentMonth() {
-
-        return jpaQueryFactory
-                .select(Projections.constructor(
-                        LogExcelResponse.class,
-                        qLog.visitDate,
-                        qLog.visitTime,
-                        qLog.name,
-                        qLog.age,
-                        qLog.maleCount,
-                        qLog.femaleCount,
-                        qLog.phone,
-                        qLog.purpose,
-                        qLog.privacyAgreed
-                ))
-                .from(qLog)
-                .where(
-                        qLog.year.eq(currentYear),
-                        qLog.visitDate.startsWith(currentYearMonth)
-                )
-                .orderBy(qLog.visitDate.asc())
-                .fetch();
-    }
 
     @Override
     public Optional<Log> findByUserIdAndVisitAt(Long userId, LocalDateTime visitAt, String purpose) {

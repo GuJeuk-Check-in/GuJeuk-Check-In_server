@@ -1,17 +1,15 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
-import com.example.gujeuck_server.domain.log.presentation.dto.response.MonthlyOperationCount;
-import com.example.gujeuck_server.domain.log.presentation.dto.response.VisitStatisticsCount;
-import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.MonthlyOperationCount;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.VisitStatisticsCount;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.LogExcelResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface LogRepositoryCustom {
-    List<LogExcelResponse> findAllByCurrentMonth();
-
     Optional<Log> findByUserIdAndVisitAt(Long userId, LocalDateTime visitAt, String purpose);
 
     long countByYearMonth(Long organId, String yearMonth);

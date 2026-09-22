@@ -2,7 +2,6 @@ package com.example.gujeuck_server.global.security.implementation;
 
 import com.example.gujeuck_server.global.error.ErrorResponse;
 import com.example.gujeuck_server.global.error.exception.ErrorCode;
-import com.example.gujeuck_server.global.security.jwt.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

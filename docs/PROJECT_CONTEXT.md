@@ -1,730 +1,241 @@
 # GuJeuk 프로젝트 현재 상황
 
-> 최종 갱신: 2026-09-15 KST
-> 목적: 새로운 Codex 대화에서도 현재 서비스·배포·운영 상황을 빠르게 파악하기 위한 기준 문서
+> 최종 갱신 및 EC2 확인: 2026-09-22 15:33 KST
+> 확인한 작업 브랜치: `chore/#119-ChoreUnuseDelete` (`322b00d` 기준)
+> 목적: 현재 코드·운영 구성·배포 시 주의할 차이를 파악하기 위한 기준 문서
 
-## 1. 문서 사용 방법
+## 1. 먼저 확인할 현재 상태
 
-- 이 문서는 **현재 상태와 앞으로의 판단 기준**을 요약한다.
-- 라이브 서버 상태처럼 변할 수 있는 정보는 문서만 믿지 말고 실제로 확인한다.
-- 라이브 확인 결과가 문서와 다르면 실제 상태를 우선하고 이 문서를 갱신한다.
+- 현재 운영 대상은 **AWS EC2 `3.37.79.125`**다. 체크인 운영·스테이징, 게임, 모니터링이 같은 EC2에서 실행된다.
+- 홈서버, Oracle HAProxy, Cloudflare Tunnel, Primary/Replica 승격 절차는 과거 구성이다. 현재 AWS 운영 절차로 사용하지 않는다. 과거 기록은 이 파일의 Git 이력에서 확인한다.
+- `develop` push는 EC2 스테이징, `main` push는 EC2 운영으로 자동 배포된다. PR은 Java 컴파일만 수행한다.
+- 저장소의 최신 코드, EC2에 저장된 파일, 실행 중 컨테이너의 이미지·환경변수는 서로 다를 수 있다. 아래의 **구성 차이**를 먼저 읽는다.
+- 아래 정보는 확인 시점의 스냅샷이다. 배포·DB·네트워크 작업 전에 실제 상태를 다시 확인한다.
 
-## 2. 서비스 개요
+## 2. 서비스와 코드
 
-GuJeuk-Check-In Server는 시설 출입 관리용 Spring Boot 백엔드다.
+시설 출입 관리용 Spring Boot 백엔드다. 운영자별로 이용자·방문 목적·거주지·출입 기록을 관리한다.
 
-주요 기능:
-
-- 운영자 계정과 JWT 인증
-- 이용자 등록·조회·수정
-- 방문 목적과 거주지 분류
-- 출입 로그 생성·조회·수정
-- 운영자별 월간·연간 누계 방문 실적 통계
-- 관리자 Excel 내보내기
-- 운영자별 데이터 분리를 적용한 멀티 테넌트 구조
-
-기술 스택:
-
-- Java 17
-- Spring Boot 3.5.6
-- Gradle
-- MySQL 8
-- Redis 7.2
-- Spring Security + JWT
-- QueryDSL
-- Docker / Docker Compose
-
-## 3. 저장소와 브랜치
-
-저장소:
-
-```text
-GuJeuk-Check-in/GuJeuk-Check-In_server
-```
-
-로컬 작업 경로:
-
-```text
-/Users/bagtaesu/Desktop/git/GuJeuk-Check-In_server
-```
-
-현재 기능 작업 브랜치 예시:
-
-```text
-feature/#73-month-hwp-file
-```
-
-GitHub 기본 브랜치:
-
-```text
-develop
-```
-
-주의:
-
-- 권장 흐름은 `feature/* -> develop -> main`이다.
-- `develop` push는 홈서버 스테이징 스택으로 자동 배포된다.
-- `main` push는 홈서버 운영 스택으로 자동 배포된다.
-- `develop -> main` 머지 전 스테이징 검증을 끝낸다.
-
-## 4. 운영 인프라
-
-홈서버:
-
-```text
-Samsung 550XED
-Ubuntu Server
-사용자: ubuntu
-```
-
-홈서버 배포 경로:
-
-```text
-/home/ubuntu/git/gujeuk-check-in-server
-/home/ubuntu/git/gujeuk-check-in-server-stag
-/home/ubuntu/git/monitoring
-```
-
-Docker 서비스:
-
-| 서비스 | 컨테이너 | 역할 |
-|---|---|---|
-| Spring Boot | `gujeuk-app` | API, 호스트 포트 8080 |
-| MySQL | `gujeuk-mysql` | 운영 데이터베이스 |
-| Redis | `gujeuk-redis` | JWT 토큰 저장 |
-
-Oracle Always Free HAProxy:
-
-```text
-Host: oracle-haproxy
-Public IP: 161.33.21.41
-OS: Ubuntu 24.04
-SSH: ssh -i ~/.ssh/oracle_haproxy.key ubuntu@161.33.21.41
-HAProxy frontend: 0.0.0.0:80
-HAProxy HTTPS frontend: 0.0.0.0:443 with local self-signed cert for Cloudflare Full mode testing
-Cloudflare Tunnel: oracle-haproxy / 6582395b-e23e-4d68-800d-198dd71bdb48
-Proxy API route: https://proxy.oijwef098234.com -> Oracle cloudflared -> http://localhost:80 -> HAProxy
-Backends:
-  - oijwef098234 API: https://gujeuk-api.oijwef098234.com
-  - taisu API route: https://api.taisu.site (taisu-oijwef tunnel -> oijwef API)
-Status: 2026-07-14 KST 현재 `proxy.oijwef098234.com`은 oijwef098234 backend를 primary로 사용하고, `X-Gujeuk-Origin: oijwef098234`로 200 응답한다.
-Pending: OCI VCN Security List/NSG inbound TCP 443 is still closed unless opened separately. The proxy.oijwef098234.com route uses Cloudflare Tunnel, so it does not depend on public 443.
-```
-
-운영 데이터 volume 기본값:
-
-```text
-MySQL -> gujeuk-check-in-server_mysql_data
-Redis -> gujeuk-check-in-server_redis_data
-```
-
-운영 이미지 Registry 복제:
-
-```text
-GHCR image: ghcr.io/gujeuk-check-in/gujeuk-check-in-server:prod-d718e023825264058df52cad4e37a0737acf88f5
-Digest: sha256:2ad0bb57646fff2075a8d5150dcd80ca5087c863728fd63b8a3451d27f38e794
-Source: ubuntu 홈서버 운영 이미지
-Pulled target: gaemideul8
-Verified: 2026-07-03 KST
-```
-
-Primary/Replica 현재 상태:
-
-```text
-Current Primary DB: oijwef098234 / gujeuk-mysql / Docker network mysql:3306
-Current public app: oijwef098234 / gujeuk-app / port 8080
-Current public app DB_URL: local compose mysql at mysql:3306
-Current staging app: oijwef098234 / gujeuk-app-stag / port 8081
-Taisu public routes: api.taisu.site and api-stag.taisu.site terminate on oijwef `cloudflared-taisu-oijwef.service` and route directly to local ports 8080/8081.
-Previous Primary DB: ubuntu / gujeuk-mysql-replica promoted / 172.18.0.1:3307, 127.0.0.1:3307
-Fresh dump used: /home/ubuntu/git/gujeuk-check-in-server/backups/primary-switch-20260703_122952/prod-fresh.sql.gz
-Promoted: 2026-07-14 KST via /home/ubuntu/bin/gujeuk-promote-replica --yes
-Pre-promotion app env backup: /home/ubuntu/git/gujeuk-check-in-server/.env.before-replica-promote-20260713_231140
-Verified after promotion: ubuntu local /purpose/all 200, proxy.oijwef098234.com /purpose/all 200 with X-Gujeuk-Origin: ubuntu
-Promotion source state: Replica_IO_Running=Connecting, Replica_SQL_Running=Yes, Source_Log_File=mysql-bin.000005, Exec_Source_Log_Pos=1124
-Final oijwef cutover: 2026-07-14 KST using ubuntu final dumps at /home/ubuntu/git/gujeuk-check-in-server/backups/final-oijwef-cutover-20260714_071524 and oijwef imports at /home/gaemideul8/migration-imports/final-oijwef-cutover-20260714_071524
-Verified after cutover: gujeuk-api.oijwef098234.com 200, api.oijwef098234.com 200, api.taisu.site 200, api-stag.taisu.site 200, proxy.oijwef098234.com 200 with X-Gujeuk-Origin: oijwef098234.
-```
-
-장애 승격:
-
-```bash
-/home/ubuntu/bin/gujeuk-promote-replica --yes
-```
-
-이 명령은 gaemideul8 Primary 장애 시 ubuntu의 `gujeuk-mysql-replica`를 쓰기 가능한 DB로 승격하고, ubuntu `gujeuk-app`의 `DB_URL`을 local promoted DB로 변경한 뒤 앱을 재시작한다. 2026-07-14 KST에 실행되어 ubuntu DB가 일시 promoted primary였으나, 같은 날 최종 운영 primary는 oijwef098234의 `gujeuk-mysql`로 이전됐다. 기존 primary를 자동으로 다시 붙이지 않는다.
-
-주의:
-
-- 운영 `docker-compose.yml` 기본 volume 이름을 임의로 바꾸면 기존 운영 DB 대신 새 빈 volume으로 기동될 수 있다.
-- DB 연결 장애처럼 보여도 실제로는 "다른 빈 MySQL volume"에 붙은 상황일 수 있으니 volume 이름부터 확인한다.
-- ubuntu의 `api.taisu.site` / `api-stag.taisu.site` 경로는 더 이상 운영 경로가 아니다. 2026-07-14 KST 이후 해당 DNS는 oijwef의 `taisu-oijwef` Cloudflare Tunnel로 직접 연결된다.
-- oijwef public app은 실제 운영 이미지 `ghcr.io/gujeuk-check-in/gujeuk-check-in-server:prod-b12496b92436a98abbbae9d29446e609d9edd93e`를 사용한다.
-- ubuntu replica compose는 고정 LAN IP에 port bind하지 않는다. 2026-07-06에 이전 `192.168.1.233:3307` bind가 실제 IP 변경 후 컨테이너 네트워크 부착을 막아 제거했다.
-- gaemideul8의 Wi-Fi IP는 고정값으로 가정하지 않는다. 2026-07-07 확인 시 `172.20.10.9`였고, ubuntu의 Docker bridge `172.20.0.0/16` 라우트와 충돌해 ubuntu -> gaemideul8 직접 IP 프록시는 실패했다. 프록시 준비 상태는 gaemideul8 자체 Cloudflare Tunnel의 `api.oijwef098234.com -> localhost:8080` 경로로 확인한다.
-
-통합 모니터링은 별도 Compose 프로젝트 `gujeuk-monitoring`으로 실행한다.
-
-| 서비스 | 컨테이너 | 역할 |
-|---|---|---|
-| Grafana | `monitoring-grafana` | 대시보드와 로그 조회, localhost 3000 |
-| Prometheus | `monitoring-prometheus` | 메트릭과 경보 규칙 |
-| Loki | `monitoring-loki` | Docker와 systemd 로그 저장 |
-| Alloy | `monitoring-alloy` | Docker 및 journal 로그 수집 |
-| node_exporter | `monitoring-node-exporter` | 호스트 CPU·메모리·디스크·네트워크 |
-| cAdvisor | `monitoring-cadvisor` | 컨테이너별 자원 사용량 |
-| blackbox_exporter | `monitoring-blackbox-exporter` | 로컬·공개 URL HTTP probe |
-| home-metrics | `monitoring-home-metrics` | 배터리, AC, Compose 상태 |
-
-외부 주소:
-
-| 용도 | 주소 |
+| 항목 | 현재 코드 기준 |
 |---|---|
-| 운영 API | `https://api.taisu.site` |
-| 스테이징 API 라우트 | `https://api-stag.taisu.site` |
-| Focus Mate | `https://focus.taisu.site` |
-| GuJeuk Prototype | `https://prototype.taisu.site` |
-| 통합 모니터링 | `https://monitor.taisu.site` |
-| Cloudflare SSH | `ssh.taisu.site` |
-| gaemideul8 SSH | `ssh.oijwef098234.com` |
-| gaemideul8 API | `https://api.oijwef098234.com` |
-| Oracle HAProxy | `http://161.33.21.41` |
-| Oracle HAProxy Cloudflare route | `https://proxy.oijwef098234.com` |
+| 기술 | Java 17, Spring Boot 3.5.6, Gradle, MySQL 8, Redis 7.2 |
+| 주요 구성 | Spring Security/JWT, JPA, QueryDSL, Flyway, Apache POI |
+| 패키지 | `src/main/java/com/example/gujeuck_server` |
+| 도메인 | `organ`, `user`, `purpose`, `residence`, `log`, `common` |
+| 공통 기능 | readiness 확인, 체크인 퍼널 이벤트 기록·조회 |
+| 게임 | 별도 `GuJeuk-Game-FE` 저장소의 `server/`에서 관리 |
 
-Cloudflare ingress:
+주요 API:
 
-```text
-api.taisu.site      -> oijwef taisu-oijwef Tunnel -> http://localhost:8080
-api-stag.taisu.site -> oijwef taisu-oijwef Tunnel -> http://localhost:8081
-focus.taisu.site    -> oijwef taisu-oijwef Tunnel -> http://localhost:8787
-prototype.taisu.site -> oijwef taisu-oijwef Tunnel -> http://localhost:8788
-monitor.taisu.site  -> oijwef taisu-oijwef Tunnel -> http://localhost:3000
-ssh.taisu.site      -> oijwef taisu-oijwef Tunnel -> ssh://localhost:22
-ssh.oijwef098234.com -> gaemideul8 전용 Tunnel -> ssh://localhost:22
-api.oijwef098234.com -> gaemideul8 전용 Tunnel -> http://localhost:8080
-```
+- `/organ/**`: 기관 로그인, 토큰 재발급, 회원 관리, Excel, 방문 통계·이용 현황.
+- `/user/**`: 이용자 등록·체크인 및 간편 등록·출입 기록.
+- `/purpose/**`, `/residence/**`: 방문 목적·거주지 관리와 순서 변경.
+- `/log/**`: 방문 기록 생성·조회·수정·삭제.
+- `/common/analytics/check-in-funnel`: 퍼널 이벤트 등록. `/events`는 이벤트 조회. 현재 `SecurityConfig`에서 `ORGAN` 역할을 요구한다.
+- `GET /common/health/ready`: DB 연결 유효성 검사. 정상은 200, 실패는 503. Redis나 모든 업무 기능의 정상 여부를 보장하는 검사는 아니다.
 
-oijwef098234 전용 Tunnel은 gaemideul8 사용자 systemd 서비스로 실행한다.
+인증 여부는 `global/config/SecurityConfig.java`를 기준으로 판단한다. `/user/**`, `/organ/create`, `/organ/login`, `/purpose/all`, `/residence/all`, `/common/health/ready` 등은 공개 경로다. `/organ/excel/user`는 현재 코드에서 인증이 필요하다. 모든 API가 로그인 제외 전부 인증 필요하다고 단정하지 않는다.
 
-```text
-service: cloudflared.service --user
-unit: /home/gaemideul8/.config/systemd/user/cloudflared.service
-config: /home/gaemideul8/.cloudflared/config.yml
-linger: enabled
-primary routes:
-  gujeuk-api.oijwef098234.com  -> http://localhost:8080
-  gujeuk-stag.oijwef098234.com -> http://localhost:8081
-  api.oijwef098234.com         -> http://localhost:8080
-  ssh.oijwef098234.com         -> ssh://localhost:22
-```
+API의 최종 기준은 컨트롤러·DTO·SecurityConfig다. `apiDocument.md` 등 설명 문서와 차이가 있으면 코드를 확인한다. 예전 `/public/organs`를 배포 health check로 사용하지 않는다.
 
-taisu.site 전용 Tunnel도 gaemideul8 사용자 systemd 서비스로 실행한다.
+## 3. 접속 주소와 경로
 
-```text
-service: cloudflared-taisu-oijwef.service --user
-unit: /home/gaemideul8/.config/systemd/user/cloudflared-taisu-oijwef.service
-config: /home/gaemideul8/.cloudflared/taisu-oijwef.yml
-tunnel: taisu-oijwef / 7484f1b5-8221-4afa-a3ea-09793c7a5e46
-primary routes:
-  api.taisu.site       -> http://localhost:8080
-  api-stag.taisu.site  -> http://localhost:8081
-  monitor.taisu.site   -> http://localhost:3000
-  ssh.taisu.site       -> ssh://localhost:22
-```
+| 용도 | 주소/경로 |
+|---|---|
+| 운영 API | `https://aws-api.oijwef098234.com` |
+| 스테이징 API | `https://aws-stag.oijwef098234.com` |
+| 게임 API | `https://game-api.oijwef098234.com` |
+| 운영 프론트 | `https://gujeuk-check-in-fe.pages.dev` |
+| 스테이징 프론트 | `https://gujeuk-check-in-develop.pages.dev` |
+| 관리자 화면 | 운영 프론트의 `/organ/login` |
+| 이용자 화면 | 운영 프론트의 `/check-in` |
+| SSH | `ssh ubuntu@3.37.79.125` |
+| 체크인 운영 | `/home/ubuntu/gujeuk-aws/prod` |
+| 체크인 스테이징 | `/home/ubuntu/gujeuk-aws/stag` |
+| Caddy | `/home/ubuntu/gujeuk-aws/proxy` |
+| 게임 | `/home/ubuntu/gujuck-game` |
+| 모니터링 | `/home/ubuntu/monitoring` |
 
-oijwef 장비(`ant`) 덮개 닫힘 방지:
+현재 호스트명은 `ip-172-31-2-113`이다. SSH 직접 접속을 확인했다. 프론트 주소는 현재 사용하는 주소이며, 이번 확인에서 브라우저의 모든 화면을 테스트한 것은 아니다.
 
-```text
-/etc/systemd/logind.conf.d/99-server.conf
-HandleLidSwitch=ignore
-HandleLidSwitchExternalPower=ignore
-HandleLidSwitchDocked=ignore
-Verified: 2026-07-14 KST with systemd-analyze cat-config systemd/logind.conf
-```
+추가 접속 참고 문서는 [AWS_EC2_ACCESS.md](AWS_EC2_ACCESS.md)다. 해당 문서의 IAM·SSM·보안 그룹 설명은 과거 확인 기록도 포함하므로 현재 권한과 네트워크 상태를 확인한다. SSH가 안 된다는 이유만으로 다른 관리자의 보안 그룹 허용 규칙을 지우지 않는다.
 
-HTTPS는 Nginx·Certbot이 아니라 Cloudflare에서 처리한다.
+## 4. EC2 컨테이너·네트워크·저장소
 
-## 5. 원격 접속
+확인 시 실행 중인 컨테이너는 11개다.
 
-Mac의 `~/.ssh/config`에 다음 alias가 구성되어 있다.
+| 컨테이너 | 역할 | 호스트 → 컨테이너 포트 | Docker 네트워크 |
+|---|---|---|---|
+| `gujeuk-aws-caddy` | HTTPS 및 도메인별 프록시 | 80:80, 443:443 TCP/UDP | `proxy_default` |
+| `gujeuk-app-prod` | 체크인 운영 | 8080:8080 | `gujeuk-aws-prod_default` |
+| `gujeuk-mysql-prod` | 운영 MySQL 8 | 호스트 게시 없음, 내부 3306 | 운영 네트워크 |
+| `gujeuk-redis-prod` | 운영 Redis 7.2 | 호스트 게시 없음, 내부 6379 | 운영 네트워크 |
+| `gujeuk-app-stag` | 체크인 스테이징 | 8081:8080 | `gujeuk-aws-stag_default` |
+| `gujeuk-mysql-stag` | 스테이징 MySQL 8 | 호스트 게시 없음, 내부 3306 | 스테이징 네트워크 |
+| `gujeuk-redis-stag` | 스테이징 Redis 7.2 | 호스트 게시 없음, 내부 6379 | 스테이징 네트워크 |
+| `gujuck-game-app` | 게임 서버 | 8095:8090 | 운영 네트워크 |
+| `monitor-bot` | 상태 확인·지표 제공·Discord 연동 | 127.0.0.1:8090 → 8090 | `monitoring` + 운영 네트워크 |
+| `prometheus` | 지표 수집 | 127.0.0.1:9090 → 9090 | `monitoring` |
+| `grafana` | 대시보드·경보 | 127.0.0.1:3000 → 3000 | `monitoring` |
 
-```sshconfig
-Host taisu-oijwef
-  HostName ssh.taisu.site
-  User gaemideul8
-  ProxyCommand env GODEBUG=netdns=go cloudflared --edge-ip-version 4 access ssh --hostname %h
-```
+데이터 연결:
 
-접속 명령:
+- 운영 앱: `mysql:3306/gujeuk_prod`, `redis:6379`.
+- 스테이징 앱: `mysql:3306/gujeuk_stag`, `redis:6379`.
+- 두 환경의 `mysql`, `redis`는 이름이 같아도 네트워크가 달라 각각의 컨테이너에 연결된다.
+- 게임 앱: 운영 MySQL 컨테이너 안의 별도 DB `gujuck_game`. 체크인 운영 MySQL을 중지·삭제하면 게임에도 영향이 있다.
+- 운영 볼륨: `gujeuk-aws-prod-mysql-data`, `gujeuk-aws-prod-redis-data`.
+- 스테이징 볼륨: `gujeuk-aws-stag-mysql-data`, `gujeuk-aws-stag-redis-data`.
+- Caddy 볼륨: `gujeuk-aws-caddy-data`, `gujeuk-aws-caddy-config`.
+- 모니터링 볼륨: `monitoring_prometheus_data`, `monitoring_grafana_data`.
 
-```bash
-ssh taisu-oijwef
-```
+Compose 프로젝트/볼륨 이름을 임의로 변경하면 기존 DB 대신 새 빈 볼륨으로 기동될 수 있다. 앱 포트 8080·8081·8095는 전체 인터페이스에 게시되어 있으나 외부 직접 접근 가능 여부는 보안 그룹·방화벽 확인이 별도로 필요하다.
 
-기존 `gujeuk-home` alias는 ubuntu 홈서버용이었고, 2026-07-14 KST `ssh.taisu.site`를 oijwef로 이전한 뒤에는 `User ubuntu` 설정으로 접속하면 실패한다.
+## 5. Cloudflare와 Caddy
 
-gaemideul8 전용 SSH Tunnel:
+공개 API DNS 및 응답 헤더에서 Cloudflare 경유를 확인했다. EC2의 Caddy는 도메인에 따라 호스트 포트로 전달한다. 운영·스테이징 사이의 부하 분산이나 자동 장애 전환 구성이 아니다.
 
-```sshconfig
-Host gaemideul8
-  HostName ssh.oijwef098234.com
-  User gaemideul8
-  ProxyCommand env GODEBUG=netdns=go cloudflared --edge-ip-version 4 access ssh --hostname %h
-```
+| 요청 도메인 | Caddy upstream |
+|---|---|
+| `aws-api.oijwef098234.com` | `host.docker.internal:8080` |
+| `aws-stag.oijwef098234.com` | `host.docker.internal:8081` |
+| `game-api.oijwef098234.com` | `host.docker.internal:8095` |
 
-접속 명령:
+- 저장소: `ops/aws/Caddyfile`, `ops/aws/docker-compose.proxy.yml`.
+- 서버: `/home/ubuntu/gujeuk-aws/proxy/Caddyfile` → 컨테이너 `/etc/caddy/Caddyfile`에 마운트.
+- `host.docker.internal`은 Compose의 `host-gateway` 설정으로 EC2 호스트를 가리킨다.
+- Caddy가 원본 HTTPS를 처리한다. Cloudflare 관리 콘솔의 SSL 모드와 원본 연결 프로토콜은 이번에 확인하지 않았다.
 
-```bash
-ssh gaemideul8
-```
-
-주의:
-
-- `gujeuk-home`은 Mac에서 사용하는 alias다.
-- 홈서버 내부에서 `ssh gujeuk-home`을 실행하는 용도가 아니다.
-- 서버 전원, 인터넷 또는 cloudflared가 꺼지면 이 경로로 접속할 수 없다.
+**확인된 차이:** 현재 브랜치의 `Caddyfile`에서는 `api.taisu.site`, `api-stag.taisu.site`가 제거됐다. 하지만 EC2 파일과 실행 중인 Caddy 설정에는 두 도메인이 각각 운영·스테이징의 별칭으로 남아 있다. 이는 taisu로 다시 전달하는 설정이 아니다. 체크인 앱 CI/CD는 Caddyfile을 복사하거나 Caddy를 reload하지 않으므로, 앱 배포만으로 이 변경이 반영되지는 않는다.
 
 ## 6. CI/CD
 
-브랜치별 자동 배포:
-
-```text
-feature/* -> PR -> develop -> 스테이징 배포
-develop   -> 검증 -> PR -> main -> 운영 배포
-```
-
-CI/CD 흐름:
-
-1. GitHub-hosted runner에서 JDK 17로 `bootJar -x test` 실행
-2. 생성된 JAR를 artifact로 업로드
-3. GitHub-hosted runner에서 해당 JAR를 포함한 배포용 Docker 이미지 생성
-4. 이미지를 GHCR `ghcr.io/gujeuk-check-in/gujeuk-check-in-server`에 push
-5. 홈서버 self-hosted runner가 GHCR에서 이미지를 `docker pull`
-6. 브랜치에 따라 운영 또는 스테이징 배포 디렉터리에 소스 `rsync`
-7. 홈서버는 pull 받은 이미지로 앱 컨테이너 교체
-8. `deploy-stack.sh`가 MySQL/Redis 준비 상태 확인 후 앱만 재기동
-9. 로컬 API와 공개 API health check (`/public/organs`)
-10. Discord에 한국어 성공·실패 메시지 전송
-
-`docs/**` 또는 Markdown만 변경한 push는 배포 workflow를 실행하지 않는다.
-
-브랜치별 배포 대상:
-
-| 브랜치 | 배포 경로 | 공개 주소 | 포트 |
-|---|---|---|---|
-| `develop` | `/home/ubuntu/git/gujeuk-check-in-server-stag` | `https://api-stag.taisu.site` | `8081` |
-| `main` | `/home/ubuntu/git/gujeuk-check-in-server` | `https://api.taisu.site` | `8080` |
-
-Self-hosted runner:
-
-```text
-경로: /home/ubuntu/actions-runner/gujeuk-check-in-server
-label: gujeuk-home-server
-```
-
-중요:
-
-- 이전 구조는 홈서버에서 직접 `docker compose build app`를 수행해 CPU와 메모리를 오래 점유했다.
-- 그 결과 배포 중 홈서버가 느려지거나 API 응답이 불안정해질 수 있었다.
-- 현재 구조는 빌드를 GitHub-hosted runner로 옮겨 홈서버는 이미지 적재와 앱 재기동만 담당한다.
-- 앱 컨테이너를 교체하는 수초 동안은 짧은 연결 재시도가 발생할 수 있다.
-- CI/CD에서 cloudflared를 재시작하면 GitHub Runner가 자식 프로세스를 정리하면서 `530`과 SSH 단절이 발생할 수 있다.
-- 따라서 CI/CD는 앱만 배포하고 Cloudflare Tunnel 생명주기를 직접 제어하지 않는다.
-
-## 7. 모니터링과 Discord
-
-Grafana 통합 모니터링:
-
-- 배포 경로: `/home/ubuntu/git/monitoring`
-- 외부 주소: `https://monitor.taisu.site`
-- 호스트 CPU, 메모리, 디스크, 네트워크, 배터리와 AC 상태
-- 모든 Docker Compose 프로젝트와 컨테이너 상태
-- 로컬·공개 URL의 HTTP 상태와 응답 시간
-- Docker 로그와 systemd journal 검색
-- Prometheus 경보 상태
-- Grafana 외 Prometheus, Loki, Alloy 포트는 localhost에만 바인딩
-
-기본 대시보드:
-
-- `홈서버 전체 현황`
-- `프로젝트와 컨테이너`
-- `통합 로그와 컨테이너`
-
-`홈서버 전체 현황`과 `통합 로그와 컨테이너`에는 모든 Docker 컨테이너의 실행 상태, Healthcheck, 재시작 횟수, CPU와 메모리 사용량이 표시된다. 로그 검색 기본값은 전체 로그를 의미하는 정규식 `.*`이며 raw 값으로 Loki에 전달한다.
-
-홈서버 로컬 모니터는 다음을 검사한다.
-
-- `gujeuk-app`
-- `gujeuk-mysql`
-- `gujeuk-redis`
-- `http://localhost:8080/public/organs`
-- `https://api.taisu.site/public/organs`
-- 배터리 잔량과 충전 상태
-
-Discord 알림:
-
-- 서버 부팅
-- 서버 종료
-- API 장애와 복구
-- 배터리 10% 이하
-- CI 빌드 성공·실패
-- 홈서버 배포 성공·실패
-
-한계:
-
-- 홈서버 자체가 꺼지거나 인터넷이 끊기면 로컬 모니터도 알림을 보낼 수 없다.
-- Grafana도 같은 홈서버에서 실행되므로 완전한 외부 uptime monitor를 대체하지 않는다.
-- 외부 장애 감지를 위해 UptimeRobot, Better Stack 또는 별도 클라우드 모니터가 필요하다.
-
-## 8. 현재 라이브 상태
-
-2026-06-14 KST 배포 후 실제 확인 결과:
-
-```text
-https://api.taisu.site/purpose/all -> HTTP 200
-https://api.taisu.site/residence/all -> HTTP 200
-GET /organ/statistics/visits         -> Access Token 인증 후 HTTP 200
-통계 API 토큰 없음                   -> HTTP 403
-통계 API 미래 연월                   -> HTTP 400
-https://monitor.taisu.site/api/health -> HTTP 200
-ssh gujeuk-home                    -> 정상 접속
-gujeuk-app                         -> 실행 중, 재시작 0회
-gujeuk-mysql                       -> healthy, 재시작 0회
-gujeuk-redis                       -> healthy, 재시작 0회
-```
-
-월별 방문 통계 API:
-
-```text
-GET /organ/statistics/visits?year={year}&month={month}
-Authorization: Bearer {accessToken}
-```
-
-- 인증된 운영자의 데이터만 조회한다.
-- `monthly`는 선택 월, `cumulative`는 선택 연도 1월 1일부터 선택 월 말일까지 집계한다.
-- 청소년은 `AGE_9_13`, `AGE_14_16`, `AGE_17_19`, `AGE_20_24`, 기타는 `BABY`, `ADULT`로 분류한다.
-- 상세 요청·응답 JSON은 `apiDocument.md`를 기준으로 한다.
-
-RTC 예약 복귀 수정 결과:
-
-- 기존 `rtcwake -m off`는 RTC 알람은 설정됐지만 S5 완전 종료에서 펌웨어가 깨우지 못했다.
-- 커널은 `rtc_cmos: RTC can wake from S4`로 보고하며 S5 기상을 보장하지 않는다.
-- `rtcwake -m mem` + `deep`은 예약 시각에 기상했지만 정상 resume 대신 콜드 부팅이 발생했다.
-- 최종적으로 `rtcwake -m freeze`를 적용했다.
-- 60초 실제 테스트에서 Boot ID가 유지됐고 커널 로그에 `PM: suspend entry (s2idle)`와 `PM: suspend exit`가 기록됐다.
-- 공개 API는 복귀 후 약 29초 안에 HTTP 200으로 정상화됐다.
-
-현재 동작:
-
-- `shutdown`에 `0`보다 큰 시간을 입력하면 완전 종료가 아니라 저전력 `freeze` 절전에 들어간다.
-- 지정 시간이 지나면 같은 부팅 세션으로 자동 복귀한다.
-- `shutdown`에 `0`을 입력하면 완전히 종료되며 자동 복귀하지 않는다.
-- 절전 중에는 API와 SSH가 중단되고 복귀 후 Tunnel 재연결까지 수십 초가 걸릴 수 있다.
-- 예약 절전은 `nohup` 분리 작업으로 실행되어 SSH가 끊겨도 유지된다.
-- 복귀 후 local/public API를 최대 5분간 확인한 뒤 Discord에 한국어 복귀 완료 알림을 전송한다.
-
-이 상태는 변할 수 있으므로 다음 작업 전 반드시 다시 확인한다.
-
-```bash
-curl -I https://api.taisu.site/purpose/all
-ssh gujeuk-home
-```
-
-## 9. 반드시 지킬 운영 안전 규칙
-
-### Wi-Fi 변경 금지
-
-커스텀 `wifi` 명령은 Netplan 충돌과 네트워크 단절을 발생시켰다.
-
-현재 정책:
-
-- `wifi`, `/wifi`, `gujeuk-wifi-admin`으로 운영 네트워크를 변경하지 않는다.
-- 현재 SSID 확인만 기본 명령으로 수행한다.
-
-```bash
-iw dev wlo1 link | grep SSID
-networkctl status wlo1 --no-pager
-```
-
-네트워크 변경이 꼭 필요하면:
-
-- 서버 물리 콘솔에서 작업
-- 기존 Netplan 백업
-- 복구 경로 확보
-- Cloudflare SSH만 믿고 원격 변경하지 않기
-
-### RTC 예약 복귀
-
-다음 방식은 사용하지 않는다.
-
-```bash
-rtcwake -m off
-rtcwake -m mem
-```
-
-현재 정책:
-
-- S5 완전 종료 후 RTC 자동 부팅은 이 장비에서 지원되지 않는다.
-- `deep` 절전은 콜드 부팅을 일으켰으므로 사용하지 않는다.
-- 예약 복귀는 설치된 `freeze` 모드 명령만 사용한다.
-- 장시간 완전 종료가 필요하면 자동 복귀를 기대하지 않는다.
-- 완전 종료 후 자동 부팅이 필요하면 BIOS AC Power Recovery, 유선 Wake-on-LAN 또는 별도 하드웨어를 검토한다.
-
-```bash
-shutdown
-# Hours에 0보다 큰 값: freeze 절전 후 예약 복귀
-# Hours에 0: 완전 종료, 자동 복귀 없음
-```
-
-### Cloudflare Tunnel
-
-- 배포 workflow에서 cloudflared를 시작·종료하지 않는다.
-- `502`는 앱 origin 문제, `530/1033`은 Tunnel connector 문제로 구분한다.
-- `000`은 HTTP 응답을 받지 못한 네트워크·DNS·timeout 계열 문제로 본다.
-
-### 데이터베이스
-
-- dump 복원 전 반드시 현재 DB를 백업한다.
-- 복원 파이프에서는 `docker compose exec -T`를 사용한다.
-- 사용자 또는 로그 삭제 전 대상 조건과 건수를 먼저 조회한다.
-- 운영 데이터 삭제는 사용자의 명시적 확인 없이 실행하지 않는다.
-
-## 10. 데이터베이스 상태 이력
-
-최종으로 적용한 dump:
-
-```text
-projectsilmoo_gujeuk_prod_synced_20260603_153552.sql.zip
-```
-
-복원 직후 확인한 건수:
-
-| 테이블 | 건수 |
-|---|---:|
-| `admin` | 1 |
-| `organ` | 5 |
-| `purpose` | 12 |
-| `residence` | 13 |
-| `user` | 533 |
-| `log` | 3293 |
-
-이 수치는 복원 직후의 이력이며 현재 데이터 건수로 단정하지 않는다.
-
-## 11. CORS
-
-환경 변수 기반 허용 origin:
-
-- `PROD_BASE_URL`
-- `STAG_BASE_URL`
-- `TEST_URL`
-
-추가 요청으로 허용한 origin:
-
-```text
-https://gujeuk-check-in-develop.pages.dev
-https://prototype.taisu.site
-http://localhost:5174
-https://gujeuk-check-in-fe.pages.dev
-```
-
-origin은 쉼표로 여러 개를 전달할 수 있고 후행 `/`는 코드에서 제거한다.
-
-2026-07-07 KST 확인:
-
-- 운영 `.env`의 `STAG_BASE_URL`에 `https://prototype.taisu.site`를 추가했다.
-- `https://prototype.taisu.site` Origin의 `PATCH /organ/user/{id}` CORS preflight가 HTTP 200을 반환한다.
-
-2026-07-14 KST 최종 oijwef 이전 후 확인:
-
-- oijwef prod/stag `.env`의 CORS origin에 `https://gujeuk.com`, `https://www.gujeuk.com`, `https://taisu.site`, 기존 Cloudflare Pages/Prototype origin을 포함했다.
-- `https://www.gujeuk.com`, `https://gujeuk.com`, `https://taisu.site` Origin의 `OPTIONS https://api.taisu.site/purpose/all` preflight가 HTTP 200을 반환한다.
-- `https://www.gujeuk.com` Origin의 `OPTIONS https://gujeuk-api.oijwef098234.com/purpose/all`와 `OPTIONS https://api.oijwef098234.com/purpose/all`도 HTTP 200을 반환한다.
-
-2026-09-15 KST AWS 환경 정리:
-
-- prod/stag `.env`의 CORS origin은 `PROD_BASE_URL`, `STAG_BASE_URL`, `TEST_URL`만 사용한다.
-- `PROD_BASE_URL=https://gujeuk-check-in-fe.pages.dev`
-- `STAG_BASE_URL=https://gujeuk-check-in-develop.pages.dev`
-- `TEST_URL=http://localhost:5173,http://localhost:5174`
-- AWS prod/stag Compose에서 `VERCEL_URL` 전달을 제거했다.
-- 기존 실행 컨테이너는 재생성 전까지 과거 CORS 환경변수를 유지한다. `VERCEL_URL`을 요구하는 기존 이미지로 재생성하지 말고, 세 변수만 사용하는 애플리케이션 이미지와 함께 배포한다.
-
-## 12. 보안 긴급 사항
-
-다음 파일은 Git에 추적되고 있으며 실제 운영 secret 형태의 값을 포함한다.
-
-```text
-backups/prod-2026-06-02/gujeuk-check-in-server.prod.env
-```
-
-Codex 작업 규칙:
-
-- 이 파일 내용을 출력하지 않는다.
-- secret 값을 대화, 로그, 문서, 커밋 메시지에 노출하지 않는다.
-- 제거 작업 전 사용자와 이력 재작성 범위를 합의한다.
-
-필요 조치:
-
-1. 파일을 Git 추적에서 제거
-2. `.gitignore`에 백업 `.env` 패턴 추가
-3. Git 이력에서 secret 제거 검토
-4. JWT secret 교체
-5. MySQL 비밀번호 교체
-6. Discord webhook 재발급
-
-## 13. 서버와 저장소의 구성 드리프트
-
-저장소의 `ops/home-server`에 없는 서버 전용 스크립트가 존재한다.
-
-예:
-
-- `cloudflared-supervisor.sh`
-- `discord-notify`
-- `monitor-gujeuk-api`
-- `notify-server-started`
-- `server-test`
-- `server-battery`
-- Runner watchdog 스크립트
-
-따라서:
-
-- 저장소 파일만으로 현재 서버를 완전히 재현할 수 없다.
-- 인프라 작업 전 서버의 실제 파일과 cron을 확인한다.
-- 새 운영 스크립트는 가능하면 저장소 `ops/home-server`에 함께 반영한다.
-
-## 14. 자주 사용하는 확인 명령
-
-외부 API:
-
-```bash
-curl -I https://api.taisu.site/purpose/all
-```
-
-서버 접속:
-
-```bash
-ssh gujeuk-home
-```
-
-서버 상태:
-
-```bash
-/home/ubuntu/bin/health
-```
-
-Docker:
-
-```bash
-cd /home/ubuntu/git/gujeuk-check-in-server
-docker compose ps
-docker compose logs --tail=200 app
-```
-
-Cloudflare:
-
-```bash
-pgrep -af cloudflared
-tail -n 100 /home/ubuntu/.cloudflared/cloudflared.log
-tail -n 100 /home/ubuntu/.cloudflared/watchdog.log
-```
-
-통합 모니터링:
-
-```bash
-cd /home/ubuntu/git/monitoring
-./scripts/verify.sh
-docker compose ps
-docker compose logs --tail=200 grafana prometheus loki alloy
-```
-
-## 15. 운영 프론트와 사용자 API 상태
-
-2026-06-10 KST 실제 확인 결과:
-
-- `https://api.taisu.site/purpose/all`은 HTTP 200이며 운영 방문 목적 12개를 반환한다.
-- `https://api.taisu.site/residence/all`은 HTTP 200이다.
-- `https://gujeuk.dsmhs.kr` Origin의 CORS preflight와 API 응답 헤더는 정상이다.
-- 빈 회원가입 요청과 잘못된 성별 enum 요청은 HTTP 400으로 응답하도록 수정·배포했다.
-- 존재하지 않는 사용자 로그인은 HTTP 404로 정상 응답한다.
-- 같은 사용자가 같은 분에 다시 체크인하면 DB 제약조건의 500 대신 HTTP 409를 반환하도록 수정했다.
-- `https://gujeuk.dsmhs.kr` 프론트 주소는 점검 시 HTTP 503으로 정상 서비스되지 않았다.
-- Cloudflare Pages 배포본은 `/` 라우트가 없어 흰 화면이며 관리자 화면만 포함한다.
-- 현재 프론트 저장소에는 `/user/sign-up`, `/user/login` 사용자 체크인 화면과 API 호출 구현이 없다.
-
-따라서 방문 목적 API 장애와 프론트 서비스 장애를 구분해야 한다. 현재 방문 목적 API는 정상이고, 사용자 회원가입·로그인 절차가 브라우저에서 제공되지 않는 주원인은 잘못되거나 불완전한 프론트 배포다.
-
-## 16. 다음 우선 작업
-
-1. 사용자 체크인 전용 프론트의 회원가입·로그인 화면과 API 연동 복구
-2. `https://gujeuk.dsmhs.kr` 배포 대상과 DNS·호스팅 상태 복구
-3. 프론트 루트 경로에 명시적인 시작 화면 또는 redirect 추가
-4. Git에 추적된 운영 secret 제거와 credential rotation
-5. `main`과 `develop` CI/CD 정책 통합
-6. 홈서버 외부 uptime monitor 도입
-7. 정기 DB 백업과 외부 저장소 복제
-8. CI에서 테스트를 다시 활성화할 수 있는 환경 구성
-
-## 17. 문서 갱신 규칙
-
-다음 변경이 발생하면 이 문서를 함께 갱신한다.
-
-- 운영 URL 변경
-- 서버 경로 변경
-- Docker 서비스 추가·삭제
-- 브랜치·CI/CD 정책 변경
-- Cloudflare route 변경
-- 새로운 장애 원인과 해결책 확인
-- 사용 금지 기능의 재검증
-- DB dump 복원
-- credential rotation
-
-이 문서에는 현재 판단에 필요한 핵심만 유지한다.
-
-## 18. AWS 이전 상태
-
-2026-07-20 KST에 서울 리전에서 prod/stag 공용 Docker 호스트를 신규 생성했다.
-
-```text
-Region: ap-northeast-2
-Instance: i-05e2a254f15e59ead / gujeuk-aws-prod-stag
-Type: t3.medium
-OS: Ubuntu Server 24.04 LTS
-Root volume: encrypted gp3 30GB
-Elastic IP: 3.37.79.125
-Security group: sg-0c16acf4997f79b3f / gujeuk-aws-app-sg
-SSH key pair: gujeuk-aws-deploy (local ~/.ssh/id_ed25519 public key imported)
-SSM role: gujeuk-aws-ec2-ssm-role
-SSM instance profile: gujeuk-aws-ec2-ssm-profile
-```
-
-현재 AWS 런타임:
-
-```text
-source commit: origin/main / 488a2044d067ac6fe33ae56b1132211c553f521f
-image: ghcr.io/gujeuk-check-in/gujeuk-check-in-server:aws-main-488a2044d067
-prod app/mysql/redis: localhost:8080 -> HTTP 200
-stag app/mysql/redis: localhost:8081 -> HTTP 200
-reverse proxy: gujeuk-aws-caddy / host ports 80, 443
-server path: /home/ubuntu/gujeuk-aws
-```
-
-현재 데이터 상태:
-
-```text
-prod: organ 5, purpose 12, residence 13, user 583, log 4442, Redis 24 keys
-stag: organ 1, purpose 4, residence 2, user 5, log 37, Redis 0 keys
-source backup: /home/gaemideul8/migration-aws-cutover-20260720_113023/final
-AWS backup: /home/ubuntu/gujeuk-aws/backups/source-cutover-20260720_113023
-```
+기준: `.github/workflows/ci-cd.yml`.
+
+| 이벤트 | 수행 작업 |
+|---|---|
+| `main`/`develop` 대상 PR | GitHub-hosted runner에서 `./gradlew compileJava` |
+| `develop` push | JAR·이미지 빌드 → GHCR → EC2 스테이징 배포 |
+| `main` push | JAR·이미지 빌드 → GHCR → EC2 운영 배포 |
+| `workflow_dispatch` | 현재 조건상 JAR 빌드·artifact 업로드만 수행. 이미지 생성·배포 job은 push만 허용 |
+
+배포 순서:
+
+1. JDK 17로 `./gradlew bootJar -x test` 실행.
+2. Dockerfile로 이미지 생성, GHCR에 `prod-${GITHUB_SHA}` 또는 `stag-${GITHUB_SHA}` 태그로 push.
+3. SCP로 `ops/aws/docker-compose.aws.yml`을 EC2의 해당 환경 `docker-compose.yml`로 복사.
+4. SSH로 배포 디렉터리에 접속. 기존 `.env`를 사용하고 `APP_IMAGE`는 이번 이미지 주소로 export.
+5. `COMPOSE_PROJECT_NAME=gujeuk-aws-prod` 또는 `gujeuk-aws-stag` 설정.
+6. `docker compose --env-file .env pull app`, 이어서 `docker compose --env-file .env up -d` 실행.
+7. 로컬 및 공개 `/purpose/all`의 정상 응답을 각각 최대 40회, 3초 간격으로 확인. 요청 소요 시간은 별도다.
+8. 로컬 확인 이후 사용하지 않는 dangling 이미지를 정리한다.
 
 주의:
 
-- 홈서버 prod/stag 앱은 최종 dump 이후 중지했으며 AWS DB와 Redis로 데이터 이전을 완료했다.
-- CI/CD와 무중단 전환은 구성하지 않았다.
-- `aws-api.oijwef098234.com`과 `aws-stag.oijwef098234.com`은 명시적인 proxied A record로 `3.37.79.125`를 가리킨다.
-- Caddy의 Let's Encrypt 인증서 발급이 완료됐고 두 Cloudflare HTTPS 경로 모두 `/purpose/all` HTTP 200을 반환한다.
-- 기존 `api.taisu.site`와 `api-stag.taisu.site`는 아직 홈서버 Tunnel 레코드이므로 AWS hostname을 사용하는 클라이언트만 AWS로 연결된다.
-- 2026-07-20 prod 회원가입 500 원인은 복원 스키마에 폐기된 `user.user_id VARCHAR(30) NOT NULL`이 남아 있었기 때문이다. 전체 백업 후 기존 값은 보존하면서 NULL 허용으로 변경했고, V9 보정 migration을 추가했다.
-- SSH 22는 2026-07-20 확인 당시 관리자 공인 IP `14.50.190.128/32`에만 허용했다. 관리자 IP가 바뀌면 보안 그룹 rule을 갱신한다.
-- 기존 AWS `t2.micro` 인스턴스 2대(`i-02c201072f29819ed`, `i-0ecf972c13bf39b24`)는 별도 기존 자원이라 변경하지 않았다.
-- AWS CLI 로그인에 root 임시 세션을 사용했다. 구축 완료 후 IAM 관리자 사용자 또는 IAM Identity Center로 전환한다.
+- 서버에서 앱 이미지를 빌드하거나 홈서버 self-hosted runner로 배포하는 구조가 아니다.
+- `up -d`는 앱만 지정하지 않으므로 Compose 변경에 따라 다른 서비스도 영향을 받을 수 있다.
+- 단일 앱 컨테이너 교체 방식이며, 무중단 배포나 자동 롤백은 구성되어 있지 않다.
+- `.env`를 저장소에서 복사하는 단계는 없다. 서버 파일과 실행 컨테이너 환경변수를 구분한다.
+- Caddy·게임·모니터링은 이 앱 배포 workflow로 자동 배포되지 않는다. `ops/aws/docker-compose.aws.yml`만 복사한다.
+- push에서 `docs/**`, `**/*.md`, `monitor-bot/**`, `ops/monitoring/**`, `.github/ISSUE_TEMPLATE/**`만 바뀐 경우 workflow가 제외된다. PR은 이 경로 제외 조건을 적용하지 않는다.
+- 현재 CI에 테스트 실행 단계와 Discord 배포 알림 단계는 없다. `src/test` 디렉터리도 현재 체크아웃에 없다.
+
+## 7. 실행 이미지와 현재 코드의 차이
+
+2026-09-22 15:33 KST 확인:
+
+| 환경 | 실행 이미지 |
+|---|---|
+| 운영 | `ghcr.io/gujeuk-check-in/gujeuk-check-in-server:prod-bf732f25c2560c29d4b6ba50b4ecdd0e3ede87dd` |
+| 스테이징 | `ghcr.io/gujeuk-check-in/gujeuk-check-in-server:stag-05ee8eb555f0551621f7f453d5decb82917faede` |
+| 게임 | `ghcr.io/gujeuk-check-in/gujeuk-game-fe-server:ad07088` |
+
+운영과 스테이징의 이미지 버전은 다르다. 현재 작업 브랜치에는 #113 리팩터링, #117 Caddy 변경, #119 미사용 구성 정리 이력이 있지만 이를 모두 운영 반영 완료로 설명하지 않는다. 현재 브랜치의 #119 변경에는 `.square` 관련 구성 삭제가 포함된다.
+
+## 8. 환경변수와 CORS
+
+현재 코드의 CORS 변수는 다음 세 개다. 여러 origin은 쉼표로 구분하며 코드가 공백과 후행 `/`를 정리한다.
+
+```dotenv
+PROD_BASE_URL=https://gujeuk-check-in-fe.pages.dev
+STAG_BASE_URL=https://gujeuk-check-in-develop.pages.dev
+TEST_URL=http://localhost:5173,http://localhost:5174
+```
+
+- EC2 prod/stag `.env`는 위 주소로 정리돼 있고 `VERCEL_URL`은 없다. prod `TEST_URL`에는 쉼표 뒤 공백이 있으며 현재 코드에서는 trim 처리된다.
+- 실행 중인 stag 컨테이너는 정리된 세 변수를 사용하고 `VERCEL_URL`이 없다.
+- **실행 중인 prod 컨테이너에는 아직 예전 CORS 주소 목록과 `VERCEL_URL`이 남아 있다.** 이전 이미지로 기동한 컨테이너의 환경변수는 `.env` 수정만으로 바뀌지 않는다.
+- 현재 코드와 정리된 환경변수를 함께 적용해야 한다. 이전 이미지가 요구하는 변수를 없앤 상태로 이전 이미지만 재기동하지 않는다.
+
+앱 실행에는 DB 연결 정보, JWT secret, Redis 연결 정보가 필요하다. AWS Compose에는 이미지·컨테이너 이름·호스트 포트·볼륨 이름도 필요하다. `ops/aws/prod.env.example`, `stag.env.example`은 형식 참고용이며 실제 `.env`가 아니다.
+
+`${VAR:?message}`는 필수값이 없거나 비어 있으면 Compose 실행을 실패시키는 문법이다. `APP_IMAGE`는 배포 쉘에서 전달할 수 있으므로 서버 `.env`만으로 실행 설정을 판단하지 않는다.
+
+## 9. 모니터링
+
+- 현재 구성은 `monitor-bot`, Prometheus, Grafana다. 과거 Loki·Alloy·node_exporter·cAdvisor 기반 홈서버 구성을 현재 EC2 구성으로 설명하지 않는다.
+- monitor-bot은 Docker 소켓을 마운트하며 운영 네트워크와 모니터링 네트워크에 연결된다.
+- 현재 소스의 기본 감시 대상은 운영 앱·MySQL·Redis와 Caddy다. 스테이징은 감시 대상에서 제외돼 있다.
+- EC2 monitor-bot 환경변수의 운영 health URL은 `http://gujeuk-app-prod:8080/common/health/ready`다.
+- Prometheus는 `monitor-bot:8090/actuator/prometheus`와 자신의 지표를 15초마다 수집한다.
+- Grafana 데이터 소스는 `http://prometheus:9090`이다. Discord contact point와 경보 규칙이 있다.
+- monitor-bot의 Discord 토큰/Webhook 설정 존재를 확인했으며 실제 알림 발송 테스트는 하지 않았다.
+- Prometheus의 `alertmanagers`는 빈 목록이다. 별도 Alertmanager 컨테이너는 실행 중이지 않다.
+- 이 구성은 운영과 같은 EC2에 있으므로 EC2 전체 장애 시 모니터링도 영향을 받는다.
+- 호스트의 3000·8090·9090은 loopback에만 바인딩돼 있다. 필요하면 SSH 포워딩으로 접근한다.
+
+```bash
+ssh -N -L 13000:127.0.0.1:3000 ubuntu@3.37.79.125
+# 로컬 브라우저에서 http://localhost:13000
+```
+
+## 10. DB와 배포 안전 기준
+
+- 현재 `application.yml`은 Flyway 활성화, `baseline-version: 6`, `validate-on-migrate: false`, Hibernate `ddl-auto: update`를 함께 사용한다. 앱 기동이 DB 변경을 일으킬 수 있다.
+- 마이그레이션 파일은 V1~V13이다. V13은 과거 체크인 DB의 펫 관련 테이블을 삭제하는 SQL이다. 현재 게임 DB 공유 구조와 혼동하지 말고 실행 대상 DB와 적용 이력을 확인한다.
+- 과거 문서의 V14 시간 변환/backfill 파일은 현재 브랜치에 없다.
+- 이번 갱신에서는 DB 내용·건수·Flyway 적용 이력·복제 상태를 조회하지 않았다. 과거 dump 복원 건수는 현재 수치로 사용하지 않는다.
+- DB 변경·복원 전에 대상 환경·DB·볼륨을 확인하고 백업한다. 복원 파이프에서는 `docker compose exec -T`를 사용한다.
+- 운영 데이터 삭제는 조건과 건수를 먼저 확인하고 사용자 승인 범위를 따른다. `docker compose down -v`처럼 볼륨을 삭제하는 명령을 정리 작업에 사용하지 않는다.
+- Caddy는 운영·스테이징·게임이 함께 사용한다. 한 서비스 작업 때문에 공통 프록시를 임의로 중지하지 않는다.
+- 홈서버의 Wi-Fi 변경, RTC 절전, DB 승격, cloudflared 재시작 명령을 AWS에 적용하지 않는다. `AGENTS.md`의 관련 장비별 지침은 과거 홈서버 작업 시의 안전 기록이다.
+- `.env`, 토큰, 비밀번호, SSH 키, Webhook, DB dump를 출력·문서화·커밋하지 않는다. 컨테이너 전체 Env 대신 필요한 비민감 항목만 확인한다.
+- 현재 `git ls-files backups` 결과는 비어 있고 `.gitignore`가 `backups/`, `*.env`, dump를 제외한다. 예전 문서의 “백업 secret 파일이 현재 추적 중”이라는 설명은 현재 체크아웃에 해당하지 않는다. 과거 Git 이력 정리와 자격증명 교체 완료 여부는 별도 확인이 필요하다.
+
+## 11. 실제 확인 결과와 자주 쓰는 조회 명령
+
+2026-09-22 15:33 KST에 다음 8개 GET 요청은 모두 HTTP 200이었다.
+
+| 대상 | `/purpose/all` | `/common/health/ready` |
+|---|---|---|
+| EC2 `localhost:8080` | 200 | 200 |
+| EC2 `localhost:8081` | 200 | 200 |
+| `https://aws-api.oijwef098234.com` | 200 | 200 |
+| `https://aws-stag.oijwef098234.com` | 200 | 200 |
+
+이 결과는 전체 업무 기능, CORS, 인증, Excel, 게임의 통합 테스트를 의미하지 않는다. MySQL/Redis 컨테이너 4개는 Docker 상태에서 healthy였다.
+
+```bash
+# 로컬에서 실행
+ssh ubuntu@3.37.79.125
+curl -s -o /dev/null -w '%{http_code}\n' https://aws-api.oijwef098234.com/common/health/ready
+curl -s -o /dev/null -w '%{http_code}\n' https://aws-stag.oijwef098234.com/common/health/ready
+
+# EC2에서 실행: 상태와 실제 이미지 확인
+docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}'
+docker inspect gujeuk-app-prod --format '{{.Config.Image}}'
+docker inspect gujeuk-app-stag --format '{{.Config.Image}}'
+```
+
+로그가 필요하면 `docker logs --tail 100 <컨테이너명>`으로 범위를 제한하고, 개인정보·자격증명을 대화나 문서로 옮기지 않는다. Compose 명령은 해당 환경 디렉터리 및 배포 시 사용한 이미지·프로젝트 변수를 확인한 뒤 사용한다.
+
+## 12. 후속 작업과 갱신 규칙
+
+확인된 차이를 해소할 때 별도로 검토할 사항:
+
+1. 운영 이미지와 현재 코드/CORS 환경변수의 차이를 운영 배포 전에 검토한다.
+2. 저장소의 Caddy 도메인 제거를 서버에 반영할지는 기존 도메인 사용 여부를 확인하고 결정한다. 앱 배포가 Caddy를 갱신한다고 가정하지 않는다.
+3. 실제 정기 백업, 외부 저장, 복구 검증 및 외부 장애 감시 상태는 별도 확인한다. 구성돼 있다고 단정하지 않는다.
+4. 과거 자격증명 노출 이력에 대한 정리·교체 여부는 별도 확인한다.
+
+인프라·URL·Compose·CI/CD·환경변수·DB 변경 시 이 문서를 갱신한다. **확인 날짜, 현재 코드, 실제 런타임, 미확인 사항을 구분**하고 과거 작업 이력을 현재 상태 아래 누적하지 않는다. 문서만 수정한 작업에서는 앱·DB·프록시를 재시작하거나 배포하지 않는다.
