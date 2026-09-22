@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LogRepositoryCustom {
-    List<LogExcelResponse> findAllByCurrentMonth();
-
     Optional<Log> findByUserIdAndVisitAt(Long userId, LocalDateTime visitAt, String purpose);
 
     long countByYearMonth(Long organId, String yearMonth);
