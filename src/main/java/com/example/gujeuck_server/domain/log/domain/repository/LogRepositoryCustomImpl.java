@@ -39,31 +39,6 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
     String currentYearMonth = String.format("%d년%02d월", currentYear, now.getMonthValue());
 
     @Override
-    public List<LogExcelResponse> findAllByCurrentMonth() {
-
-        return jpaQueryFactory
-                .select(Projections.constructor(
-                        LogExcelResponse.class,
-                        qLog.visitDate,
-                        qLog.visitTime,
-                        qLog.name,
-                        qLog.age,
-                        qLog.maleCount,
-                        qLog.femaleCount,
-                        qLog.phone,
-                        qLog.purpose,
-                        qLog.privacyAgreed
-                ))
-                .from(qLog)
-                .where(
-                        qLog.year.eq(currentYear),
-                        qLog.visitDate.startsWith(currentYearMonth)
-                )
-                .orderBy(qLog.visitDate.asc())
-                .fetch();
-    }
-
-    @Override
     public Optional<Log> findByUserIdAndVisitAt(Long userId, LocalDateTime visitAt, String purpose) {
 
         return Optional.ofNullable(

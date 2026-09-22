@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.facade.LogFacade;
 import lombok.RequiredArgsConstructor;
