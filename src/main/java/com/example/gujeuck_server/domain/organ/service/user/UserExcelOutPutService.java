@@ -1,8 +1,8 @@
-package com.example.gujeuck_server.domain.organ.service;
+package com.example.gujeuck_server.domain.organ.service.user;
 
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserExcelResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.user.UserExcelResponse;
 import com.example.gujeuck_server.infrastructure.excel.exception.ExcelGenerationException;
 import com.example.gujeuck_server.infrastructure.excel.util.ExcelGenerator;
 import lombok.RequiredArgsConstructor;

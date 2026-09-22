@@ -1,9 +1,9 @@
-package com.example.gujeuck_server.domain.organ.service;
+package com.example.gujeuck_server.domain.organ.service.organ;
 
-import com.example.gujeuck_server.domain.log.presentation.dto.response.VisitStatisticsCount;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.VisitStatisticsCount;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.exception.InvalidLogDateException;
-import com.example.gujeuck_server.domain.organ.presentation.dto.response.VisitStatisticsResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.VisitStatisticsResponse;
 import com.example.gujeuck_server.global.utility.DateFormatter;
 import com.example.gujeuck_server.global.utility.TimeProvider;
 import lombok.RequiredArgsConstructor;

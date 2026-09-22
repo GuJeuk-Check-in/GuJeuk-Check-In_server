@@ -1,11 +1,11 @@
-package com.example.gujeuck_server.domain.user.service;
+package com.example.gujeuck_server.domain.organ.service.user;
 
 import com.example.gujeuck_server.domain.user.domain.User;
 import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
 import com.example.gujeuck_server.domain.user.exception.UserAccessDeniedException;
 import com.example.gujeuck_server.domain.user.exception.UserNotFoundException;
-import com.example.gujeuck_server.domain.user.presentation.dto.request.UpdateUserRequest;
+import com.example.gujeuck_server.domain.organ.presentation.dto.request.user.UpdateUserRequest;
 import com.example.gujeuck_server.global.utility.CalculateAgeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

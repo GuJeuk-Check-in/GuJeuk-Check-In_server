@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.log.presentation.dto.response;
+package com.example.gujeuck_server.domain.organ.presentation.dto.response.organ;
 
 public record VisitStatisticsCount(
         long youthMale,

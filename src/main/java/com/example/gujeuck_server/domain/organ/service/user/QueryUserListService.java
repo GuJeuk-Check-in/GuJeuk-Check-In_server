@@ -1,8 +1,8 @@
-package com.example.gujeuck_server.domain.user.service;
+package com.example.gujeuck_server.domain.organ.service.user;
 
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.user.UserInfoResponse;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserSliceWithTotalResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.user.UserSliceWithTotalResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

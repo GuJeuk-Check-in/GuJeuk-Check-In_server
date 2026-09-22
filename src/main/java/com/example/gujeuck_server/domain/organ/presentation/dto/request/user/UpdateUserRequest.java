@@ -1,4 +1,4 @@
-package com.example.gujeuck_server.domain.user.presentation.dto.request;
+package com.example.gujeuck_server.domain.organ.presentation.dto.request.user;
 
 import com.example.gujeuck_server.domain.user.domain.enums.Gender;
 import jakarta.validation.constraints.NotBlank;

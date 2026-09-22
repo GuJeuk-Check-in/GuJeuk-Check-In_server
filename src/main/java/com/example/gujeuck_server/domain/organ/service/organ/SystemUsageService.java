@@ -1,9 +1,9 @@
-package com.example.gujeuck_server.domain.organ.service;
+package com.example.gujeuck_server.domain.organ.service.organ;
 
-import com.example.gujeuck_server.domain.log.presentation.dto.response.MonthlyOperationCount;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.MonthlyOperationCount;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
-import com.example.gujeuck_server.domain.organ.presentation.dto.response.SystemUsageOneResponse;
-import com.example.gujeuck_server.domain.organ.presentation.dto.response.SystemUsageResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.SystemUsageOneResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.SystemUsageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

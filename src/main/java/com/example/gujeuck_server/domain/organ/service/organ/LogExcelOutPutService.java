@@ -1,6 +1,6 @@
-package com.example.gujeuck_server.domain.organ.service;
+package com.example.gujeuck_server.domain.organ.service.organ;
 
-import com.example.gujeuck_server.domain.log.presentation.dto.response.LogExcelResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.LogExcelResponse;
 import com.example.gujeuck_server.infrastructure.excel.exception.ExcelGenerationException;
 import com.example.gujeuck_server.infrastructure.excel.exception.InvalidDateException;
 import com.example.gujeuck_server.domain.log.domain.Log;

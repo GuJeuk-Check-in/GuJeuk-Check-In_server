@@ -1,6 +1,6 @@
 package com.example.gujeuck_server.global.security.jwt;
 
-import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.auth.TokenResponse;
 import com.example.gujeuck_server.domain.organ.exception.OrganNotFoundException;
 import com.example.gujeuck_server.domain.organ.domain.repository.OrganRepository;
 import com.example.gujeuck_server.domain.organ.domain.RefreshToken;
