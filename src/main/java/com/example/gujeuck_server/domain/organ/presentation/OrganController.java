@@ -3,6 +3,7 @@ package com.example.gujeuck_server.domain.organ.presentation;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.CreateOrganRequest;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.SystemUsageResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.TokenResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.UserWithTotalResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.VisitStatisticsResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.LoginOrganRequest;
 import com.example.gujeuck_server.domain.organ.presentation.dto.request.ChangePasswordRequest;
@@ -42,6 +43,7 @@ public class OrganController {
     private final QueryUserDetailService queryUserDetailService;
     private final QueryVisitStatisticsService queryVisitStatisticsService;
     private final SystemUsageService systemUsageService;
+    private final UserQueryListByNameService userQueryListByNameService;
 
     @GetMapping("/user/all")
     public UserSliceWithTotalResponse queryAllUserList(
@@ -128,5 +130,14 @@ public class OrganController {
             @RequestParam int year
     ) {
         return systemUsageService.execute(userDetails.organ().getId(), year);
+    }
+
+    @GetMapping("/search")
+    public UserSliceWithTotalResponse usrQueryListByName(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam String name,
+            Pageable pageable
+    ) {
+        return userQueryListByNameService.execute(userDetails.organ().getId(), name, pageable);
     }
 }
