@@ -2,14 +2,10 @@ package com.example.gujeuck_server.domain.log.presentation;
 
 import com.example.gujeuck_server.domain.log.presentation.dto.request.LogRequest;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.LogSliceWithTotalResponse;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryAllMonthLogCountResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogDetailResponse;
 import com.example.gujeuck_server.domain.log.presentation.dto.response.QueryLogListResponse;
-import com.example.gujeuck_server.domain.log.service.CreateLogService;
-import com.example.gujeuck_server.domain.log.service.DeleteLogService;
-import com.example.gujeuck_server.domain.log.service.QueryLogDetailService;
-import com.example.gujeuck_server.domain.log.service.QueryLogListByDateService;
-import com.example.gujeuck_server.domain.log.service.QueryLogListService;
-import com.example.gujeuck_server.domain.log.service.UpdateLogService;
+import com.example.gujeuck_server.domain.log.service.*;
 import com.example.gujeuck_server.global.security.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +26,7 @@ public class LogController {
     private final UpdateLogService updateLogService;
     private final QueryLogDetailService queryLogDetailService;
     private final QueryLogListByDateService queryLogListByDateService;
+    private final QueryAllMonthLogCountService queryAllMonthLogCountService;
 
     @PostMapping
     public void createLog(
@@ -80,5 +77,10 @@ public class LogController {
             Pageable pageable
     ) {
         return queryLogListByDateService.execute(userDetails.organ().getId(), date, pageable);
+    }
+
+    @GetMapping("/date/{year}")
+    public QueryAllMonthLogCountResponse queryAllMonthLogCountService(@PathVariable("year") String year) {
+        return queryAllMonthLogCountService.execute(year);
     }
 }
