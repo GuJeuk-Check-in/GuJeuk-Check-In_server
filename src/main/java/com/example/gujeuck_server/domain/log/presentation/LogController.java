@@ -79,8 +79,10 @@ public class LogController {
         return queryLogListByDateService.execute(userDetails.organ().getId(), date, pageable);
     }
 
-    @GetMapping("/date/{year}")
-    public QueryAllMonthLogCountResponse queryAllMonthLogCountService(@PathVariable("year") String year) {
+    @GetMapping("/count/{year}")
+    public QueryAllMonthLogCountResponse queryAllMonthLogCountService(
+            @PathVariable("year") String year
+    ) {
         return queryAllMonthLogCountService.execute(year);
     }
 }
