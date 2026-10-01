@@ -51,8 +51,8 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
     )
     FROM Log l
     WHERE l.visitDate LIKE CONCAT(:year, '년%')
-    GROUP BY SUBSTRING(l.visitDate, 6, 2)
-    ORDER BY SUBSTRING(l.visitDate, 6, 2)
+    GROUP BY CAST(SUBSTRING(l.visitDate, 6, 2) AS Integer)
+    ORDER BY CAST(SUBSTRING(l.visitDate, 6, 2) AS Integer)
 """)
   List<MonthlyLogCountResponse> findMonthlyCounts(@Param("year") String year);
 }
