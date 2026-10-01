@@ -5,7 +5,10 @@ import com.example.gujeuck_server.domain.user.domain.enums.Age;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCustom {
@@ -40,4 +43,13 @@ public interface LogRepository extends JpaRepository<Log, Long>, LogRepositoryCu
           String visitTime,
           Long id
   );
+
+  @Query("""
+    SELECT COUNT(l)
+    FROM Log l
+    WHERE l.visitDate LIKE CONCAT(:year, '년%')
+    GROUP BY SUBSTRING(l.visitDate, 6, 2)
+    ORDER BY SUBSTRING(l.visitDate, 6, 2)
+""")
+  List<Integer> findMonthlyCounts(@Param("year") String year);
 }
