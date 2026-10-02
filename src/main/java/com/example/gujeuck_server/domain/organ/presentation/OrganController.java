@@ -133,7 +133,7 @@ public class OrganController {
     }
 
     @GetMapping("/search")
-    public UserSliceWithTotalResponse usrQueryListByName(
+    public UserWithTotalResponse usrQueryListByName(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam String name,
             Pageable pageable
