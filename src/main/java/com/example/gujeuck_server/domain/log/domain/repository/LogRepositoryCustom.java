@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.MonthlyLogCountResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.MonthlyOperationCount;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.VisitStatisticsCount;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.LogExcelResponse;
@@ -19,4 +20,6 @@ public interface LogRepositoryCustom {
     VisitStatisticsCount summarizeVisits(Long organId, String startVisitDate, String endVisitDate);
 
     MonthlyOperationCount findMonthlyOperationCount(Long organId, String yearMonth);
+
+    List<MonthlyLogCountResponse> findMonthlyCounts(String year);
 }

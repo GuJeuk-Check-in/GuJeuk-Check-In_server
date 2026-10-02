@@ -1,6 +1,7 @@
 package com.example.gujeuck_server.domain.log.domain.repository;
 
 import com.example.gujeuck_server.domain.log.domain.Log;
+import com.example.gujeuck_server.domain.log.presentation.dto.response.MonthlyLogCountResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.MonthlyOperationCount;
 import com.example.gujeuck_server.domain.log.domain.QLog;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.organ.VisitStatisticsCount;
@@ -149,5 +150,22 @@ public class LogRepositoryCustomImpl implements LogRepositoryCustom {
                 operatingDays == null ? 0 : operatingDays,
                 totalVisitors == null ? 0 : totalVisitors
         );
+    }
+
+    @Override
+    public List<MonthlyLogCountResponse> findMonthlyCounts(String year) {
+        NumberExpression<Integer> month = qLog.visitDate.substring(5, 7).castToNum(Integer.class);
+
+        return jpaQueryFactory
+            .select(Projections.constructor(
+                MonthlyLogCountResponse.class,
+                month,
+                qLog.id.count()
+            ))
+            .from(qLog)
+            .where(qLog.visitDate.startsWith(year + "년"))
+            .groupBy(month)
+            .orderBy(month.asc())
+            .fetch();
     }
 }
