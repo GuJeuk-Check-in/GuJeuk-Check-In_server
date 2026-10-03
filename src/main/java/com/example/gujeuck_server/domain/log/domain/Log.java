@@ -22,10 +22,6 @@ import java.time.LocalDateTime;
                         columnNames = {"user_id", "visit_at", "purpose"}
                 ),
                 @UniqueConstraint(
-                        name = "uk_log_organ_name_age_purpose_visit",
-                        columnNames = {"organ_id", "name", "age", "purpose", "visit_date", "visit_time"}
-                ),
-                @UniqueConstraint(
                         name = "uk_log_client_record_id",
                         columnNames = {"client_record_id"}
                 )
