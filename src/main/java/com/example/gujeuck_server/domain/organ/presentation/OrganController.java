@@ -21,6 +21,8 @@ import com.example.gujeuck_server.domain.organ.service.user.QueryUserDetailServi
 import com.example.gujeuck_server.domain.organ.service.residence.QueryUserListByResidenceService;
 import com.example.gujeuck_server.domain.organ.service.user.QueryUserListService;
 import com.example.gujeuck_server.domain.organ.service.user.UpdateUserService;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.UserWithTotalResponse;
+import com.example.gujeuck_server.domain.organ.service.UserQueryListByNameService;
 import com.example.gujeuck_server.global.security.auth.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +51,7 @@ public class OrganController {
     private final QueryUserDetailService queryUserDetailService;
     private final QueryVisitStatisticsService queryVisitStatisticsService;
     private final SystemUsageService systemUsageService;
+    private final UserQueryListByNameService userQueryListByNameService;
 
     @GetMapping("/user/all")
     public UserSliceWithTotalResponse queryAllUserList(
@@ -135,5 +138,14 @@ public class OrganController {
             @RequestParam int year
     ) {
         return systemUsageService.execute(userDetails.organ().getId(), year);
+    }
+
+    @GetMapping("/search")
+    public UserWithTotalResponse usrQueryListByName(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam String name,
+            Pageable pageable
+    ) {
+        return userQueryListByNameService.execute(userDetails.organ().getId(), name, pageable);
     }
 }
