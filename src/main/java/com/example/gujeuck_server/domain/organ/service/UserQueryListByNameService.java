@@ -4,7 +4,7 @@ import com.example.gujeuck_server.domain.organ.exception.InvalidUserNameExceptio
 import com.example.gujeuck_server.domain.organ.exception.UserNameNotFoundException;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.UserWithTotalResponse;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
-import com.example.gujeuck_server.domain.user.presentation.dto.response.UserInfoResponse;
+import com.example.gujeuck_server.domain.organ.presentation.dto.response.user.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;

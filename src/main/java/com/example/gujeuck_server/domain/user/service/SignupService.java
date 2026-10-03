@@ -60,7 +60,7 @@ public class SignupService {
 
         user.increaseCount();
 
-        Log log = createLog(request, age, purpose.getPurposeName(), visitDate, visitTime, visitDateTime, currentYear, request.residence(), user, organ);
+        Log log = createLog(request, age, purpose.getPurposeName(), visitDate, visitTime, visitDateTime, currentYear, user, organ);
 
         logRepository.save(log);
     }
@@ -79,7 +79,7 @@ public class SignupService {
                 .build();
     }
 
-    private Log createLog(SignupRequest request, Age age, String purpose, String visitDate, String visitTime, LocalDateTime visitAt, int year, String residence, User user, Organ organ) {
+    private Log createLog(SignupRequest request, Age age, String purpose, String visitDate, String visitTime, LocalDateTime visitAt, int year, User user, Organ organ) {
         return Log.builder()
                 .name(request.name())
                 .phone(request.phone())
