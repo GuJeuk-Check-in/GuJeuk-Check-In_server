@@ -9,6 +9,11 @@ services:
       com.datadoghq.tags.env: "prod"
 
     environment:
+      DD_SERVICE: gujeuk-check-in-server
+      DD_ENV: prod
+      DD_AGENT_HOST: datadog-agent
+      DD_TRACE_AGENT_PORT: "8126"
+
       DB_URL: ${DB_URL:?DB_URL is required}
       MYSQL_USER: ${MYSQL_USER:?MYSQL_USER is required}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
@@ -19,6 +24,7 @@ services:
       STAG_BASE_URL: ${STAG_BASE_URL:?STAG_BASE_URL is required}
       TEST_URL: ${TEST_URL:?TEST_URL is required}
       JAVA_OPTS: ${JAVA_OPTS:--Xms64m -Xmx128m}
+
       SPRING_JPA_SHOW_SQL: "false"
       LOGGING_LEVEL_ORG_HIBERNATE_SQL: warn
       LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND: warn
@@ -47,27 +53,11 @@ services:
       com.datadoghq.tags.env: "prod"
 
     environment:
-      DD_SERVICE: gujeuk-check-in-server
-      DD_ENV: prod
-      DD_AGENT_HOST: datadog-agent
-      DD_TRACE_AGENT_PORT: "8126"
-
-      DB_URL: ${DB_URL:?DB_URL is required}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?MYSQL_DATABASE is required}
       MYSQL_USER: ${MYSQL_USER:?MYSQL_USER is required}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY is required}
-      REDIS_HOST: ${REDIS_HOST:-redis}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-      PROD_BASE_URL: ${PROD_BASE_URL:?PROD_BASE_URL is required}
-      STAG_BASE_URL: ${STAG_BASE_URL:?STAG_BASE_URL is required}
-      TEST_URL: ${TEST_URL:?TEST_URL is required}
-      JAVA_OPTS: ${JAVA_OPTS:--Xms64m -Xmx128m}
-
-      SPRING_JPA_SHOW_SQL: "false"
-      LOGGING_LEVEL_ORG_HIBERNATE_SQL: warn
-      LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND: warn
-      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA_REDIS: warn
-      LOGGING_LEVEL_IO_LETTUCE_CORE: warn
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
+      TZ: Asia/Seoul
 
     command:
       - --character-set-server=utf8mb4
