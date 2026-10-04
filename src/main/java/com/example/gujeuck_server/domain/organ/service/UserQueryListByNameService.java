@@ -1,11 +1,9 @@
 package com.example.gujeuck_server.domain.organ.service;
 
 import com.example.gujeuck_server.domain.organ.exception.InvalidUserNameException;
-import com.example.gujeuck_server.domain.organ.exception.UserNameNotFoundException;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.UserWithTotalResponse;
 import com.example.gujeuck_server.domain.organ.presentation.dto.response.user.UserListResponse;
 import com.example.gujeuck_server.domain.user.domain.repository.UserRepository;
-import com.example.gujeuck_server.domain.organ.presentation.dto.response.user.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -30,14 +28,14 @@ public class UserQueryListByNameService {
                 Sort.by(Sort.Direction.ASC, "id")
         );
 
-        long total = userRepository.countByOrganIdAndNameContaining(name);
+        long total = userRepository.countByNameContaining(name);
 
         if (total == 0) {
             return UserWithTotalResponse.of(0, List.of());
         }
 
 
-        Slice<UserListResponse> slice = userRepository.findAllByOrganIdAndNameContainingOrderByIdAsc(name, pageable)
+        Slice<UserListResponse> slice = userRepository.findAllByNameContainingOrderByIdAsc(name, pageable)
                 .map(UserListResponse::from);
 
         return UserWithTotalResponse.of(
