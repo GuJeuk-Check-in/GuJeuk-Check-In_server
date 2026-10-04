@@ -12,6 +12,11 @@ services:
       - .env.stag
 
     environment:
+      DD_SERVICE: gujeuk-check-in-server
+      DD_ENV: stag
+      DD_AGENT_HOST: datadog-agent
+      DD_TRACE_AGENT_PORT: "8126"
+
       SPRING_JPA_SHOW_SQL: "false"
       LOGGING_LEVEL_ORG_HIBERNATE_SQL: warn
       LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND: warn
