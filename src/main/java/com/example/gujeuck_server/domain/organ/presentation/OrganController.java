@@ -142,10 +142,9 @@ public class OrganController {
 
     @GetMapping("/search")
     public UserWithTotalResponse usrQueryListByName(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam String name,
             Pageable pageable
     ) {
-        return userQueryListByNameService.execute(userDetails.organ().getId(), name, pageable);
+        return userQueryListByNameService.execute(name, pageable);
     }
 }

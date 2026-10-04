@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByOrganIdOrderByIdAsc(Long organId);
 
-    Slice<User> findAllByOrganIdAndNameContainingOrderByIdAsc(Long organId, String name, Pageable pageable);
+    Slice<User> findAllByNameContainingOrderByIdAsc(String name, Pageable pageable);
 
-    long countByOrganIdAndNameContaining(Long organId, String name);
+    long countByNameContaining(String name);
 }
