@@ -9,7 +9,7 @@ fi
 SOURCE_ENV=$1
 TARGET_ENV=$2
 
-for key in JWT_SECRET_KEY PROD_BASE_URL STAG_BASE_URL VERCEL_URL TEST_URL; do
+for key in JWT_SECRET_KEY PROD_BASE_URL STAG_BASE_URL TEST_URL; do
   value=$(sed -n "s/^${key}=//p" "$SOURCE_ENV" | tail -n 1)
   if [[ -z "$value" ]]; then
     echo "missing required key in source env: $key" >&2

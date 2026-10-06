@@ -58,7 +58,6 @@ cors:
   allowed-origins:
     prod-url: ${PROD_BASE_URL}
     stag-url: ${STAG_BASE_URL}
-    vercel-url: ${VERCEL_URL}
     test-url: ${TEST_URL}
 
 management:

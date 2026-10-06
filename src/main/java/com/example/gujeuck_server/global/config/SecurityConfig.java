@@ -35,9 +35,6 @@ public class SecurityConfig {
     @Value("${cors.allowed-origins.stag-url}")
     private String stagUrl;
 
-    @Value("${cors.allowed-origins.vercel-url}")
-    private String vercelUrl;
-
     @Value("${cors.allowed-origins.test-url}")
     private String testUrl;
 
@@ -100,7 +97,6 @@ public class SecurityConfig {
 
         addOrigins(origins, prodUrl);
         addOrigins(origins, stagUrl);
-        addOrigins(origins, vercelUrl);
         addOrigins(origins, testUrl);
 
         return origins;
