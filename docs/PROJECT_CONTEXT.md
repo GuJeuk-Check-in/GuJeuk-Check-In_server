@@ -110,6 +110,15 @@ Compose 프로젝트/볼륨 이름을 임의로 변경하면 기존 DB 대신 �
 
 ## 6. CI/CD
 
+### 2026-10-06 저장소 Datadog 배포 설정 변경 (EC2 미배포·미확인)
+
+- 실제 배포 파일 `ops/aws/docker-compose.aws.yml`에 앱 APM 환경변수와 앱·MySQL·Redis의 Datadog service/env 라벨을 추가했다.
+- 배포 SSH 스크립트는 `DD_ENV="$DEPLOY_TARGET"`을 export한다. main은 prod, develop은 stag이며, Compose의 앱 환경변수와 세 서비스의 env 라벨이 같은 값을 사용한다.
+- 수동 Compose 실행 시에도 `DD_ENV`가 필수다. 환경별 `.env`에 `DD_ENV=prod` 또는 `DD_ENV=stag`를 지정하거나 셸에서 export한다. 예시는 `ops/aws/*.env.example`에 있다.
+- 앱의 trace 목적지는 `datadog-agent:8126`이다. 별도로 실행하는 Agent가 각 앱의 Docker 네트워크에 연결되어 해당 이름으로 접근 가능해야 한다. 이번 수정에서는 네트워크·서버 환경파일·컨테이너를 변경하지 않았다.
+- Dockerfile에는 Java Agent 로드 설정이 있다. 실제 EC2 네트워크 연결과 APM 수집 여부는 이번 작업에서 확인하지 않았다. 아래 런타임 및 모니터링 현황은 기존 2026-09-22 스냅샷이다.
+
+
 기준: `.github/workflows/ci-cd.yml`.
 
 | 이벤트 | 수행 작업 |
