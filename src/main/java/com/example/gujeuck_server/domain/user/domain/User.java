@@ -25,7 +25,7 @@ public class User extends BaseIdEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(nullable = false, length = 20) //2008-05-04 이런 형태로 받아야 함
+    @Column(nullable = false, length = 20)
     private String birthYMD;
 
     @Enumerated(EnumType.STRING)

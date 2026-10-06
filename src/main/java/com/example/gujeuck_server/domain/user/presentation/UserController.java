@@ -6,16 +6,12 @@ import com.example.gujeuck_server.domain.user.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-    private static final Long DEFAULT_CHECK_IN_ORGAN_ID = 1L;
-
     private final SignupService signupService;
     private final UserExistsService userExistsService;
     private final UserCheckInService userCheckInService;

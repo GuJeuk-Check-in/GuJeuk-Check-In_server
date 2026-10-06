@@ -19,11 +19,4 @@ public class QueryPurposeListService {
                 .map(PurposeResponse::from)
                 .toList();
     }
-
-    @Transactional(readOnly = true)
-    public List<PurposeResponse> execute(Long organId) {
-        return purposeRepository.findAllByOrganIdOrderByPurposeIndexAsc(organId).stream()
-                .map(PurposeResponse::from)
-                .toList();
-    }
 }

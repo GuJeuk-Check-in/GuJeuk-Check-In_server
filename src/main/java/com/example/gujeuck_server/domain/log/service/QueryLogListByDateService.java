@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -18,7 +19,8 @@ import java.time.LocalDate;
 public class QueryLogListByDateService {
     private final LogRepository logRepository;
 
-    public LogSliceWithTotalResponse queryLogListByResidence(Long organId, String yearMonth, Pageable p) {
+    @Transactional(readOnly = true)
+    public LogSliceWithTotalResponse execute(Long organId, String yearMonth, Pageable p) {
         Pageable pageable = PageRequest.of(
                 p.getPageNumber(),
                 p.getPageSize(),
@@ -32,22 +34,19 @@ public class QueryLogListByDateService {
 
         long total = logRepository.countByYearMonth(organId, date);
 
-        return LogSliceWithTotalResponse.builder()
-                .slice(slice)
-                .totalCount(total)
-                .build();
+        return LogSliceWithTotalResponse.of(total, slice);
     }
 
     private String toYearMonthPrefix(String yearMonth) {
+        if (!yearMonth.matches("\\d{4}-\\d{2}")) {
+            throw InvalidLogDateException.EXCEPTION;
+        }
+
         String[] parts = yearMonth.split("-");
         LocalDate now = LocalDate.now();
 
         String year = parts[0];
         String month = parts[1];
-
-        if (!yearMonth.matches("\\d{4}-\\d{2}")) {
-            throw InvalidLogDateException.EXCEPTION;
-        }
 
         if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1 || Integer.parseInt(year) > now.getYear()) {
             throw InvalidLogDateException.EXCEPTION;

@@ -8,6 +8,10 @@ import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 
+
+/**
+ * QCheckInFunnelEvent is a Querydsl query type for CheckInFunnelEvent
+ */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QCheckInFunnelEvent extends EntityPathBase<CheckInFunnelEvent> {
 
@@ -29,6 +33,7 @@ public class QCheckInFunnelEvent extends EntityPathBase<CheckInFunnelEvent> {
 
     public final StringPath failureReason = createString("failureReason");
 
+    //inherited
     public final NumberPath<Long> id = _super.id;
 
     public final BooleanPath isExistingUser = createBoolean("isExistingUser");
@@ -60,3 +65,4 @@ public class QCheckInFunnelEvent extends EntityPathBase<CheckInFunnelEvent> {
     }
 
 }
+

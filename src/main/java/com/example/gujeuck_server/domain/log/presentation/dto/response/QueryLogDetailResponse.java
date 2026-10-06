@@ -6,7 +6,6 @@ import lombok.Builder;
 
 @Builder
 public record QueryLogDetailResponse(
-
         Long id,
         String name,
         Age age,
@@ -18,18 +17,18 @@ public record QueryLogDetailResponse(
         String visitTime,
         boolean privacyAgreed
 ) {
-    public QueryLogDetailResponse(Log log) {
-        this(
-                log.getId(),
-                log.getName(),
-                log.getAge(),
-                log.getPhone(),
-                log.getMaleCount(),
-                log.getFemaleCount(),
-                log.getPurpose(),
-                log.getVisitDate(),
-                log.getVisitTime(),
-                log.isPrivacyAgreed()
-        );
+    public static QueryLogDetailResponse from(Log log) {
+        return QueryLogDetailResponse.builder()
+            .id(log.getId())
+            .name(log.getName())
+            .age(log.getAge())
+            .phone(log.getPhone())
+            .maleCount(log.getMaleCount())
+            .femaleCount(log.getFemaleCount())
+            .purpose(log.getPurpose())
+            .visitDate(log.getVisitDate())
+            .visitTime(log.getVisitTime())
+            .privacyAgreed(log.isPrivacyAgreed())
+            .build();
     }
 }

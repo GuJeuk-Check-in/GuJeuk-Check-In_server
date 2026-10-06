@@ -3,7 +3,14 @@ services:
     image: ${APP_IMAGE:?APP_IMAGE is required}
     container_name: ${APP_CONTAINER_NAME:?APP_CONTAINER_NAME is required}
     restart: unless-stopped
+    labels:
+      com.datadoghq.tags.service: "gujeuk-check-in-server"
+      com.datadoghq.tags.env: "${DD_ENV:?DD_ENV is required}"
     environment:
+      DD_SERVICE: gujeuk-check-in-server
+      DD_ENV: ${DD_ENV:?DD_ENV is required}
+      DD_AGENT_HOST: datadog-agent
+      DD_TRACE_AGENT_PORT: "8126"
       DB_URL: ${DB_URL:?DB_URL is required}
       MYSQL_USER: ${MYSQL_USER:?MYSQL_USER is required}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}
@@ -12,7 +19,6 @@ services:
       REDIS_PORT: ${REDIS_PORT:-6379}
       PROD_BASE_URL: ${PROD_BASE_URL:?PROD_BASE_URL is required}
       STAG_BASE_URL: ${STAG_BASE_URL:?STAG_BASE_URL is required}
-      VERCEL_URL: ${VERCEL_URL:?VERCEL_URL is required}
       TEST_URL: ${TEST_URL:?TEST_URL is required}
       JAVA_OPTS: ${JAVA_OPTS:--Xms128m -Xmx384m}
       SPRING_JPA_SHOW_SQL: "false"
@@ -32,6 +38,9 @@ services:
     image: mysql:8.0
     container_name: ${MYSQL_CONTAINER_NAME:?MYSQL_CONTAINER_NAME is required}
     restart: unless-stopped
+    labels:
+      com.datadoghq.tags.service: "mysql"
+      com.datadoghq.tags.env: "${DD_ENV:?DD_ENV is required}"
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:?MYSQL_DATABASE is required}
       MYSQL_USER: ${MYSQL_USER:?MYSQL_USER is required}
@@ -55,6 +64,9 @@ services:
     image: redis:7.2-alpine
     container_name: ${REDIS_CONTAINER_NAME:?REDIS_CONTAINER_NAME is required}
     restart: unless-stopped
+    labels:
+      com.datadoghq.tags.service: "redis"
+      com.datadoghq.tags.env: "${DD_ENV:?DD_ENV is required}"
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data

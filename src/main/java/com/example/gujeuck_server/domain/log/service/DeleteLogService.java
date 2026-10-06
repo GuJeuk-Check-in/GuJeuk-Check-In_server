@@ -1,6 +1,5 @@
 package com.example.gujeuck_server.domain.log.service;
 
-import com.example.gujeuck_server.domain.log.domain.Log;
 import com.example.gujeuck_server.domain.log.domain.repository.LogRepository;
 import com.example.gujeuck_server.domain.log.facade.LogFacade;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ public class DeleteLogService {
 
     @Transactional
     public void execute(Long organId, Long logId) {
-        Log log = logFacade.getLogByIdAndOrganId(logId, organId);
-        logRepository.delete(log);
+        logRepository.delete(logFacade.getLogByIdAndOrganId(logId, organId));
     }
 }

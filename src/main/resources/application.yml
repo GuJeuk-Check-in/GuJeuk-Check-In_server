@@ -35,13 +35,9 @@ spring:
 jwt:
   header: Authorization
   prefix: Bearer
-  accessExpiration: 3600
+  accessExpiration: 7200
   refreshExpiration: 60400
   secretKey: ${JWT_SECRET_KEY}
-
-  logging:
-    level:
-      root: DEBUG
 
 redis:
   host: ${REDIS_HOST}
@@ -49,16 +45,14 @@ redis:
 
 logging:
   level:
-    org.springframework.data.redis: DEBUG
-    io.lettuce.core: DEBUG
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+    root: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
 
 cors:
   allowed-origins:
     prod-url: ${PROD_BASE_URL}
     stag-url: ${STAG_BASE_URL}
-    vercel-url: ${VERCEL_URL}
     test-url: ${TEST_URL}
 
 management:

@@ -15,6 +15,6 @@ public class QueryLogDetailService {
     @Transactional(readOnly = true)
     public QueryLogDetailResponse execute(Long organId, Long logId) {
         Log log = logFacade.getLogByIdAndOrganId(logId, organId);
-        return new QueryLogDetailResponse(log);
+        return QueryLogDetailResponse.from(log);
     }
 }
