@@ -2045,3 +2045,12 @@ Field 'user_id' doesn't have a default value
 5. 재발 방지를 위해 `V9__make_legacy_user_id_nullable.sql` 추가
 
 기존 `api.taisu.site`와 `api-stag.taisu.site`는 여전히 홈서버 Tunnel DNS를 사용한다. 클라이언트가 `aws-api.oijwef098234.com`과 `aws-stag.oijwef098234.com`을 사용하면 기존 레코드 변경 없이 AWS로 연결되지만, 기존 hostname은 홈서버 종료 시 동작하지 않는다.
+
+
+## 2026-10-06 AWS Datadog 전환 PR (미배포)
+
+- #127의 Datadog Java Agent, 루트·AWS Compose 설정, 환경별 DD_ENV, 기존 monitor-bot 소스 삭제를 main 대상 PR에 포함한다. 운영 VERCEL_URL 의존성도 함께 제거한다.
+- 실제 배포는 AWS Compose를 사용하며 CI에서 DD_ENV를 prod/stag로 지정한다. 수동 실행은 해당 값을 별도로 설정해야 한다.
+- 앱은 같은 Docker 네트워크의 datadog-agent:8126으로 trace를 전송한다. Agent 네트워크 연결과 수집은 별도 확인이 필요하다.
+- 전체 compose up -d 시 MySQL·Redis의 라벨 변경으로 컨테이너가 재생성될 수 있다. 기존 볼륨은 유지한다. monitor-bot 소스 삭제만으로 기존 원격 컨테이너가 제거되지는 않는다.
+- 이 기록은 저장소 변경에 관한 것이며 운영 배포 완료를 의미하지 않는다.

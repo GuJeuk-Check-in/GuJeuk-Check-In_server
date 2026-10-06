@@ -2,11 +2,11 @@
 
 ## 2026-10-06 main 대상 모니터링 전용 변경 (PR 준비, 미배포)
 
-- Dockerfile에 Datadog Java tracer를 추가하고 AWS 배포 Compose의 앱에 service/env 라벨 및 Agent 연결 환경변수를 지정한다. CI가 main은 `DD_ENV=prod`, develop은 `DD_ENV=stag`로 전달한다.
+- Dockerfile에 Datadog Java tracer를 추가하고 루트 및 AWS 배포 Compose의 앱·MySQL·Redis에 service/env 라벨을 추가하고 앱에 Agent 연결 환경변수를 지정한다. CI가 main은 `DD_ENV=prod`, develop은 `DD_ENV=stag`로 전달한다.
 - 앱은 각 환경 Docker 네트워크의 `datadog-agent:8126`으로 trace를 보낸다. 실제 Agent 연결 및 APM 수집 검증은 배포 전후에 필요하다.
 - 운영 `.env`와 서버 Compose에는 VERCEL_URL이 없지만 기존 운영 컨테이너에는 예전 값이 남아 있음을 2026-10-06 SSH 읽기 조회로 확인했다. 새 기동 시 누락을 방지하기 위해 앱 CORS 설정, Compose, 환경 예시, 동기화 스크립트에서 해당 항목을 함께 제거한다. 운영 프론트 주소는 PROD_BASE_URL로 허용한다.
-- 인증 허용 경로, JWT 만료 시간, 서비스 로직, DB 마이그레이션, 기존 모니터링 봇은 변경하지 않는다.
-- MySQL/Redis 라벨 변경은 제외한다. 기존 배포 명령은 전체 `up -d`이므로 런타임 구성 차이에 따른 다른 컨테이너 재생성 가능성은 배포 전에 확인한다. 앱 배포는 단일 컨테이너 교체이며 무중단이 아니다.
+- 인증 허용 경로, JWT 만료 시간, 서비스 로직, DB 마이그레이션은 변경하지 않는다. #127과 동일하게 기존 monitor-bot 소스를 삭제한다. 소스 삭제가 EC2의 기존 컨테이너를 자동으로 중지하거나 삭제하지는 않는다.
+- MySQL/Redis에도 라벨 변경을 적용한다. 기존 배포 명령은 전체 `up -d`이므로 DB·Redis 컨테이너도 재생성될 수 있다. 볼륨 이름은 유지하지만 일시적인 연결 단절 가능성을 배포 전에 확인한다. 앱 배포는 단일 컨테이너 교체이며 무중단이 아니다.
 - 수동 Compose 실행에는 DD_ENV=prod/stag 지정이 필요하다. tracer는 기존 develop과 같은 latest 다운로드 방식으로, 버전 고정은 후속 검토 사항이다.
 - 아래 과거 운영 기록보다 이 절의 변경 범위와 확인 시점을 우선한다. PR 작성만으로 배포 완료나 로그 수집 정상 여부를 의미하지 않는다.
 
