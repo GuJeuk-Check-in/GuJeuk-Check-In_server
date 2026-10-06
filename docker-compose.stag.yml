@@ -3,21 +3,35 @@ services:
     image: ${APP_IMAGE:?APP_IMAGE is required}
     container_name: gujeuk-stag-app
     restart: unless-stopped
+
+    labels:
+      com.datadoghq.tags.service: "gujeuk-check-in-server"
+      com.datadoghq.tags.env: "stag"
+
     env_file:
       - .env.stag
+
     environment:
+      DD_SERVICE: gujeuk-check-in-server
+      DD_ENV: stag
+      DD_AGENT_HOST: datadog-agent
+      DD_TRACE_AGENT_PORT: "8126"
+
       SPRING_JPA_SHOW_SQL: "false"
       LOGGING_LEVEL_ORG_HIBERNATE_SQL: warn
       LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND: warn
       LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA_REDIS: warn
       LOGGING_LEVEL_IO_LETTUCE_CORE: warn
+
     ports:
       - "${APP_PORT:-8081}:8080"
+
     depends_on:
       stag-mysql:
         condition: service_healthy
       stag-redis:
         condition: service_healthy
+
     networks:
       - stag-network
 
@@ -25,22 +39,32 @@ services:
     image: mysql:8.0
     container_name: gujeuk-stag-mysql
     restart: unless-stopped
+
+    labels:
+      com.datadoghq.tags.service: "mysql"
+      com.datadoghq.tags.env: "stag"
+
     env_file:
       - .env.stag
+
     environment:
       TZ: Asia/Seoul
+
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --default-time-zone=+09:00
+
     volumes:
       - stag_mysql_data:/var/lib/mysql
+
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
+
     networks:
       - stag-network
 
@@ -48,14 +72,22 @@ services:
     image: redis:7.2-alpine
     container_name: gujeuk-stag-redis
     restart: unless-stopped
+
+    labels:
+      com.datadoghq.tags.service: "redis"
+      com.datadoghq.tags.env: "stag"
+
     command: redis-server --appendonly yes
+
     volumes:
       - stag_redis_data:/data
+
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 10
+
     networks:
       - stag-network
 
