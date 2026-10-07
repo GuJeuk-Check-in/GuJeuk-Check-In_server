@@ -96,6 +96,8 @@ public class SecurityConfig {
         addOrigins(origins, prodUrl);
         addOrigins(origins, stagUrl);
         addOrigins(origins, testUrl);
+        origins.add("http://localhost:5175");
+        origins.add("http://localhost:5176");
 
         return origins;
     }
