@@ -1,5 +1,14 @@
 # GuJeuk 프로젝트 현재 상황
 
+## 2026-10-07 develop → main 통합 검토 (PR 준비, 운영 상태 미확인)
+
+- 비교 기준은 main `e9250bb`와 develop `3d9cbe0`이다. 2026-09-07부터 2026-10-07까지 두 브랜치에 반영된 커밋 이력을 검토했다.
+- main에 이미 반영된 리팩터링·Datadog·로그 설정을 유지하며 develop의 이름 검색(`/organ/search`), 12개월 방문기록 건수(`/log/count/{year}`), localhost 5175/5176 CORS 허용을 통합한다.
+- 두 신규 조회 API는 기존 develop 구현대로 전체 기록을 조회한다. 이 통합에서 기관별 조회 조건을 추가하지 않는다.
+- 기존 Caddy 별칭 제거와 Log 복합 unique 선언 제거도 develop 이력을 유지한다. Caddy는 앱 CI/CD의 자동 적용 대상이 아니며, 운영 DB 인덱스 상태는 이번 작업에서 확인하지 않았다.
+- Java 파일 4개와 문서 2개의 병합 충돌을 해결했다. Java 17에서 `./gradlew --offline --no-daemon clean build`와 diff 공백 검사를 통과했다. 테스트 소스가 없어 기능 테스트는 실행되지 않았다.
+- 소스 충돌 해결과 로컬 검증은 운영 배포 완료를 의미하지 않는다. 아래의 날짜별 운영 확인 기록과 구분한다.
+
 ## 2026-10-06 main 대상 모니터링 및 리팩터링 변경 (PR 준비, 미배포)
 
 - Dockerfile에 Datadog Java tracer를 추가하고 루트 및 AWS 배포 Compose의 앱·MySQL·Redis에 service/env 라벨을 추가하고 앱에 Agent 연결 환경변수를 지정한다. CI가 main은 `DD_ENV=prod`, develop은 `DD_ENV=stag`로 전달한다.
@@ -125,6 +134,15 @@ Compose 프로젝트/볼륨 이름을 임의로 변경하면 기존 DB 대신 �
 
 ## 6. CI/CD
 
+### 2026-10-06 저장소 Datadog 배포 설정 변경 (EC2 미배포·미확인)
+
+- 실제 배포 파일 `ops/aws/docker-compose.aws.yml`에 앱 APM 환경변수와 앱·MySQL·Redis의 Datadog service/env 라벨을 추가했다.
+- 배포 SSH 스크립트는 `DD_ENV="$DEPLOY_TARGET"`을 export한다. main은 prod, develop은 stag이며, Compose의 앱 환경변수와 세 서비스의 env 라벨이 같은 값을 사용한다.
+- 수동 Compose 실행 시에도 `DD_ENV`가 필수다. 환경별 `.env`에 `DD_ENV=prod` 또는 `DD_ENV=stag`를 지정하거나 셸에서 export한다. 예시는 `ops/aws/*.env.example`에 있다.
+- 앱의 trace 목적지는 `datadog-agent:8126`이다. 별도로 실행하는 Agent가 각 앱의 Docker 네트워크에 연결되어 해당 이름으로 접근 가능해야 한다. 이번 수정에서는 네트워크·서버 환경파일·컨테이너를 변경하지 않았다.
+- Dockerfile에는 Java Agent 로드 설정이 있다. 실제 EC2 네트워크 연결과 APM 수집 여부는 이번 작업에서 확인하지 않았다. 아래 런타임 및 모니터링 현황은 기존 2026-09-22 스냅샷이다.
+
+
 기준: `.github/workflows/ci-cd.yml`.
 
 | 이벤트 | 수행 작업 |
@@ -168,6 +186,12 @@ Compose 프로젝트/볼륨 이름을 임의로 변경하면 기존 DB 대신 �
 운영과 스테이징의 이미지 버전은 다르다. 현재 작업 브랜치에는 #113 리팩터링, #117 Caddy 변경, #119 미사용 구성 정리 이력이 있지만 이를 모두 운영 반영 완료로 설명하지 않는다. 현재 브랜치의 #119 변경에는 `.square` 관련 구성 삭제가 포함된다.
 
 ## 8. 환경변수와 CORS
+
+### 2026-10-07 로컬 프론트 CORS 허용 추가 (코드 변경, 미배포)
+
+- `SecurityConfig`에서 기존 환경변수 기반 허용 목록에 `http://localhost:5175`, `http://localhost:5176`을 추가한다.
+- 두 주소는 `TEST_URL` 값과 별개로 허용된다. 다른 호스트·포트에 대한 와일드카드는 추가하지 않는다.
+- 서버 환경변수와 실행 컨테이너는 변경하지 않았다. 해당 코드가 배포된 환경부터 적용된다.
 
 현재 코드의 CORS 변수는 다음 세 개다. 여러 origin은 쉼표로 구분하며 코드가 공백과 후행 `/`를 정리한다.
 
