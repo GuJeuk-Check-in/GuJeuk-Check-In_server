@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "datagrip": {
+      "url": "http://127.0.0.1:64402/stream",
+      "type": "http"
+    }
+  }
+}
