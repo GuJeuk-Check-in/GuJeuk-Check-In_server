@@ -135,9 +135,10 @@ public class OrganController {
     @GetMapping("/usage")
     public SystemUsageResponse querySystemUsage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam int year
+            @RequestParam int year,
+            @RequestParam int month
     ) {
-        return systemUsageService.execute(userDetails.organ().getId(), year);
+        return systemUsageService.execute(userDetails.organ().getId(), year ,month);
     }
 
     @GetMapping("/search")

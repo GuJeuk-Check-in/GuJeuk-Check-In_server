@@ -19,10 +19,15 @@ public class SystemUsageService {
     private final LogRepository logRepository;
 
     @Transactional(readOnly = true)
-    public SystemUsageResponse execute(Long organId, int year) {
+    public SystemUsageResponse execute(Long organId, int year, int month) {
         List<SystemUsageOneResponse> months = new ArrayList<>();
-        for (int month = 1; month <= 12; month++) {
-            String yearMonth = String.format("%d년%02d월", year, month);
+        for (int m = 1; m <= 12; m++) {
+            if (m > month) {
+                months.add(SystemUsageOneResponse.empty());
+                continue;
+            }
+
+            String yearMonth = String.format("%d년%02d월", year, m);
             MonthlyOperationCount count = logRepository.findMonthlyOperationCount(organId, yearMonth);
 
             months.add(toResponse(count));
