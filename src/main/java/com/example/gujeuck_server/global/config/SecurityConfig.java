@@ -98,6 +98,7 @@ public class SecurityConfig {
         addOrigins(origins, testUrl);
         origins.add("http://localhost:5175");
         origins.add("http://localhost:5176");
+        origins.add("https://gujeuk-check-in-user.pages.dev");
 
         return origins;
     }
