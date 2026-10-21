@@ -1,5 +1,20 @@
 # GuJeuk 프로젝트 현재 상황
 
+## 2026-10-21 #135 모노레포와 법동 로컬 DB 구성 (로컬 검증, 미배포)
+
+- 루트 Gradle은 `apps:gujeuk-api`, `apps:beopdong-api`, `shared:common`을 관리합니다. Java 17·Spring Boot 3.5.6을 유지합니다.
+- 기존 구즉 코드를 `apps/gujeuk-api/src/`로 이동하고 사용자가 진행한 `com.example.burserker.gujeuk` 패키지 리팩터링을 유지합니다. 구즉 업무 로직·application.yml·마이그레이션 내용은 이번 모듈/DB 구성 작업에서 수정하지 않았습니다. QueryDSL 생성 파일은 컴파일 결과입니다.
+- 법동은 `BeopdongApplication`으로 독립 실행하며 JPA·MySQL 드라이버·DataSource 설정을 추가했습니다. 업무 API·헬스체크·엔티티·마이그레이션·Redis·JWT는 없습니다. 공통 모듈도 빈 상태이고 앱 간 의존성은 없습니다.
+- 실제 로컬 설정은 저장소 밖 `~/env/법동_local.env`에 권한 600으로 보관합니다. 구즉 로컬 MySQL 계정을 사용하되 대상 스키마만 `BeopDong`으로 분리합니다. 비밀값은 추적하지 않고 공개 양식만 커밋합니다.
+- 법동 IntelliJ 비공개 실행 설정 `Beopdong - Local DB`를 추가했습니다. `.idea`와 개인 env는 Git 제외 대상입니다. 로컬 포트는 8082이며 검증용 실행은 별도 임시 포트로 기동 후 종료했습니다.
+- 법동 `ddl-auto: none`으로 자동 DDL을 막습니다. 구즉 Flyway SQL은 법동 모듈의 클래스패스에 포함하지 않습니다. 로컬 MySQL의 lower_case_table_names=2에서 접속 DB 이름은 소문자로 반환되지만 SCHEMA_NAME은 `BeopDong`이며 테스트는 이를 고려합니다.
+- 법동 실제 앱 DataSource를 사용하는 로컬 연결/SELECT 테스트 2개를 통과했습니다. 이 테스트는 `BEOPDONG_LOCAL_DB_TEST=true`일 때만 실행되어 일반 CI에는 개인 DB가 필요하지 않습니다. env 없는 CI 방식에서는 테스트 2개 SKIPPED와 빌드 성공을 확인했습니다.
+- Java 17 전체 clean build, 법동 실행 JAR의 DB 풀 기동/HTTP 404, Docker 이미지 빌드 및 임시 컨테이너의 호스트 DB 연결/HTTP 404를 확인했습니다. Docker 검증에서만 호스트를 `host.docker.internal`로 덮어썼으며 개인 env는 localhost로 유지했습니다. BeopDong 테이블 수는 검증 전후 0개로 동일합니다.
+- 구즉 JAR은 `apps/gujeuk-api/build/libs/gujeuk-api.jar`, 법동 JAR은 `apps/beopdong-api/build/libs/beopdong-api.jar`입니다. 각 앱 Dockerfile은 모듈 안에 있으며 저장소 루트 컨텍스트에서 빌드합니다.
+- 기존 구즉 workflow의 Gradle·artifact·Dockerfile 경로를 새 구조에 맞췄습니다. 법동 전용 경로만 바뀌면 구즉 push 배포를 제외합니다. 법동 workflow는 빌드 검증 전용이며 자동 배포는 없습니다.
+- 목표는 실제 EC2 스테이징에 법동 App·전용 MySQL 2개만 추가하는 것입니다. 운영 법동과 법동 Redis는 만들지 않습니다. `ops/aws/`의 기존 Compose·서버 디렉터리·포트·볼륨·이미지 경로를 이번 작업에서 변경하지 않았습니다.
+- 아래 과거 기록의 루트 src/Dockerfile/산출물 경로보다 이 절의 경로를 우선합니다. 로컬 검증은 EC2 배포 완료를 의미하지 않으며 푸시·PR 생성은 하지 않습니다.
+
 ## 2026-10-07 develop → main 통합 검토 (PR 준비, 운영 상태 미확인)
 
 - 비교 기준은 main `e9250bb`와 develop `3d9cbe0`이다. 2026-09-07부터 2026-10-07까지 두 브랜치에 반영된 커밋 이력을 검토했다.
