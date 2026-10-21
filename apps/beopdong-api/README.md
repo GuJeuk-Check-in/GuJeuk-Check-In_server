@@ -1,6 +1,6 @@
 # 법동 API
 
-Java 17 / Spring Boot 3.5.6 기반 독립 실행 모듈입니다. 현재 실행 클래스와 MySQL 연결 설정만 있으며, 업무 API·헬스체크·엔티티·마이그레이션·Redis·JWT는 없습니다.
+Java 17 / Spring Boot 3.5.6 기반 독립 실행 모듈입니다. 현재 실행 클래스와 MySQL 연결 설정만 있으며, 업무 API·헬스체크·엔티티·마이그레이션·JWT 업무 기능은 없습니다. Redis는 같은 환경의 구즉과 공유하며 DB 1을 사용합니다.
 
 ## 로컬 실행
 
@@ -8,7 +8,7 @@ Java 17 / Spring Boot 3.5.6 기반 독립 실행 모듈입니다. 현재 실행 
 - 비밀값은 저장소 밖 `~/env/법동_local.env`에 보관합니다. 공개 양식은 `.env.local.example`입니다.
 - IntelliJ Application 실행 설정에서 법동 main 모듈과 `BeopdongApplication`을 선택하고 위 env 파일을 연결합니다.
 - 이 작업 환경에는 비공개 실행 설정 `Beopdong - Local DB`도 만들었습니다. `.idea`는 Git에 포함하지 않습니다.
-- 구즉 로컬 계정으로 접속하되 DB 대상은 법동으로 구분합니다. Redis·JWT·CORS 값은 복사하지 않습니다.
+- 구즉 로컬 계정으로 접속하되 DB 대상은 법동으로 구분합니다. JWT·CORS 값은 복사하지 않습니다. Redis는 REDIS_HOST/REDIS_PORT와 DB 1을 사용하며 기본 로컬 값은 localhost:6379입니다.
 - 로컬 포트는 env의 `SERVER_PORT=8082`, env가 없는 컨테이너 기본 포트는 8080입니다.
 - `ddl-auto: none`이므로 기존 DB 테이블을 생성·수정하지 않습니다. 법동에 Flyway를 추가하지 않았으며 구즉 마이그레이션도 로드하지 않습니다.
 
@@ -35,4 +35,6 @@ Mac의 MySQL에 접속할 때 컨테이너 안의 localhost는 Mac이 아니라 
 
 2026-10-21에 local env를 사용한 전체 빌드·실제 DB 테스트 2개·실행 JAR·Docker 컨테이너 기동을 확인했습니다. 컨트롤러가 없어 `/`은 404를 반환합니다. 검증 전후 테이블 수는 0개로 동일합니다.
 
-현재 CI는 빌드 검증만 합니다. EC2 컨테이너 생성·도메인 연결·자동 배포는 아직 구성하지 않았습니다. 목표 배포 범위는 법동 스테이징 App·MySQL 2개이며 운영 법동과 법동 Redis는 제외합니다.
+법동 PR은 컴파일 검증, develop/main push는 각각 스테이징/운영 배포입니다. 기존 구즉 Compose에 법동 App·MySQL을 합쳐 환경당 5개 서비스를 관리하고 Redis를 공유합니다. 최초 서버 env·메모리 확보와 도메인 연결은 별도 준비가 필요합니다. [배포 안내](../../ops/beopdong/README.md)를 참고하세요.
+
+`BEOPDONG_LOCAL_REDIS_TEST=true`를 명시하면 로컬 Redis 연결과 DB 0/1 키 분리 테스트 2개를 실행합니다. 법동 DB env도 필요하며 localhost/127.0.0.1에서만 검증하고 UUID 테스트 키만 생성 후 제거합니다. 일반 CI에서는 DB/Redis 테스트를 건너뜁니다.

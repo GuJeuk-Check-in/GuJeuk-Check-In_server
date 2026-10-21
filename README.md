@@ -12,8 +12,8 @@ apps/
 ├── gujeuk-api/     # 기존 구즉 코드·설정·마이그레이션·Dockerfile
 └── beopdong-api/   # 법동 독립 실행 앱·로컬 MySQL 연결 설정
 shared/common/     # 빈 공통 라이브러리, 앱 의존 연결 없음
-ops/aws/           # 기존 구즉 배포 설정 유지
-ops/beopdong/      # 법동 배포 설정을 위한 자리 (미구성)
+ops/gujeuk/        # 구즉 배포·기존 EC2/Caddy 설정
+ops/beopdong/      # 법동 운영·스테이징 App·MySQL 추가 설정
 ```
 
 ```bash
@@ -37,7 +37,7 @@ docker build -f apps/gujeuk-api/Dockerfile -t gujeuk-check-in-server:local .
 
 법동 로컬 실행은 저장소 밖 `~/env/법동_local.env`를 사용합니다. 연결 대상은 `BeopDong`이고 기본 설정에서 스키마를 자동 변경하지 않습니다. 자세한 실행·테스트 방법은 [법동 모듈 안내](apps/beopdong-api/README.md)를 참고합니다.
 
-기존 구즉 CI/CD는 새 모듈 경로에서 구즉만 패키징·배포합니다. 법동 전용 경로만 변경한 push는 구즉 배포를 실행하지 않습니다. 법동 CI는 빌드만 수행하며 서버 배포는 없습니다. 실제 운영 서버·DB 설정은 이번 초기 구성으로 변경하지 않습니다.
+기존 구즉 CI/CD는 새 모듈 경로에서 구즉만 패키징·배포합니다. 법동 전용 경로만 변경한 push는 구즉 배포를 실행하지 않습니다. 법동도 develop/main push에서 각각 스테이징/운영 App·MySQL을 배포하도록 설정했습니다. 각 환경의 기존 구즉 Compose에 합치고 Redis를 공유하며, 최초 서버 env·메모리 확보는 별도로 필요합니다. 실제 운영 서버·DB 설정은 이번 초기 구성으로 변경하지 않습니다.
 
 ## 운영 문서
 
