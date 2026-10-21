@@ -1,0 +1,294 @@
+name: Beopdong CI/CD
+
+on:
+  push:
+    branches: ["main", "develop"]
+    paths:
+      - "apps/beopdong-api/**"
+      - "shared/**"
+      - "ops/beopdong/**"
+      - "build.gradle"
+      - "settings.gradle"
+      - "gradle/**"
+      - "gradlew"
+      - ".github/workflows/beopdong-ci-cd.yml"
+      - ".dockerignore"
+  pull_request:
+    branches: ["main", "develop"]
+    paths:
+      - "apps/beopdong-api/**"
+      - "shared/**"
+      - "ops/beopdong/**"
+      - "build.gradle"
+      - "settings.gradle"
+      - "gradle/**"
+      - "gradlew"
+      - ".github/workflows/beopdong-ci-cd.yml"
+      - ".dockerignore"
+  # 수동 실행은 검증만 수행합니다. 배포는 develop/main push에서만 실행합니다.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: beopdong-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+          cache: gradle
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Compile source for PR verification
+        if: github.event_name == 'pull_request'
+        run: ./gradlew :apps:beopdong-api:compileJava
+
+      - name: Build bootJar for deployment flows
+        if: github.event_name != 'pull_request'
+        run: ./gradlew :apps:beopdong-api:bootJar -x test
+
+      - name: Upload bootJar artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: beopdong-bootjar-${{ github.sha }}
+          path: apps/beopdong-api/build/libs/beopdong-api.jar
+          retention-days: 3
+
+  package-image:
+    name: Package Deployment Image
+    needs: verify
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    outputs:
+      image_ref: ${{ steps.meta.outputs.image_ref }}
+      deploy_target: ${{ steps.meta.outputs.deploy_target }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download bootJar artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: beopdong-bootjar-${{ github.sha }}
+          path: apps/beopdong-api/build/libs
+
+      - name: Set deployment metadata
+        id: meta
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            DEPLOY_TARGET="prod"
+          else
+            DEPLOY_TARGET="stag"
+          fi
+          IMAGE_REF="ghcr.io/gujeuk-check-in/beopdong-api:${DEPLOY_TARGET}-${GITHUB_SHA}"
+
+          echo "deploy_target=${DEPLOY_TARGET}" >> "$GITHUB_OUTPUT"
+          echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build deployment image
+        run: docker build --label "org.opencontainers.image.source=https://github.com/${GITHUB_REPOSITORY}" -f apps/beopdong-api/Dockerfile -t "${{ steps.meta.outputs.image_ref }}" .
+
+      - name: Push deployment image
+        run: docker push "${{ steps.meta.outputs.image_ref }}"
+
+  deploy:
+    name: Deploy to AWS EC2
+    needs: [verify, package-image]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # 구즉 stag 배포와 같은 EC2에서 동시에 기동하지 않도록 공통 그룹을 사용합니다.
+    concurrency:
+      group: gujeuk-aws-deploy-${{ needs.package-image.outputs.deploy_target }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set deployment target
+        id: target
+        run: |
+          set -euo pipefail
+
+          DEPLOY_TARGET="${{ needs.package-image.outputs.deploy_target }}"
+          echo "remote_dir=/home/ubuntu/gujeuk-aws/${DEPLOY_TARGET}" >> "$GITHUB_OUTPUT"
+          if [ "$DEPLOY_TARGET" = "prod" ]; then
+            echo "local_port=8083" >> "$GITHUB_OUTPUT"
+          else
+            echo "local_port=8082" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Copy docker-compose file to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "ops/gujeuk/docker-compose.aws.yml,ops/beopdong/docker-compose.aws.yml"
+          target: "/tmp/beopdong-deploy-${{ needs.package-image.outputs.deploy_target }}"
+          strip_components: 1
+
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          IMAGE_REF: ${{ needs.package-image.outputs.image_ref }}
+          REMOTE_DIR: ${{ steps.target.outputs.remote_dir }}
+          LOCAL_PORT: ${{ steps.target.outputs.local_port }}
+          DEPLOY_TARGET: ${{ needs.package-image.outputs.deploy_target }}
+          GHCR_ACTOR: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: IMAGE_REF,REMOTE_DIR,LOCAL_PORT,DEPLOY_TARGET,GHCR_ACTOR,GHCR_TOKEN
+          command_timeout: 14m
+          script_stop: true
+          script: |
+            set -euo pipefail
+            umask 077
+
+            # 두 기관 및 prod/stag의 기동이 같은 EC2 자원을 동시에 소모하지 않도록 직렬화합니다.
+            mkdir -p "$REMOTE_DIR"
+            exec 9>/home/ubuntu/gujeuk-aws/.deploy.lock
+            flock -w 300 9
+            cd "$REMOTE_DIR"
+            test -f .env
+            test -f .env.beopdong || { echo '.env.beopdong을 먼저 준비하세요.'; exit 1; }
+            test "$(stat -c '%a' .env.beopdong)" = "600"
+            if grep -q 'change-me-' .env.beopdong; then
+              echo '법동 예시 비밀번호를 실제 값으로 변경하세요.'
+              exit 1
+            fi
+            cp "/tmp/beopdong-deploy-${DEPLOY_TARGET}/gujeuk/docker-compose.aws.yml" docker-compose.yml
+            cp "/tmp/beopdong-deploy-${DEPLOY_TARGET}/beopdong/docker-compose.aws.yml" docker-compose.beopdong.yml
+            rm -rf "/tmp/beopdong-deploy-${DEPLOY_TARGET}"
+
+            export BEOPDONG_APP_IMAGE="$IMAGE_REF"
+            export DD_ENV="$DEPLOY_TARGET"
+            export COMPOSE_PROJECT_NAME="gujeuk-aws-${DEPLOY_TARGET}"
+            export COMPOSE_FILE="docker-compose.yml:docker-compose.beopdong.yml"
+            APP="beopdong-app-${DEPLOY_TARGET}"
+            DB="beopdong-mysql-${DEPLOY_TARGET}"
+            REDIS="gujeuk-redis-${DEPLOY_TARGET}"
+            docker compose --env-file .env --env-file .env.beopdong config --quiet
+            docker compose --env-file .env --env-file .env.beopdong config --format json | python3 -c '
+            import json, os, sys
+            c = json.load(sys.stdin)
+            target = os.environ["DEPLOY_TARGET"]
+            app, mysql = c["services"]["beopdong-app"], c["services"]["beopdong-mysql"]
+            valid = (
+                set(c["services"]) == {"app", "mysql", "redis", "beopdong-app", "beopdong-mysql"}
+                and app["container_name"] == "beopdong-app-" + target
+                and mysql["container_name"] == "beopdong-mysql-" + target
+                and c["services"]["redis"]["container_name"] == "gujeuk-redis-" + target
+                and c["volumes"]["mysql_data"]["name"] == "gujeuk-aws-" + target + "-mysql-data"
+                and c["volumes"]["redis_data"]["name"] == "gujeuk-aws-" + target + "-redis-data"
+                and c["volumes"]["beopdong_mysql_data"]["name"] == "beopdong-" + target + "-mysql-data"
+                and str(app["ports"][0]["published"]) == os.environ["LOCAL_PORT"]
+                and mysql["environment"]["MYSQL_DATABASE"] == "beopdong_" + target
+                and app["environment"]["DB_URL"].startswith("jdbc:mysql://beopdong-mysql:3306/beopdong_" + target + "?")
+                and app["environment"]["REDIS_HOST"] == "redis"
+                and str(app["environment"]["REDIS_DATABASE"]) == "1"
+            )
+            if not valid:
+                sys.exit("Compose의 기관·환경·DB·Redis 설정을 확인하세요.")
+            '
+            # 기존 구즉 Redis를 그대로 사용하며 새 Redis는 생성하지 않습니다.
+            test "$(docker inspect -f '{{.State.Running}}' "$REDIS")" = "true"
+            test "$(docker inspect -f '{{index .Config.Labels "com.docker.compose.project"}}' "$REDIS")" = "$COMPOSE_PROJECT_NAME"
+            test "$(docker exec "$REDIS" redis-cli -n 1 ping)" = "PONG"
+            for CONTAINER in "$APP" "$DB"; do
+              if docker container inspect "$CONTAINER" >/dev/null 2>&1; then
+                test "$(docker inspect -f '{{index .Config.Labels "com.docker.compose.project"}}' "$CONTAINER")" = "$COMPOSE_PROJECT_NAME"
+              fi
+            done
+            VOLUME="beopdong-${DEPLOY_TARGET}-mysql-data"
+            if docker volume inspect "$VOLUME" >/dev/null 2>&1; then
+              test "$(docker volume inspect -f '{{index .Labels "com.docker.compose.project"}}' "$VOLUME")" = "$COMPOSE_PROJECT_NAME"
+            fi
+
+            REQUIRED_MIB=256
+            if [ "$(docker inspect -f '{{.State.Running}}' "$APP" 2>/dev/null || true)" != "true" ]; then
+              REQUIRED_MIB=$((REQUIRED_MIB + 512))
+              test -z "$(ss -H -ltn "sport = :${LOCAL_PORT}")"
+            fi
+            if [ "$(docker inspect -f '{{.State.Running}}' "$DB" 2>/dev/null || true)" != "true" ]; then
+              REQUIRED_MIB=$((REQUIRED_MIB + 768))
+            fi
+            AVAILABLE_MIB=$(awk '/^MemAvailable:/ {printf "%.0f", $2 / 1024}' /proc/meminfo)
+            if [ "$AVAILABLE_MIB" -lt "$REQUIRED_MIB" ]; then
+              echo "가용 RAM ${AVAILABLE_MIB}MiB가 배포 기준 ${REQUIRED_MIB}MiB보다 부족합니다."
+              exit 1
+            fi
+            AVAILABLE_KIB=$(df -Pk . | awk 'END {print $4}')
+            test "$AVAILABLE_KIB" -ge 2097152
+
+            export DOCKER_CONFIG="$(mktemp -d)"
+            trap 'rm -rf "$DOCKER_CONFIG"' EXIT
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
+            docker compose --env-file .env --env-file .env.beopdong pull beopdong-app
+            docker compose --env-file .env --env-file .env.beopdong up -d --no-deps --no-recreate beopdong-mysql
+            for i in $(seq 1 60); do
+              if [ "$(docker inspect -f '{{.State.Health.Status}}' "$DB")" = "healthy" ]; then
+                break
+              fi
+              if [ "$i" = "60" ]; then
+                echo '법동 MySQL startup check FAILED'
+                exit 1
+              fi
+              sleep 3
+            done
+            docker compose --env-file .env --env-file .env.beopdong exec -T beopdong-mysql sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" exec mysql --protocol=TCP -h 127.0.0.1 -u"$MYSQL_USER" "$MYSQL_DATABASE" -Nse "SELECT 1"' >/dev/null
+            docker compose --env-file .env --env-file .env.beopdong up -d --no-deps beopdong-app
+            for i in $(seq 1 40); do
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 3 "http://localhost:${LOCAL_PORT}/" || true)
+              RUNNING=$(docker inspect -f '{{.State.Running}}' "$APP")
+              APP_LOG=$(docker compose --env-file .env --env-file .env.beopdong logs --no-color --tail 300 beopdong-app 2>&1)
+              if [ "$RUNNING" = "true" ] && { [ "$STATUS" = "404" ] || [ "$STATUS" = "200" ]; } &&
+                grep -q 'HikariPool-1 - Start completed' <<< "$APP_LOG" &&
+                grep -q 'Started BeopdongApplication' <<< "$APP_LOG"; then
+                # 앱 네트워크에서 공유 Redis까지 실제 TCP/Redis 응답을 확인합니다.
+                docker compose --env-file .env --env-file .env.beopdong exec -T beopdong-app timeout 5 bash -c '
+                  exec 3<>/dev/tcp/${REDIS_HOST}/${REDIS_PORT}
+                  printf "PING\r\n" >&3
+                  IFS= read -r RESPONSE <&3
+                  [[ "$RESPONSE" == +PONG* ]]
+                '
+                echo "local startup check OK (${i}번째 시도)"
+                exit 0
+              fi
+              if [ "$i" = "40" ]; then
+                echo 'local startup check FAILED'
+                exit 1
+              fi
+              sleep 3
+            done

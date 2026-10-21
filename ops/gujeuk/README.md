@@ -1,4 +1,6 @@
-# AWS EC2 Docker Deployment
+# Gujeuk AWS EC2 Docker Deployment
+
+현재 자동 배포는 `.github/workflows/gujeuk-ci-cd.yml`을 사용합니다. 아래 문서는 최초 EC2 설치/수동 기동 절차의 이력이며, 법동을 포함한 현재 운영·스테이징 구조는 `../beopdong/README.md`를 우선 확인합니다.
 
 Target:
 
@@ -29,7 +31,7 @@ Recommended first instance:
 Copy and run:
 
 ```bash
-bash ops/aws/bootstrap-ec2.sh
+bash ops/gujeuk/bootstrap-ec2.sh
 ```
 
 Reconnect after the script finishes:
@@ -48,12 +50,12 @@ mkdir -p ~/gujeuk-aws/prod ~/gujeuk-aws/stag
 Copy:
 
 ```text
-ops/aws/docker-compose.aws.yml -> ~/gujeuk-aws/prod/docker-compose.yml
-ops/aws/docker-compose.aws.yml -> ~/gujeuk-aws/stag/docker-compose.yml
-ops/aws/prod.env.example       -> ~/gujeuk-aws/prod/.env
-ops/aws/stag.env.example       -> ~/gujeuk-aws/stag/.env
-ops/aws/docker-compose.proxy.yml -> ~/gujeuk-aws/proxy/docker-compose.yml
-ops/aws/Caddyfile                -> ~/gujeuk-aws/proxy/Caddyfile
+ops/gujeuk/docker-compose.aws.yml -> ~/gujeuk-aws/prod/docker-compose.yml
+ops/gujeuk/docker-compose.aws.yml -> ~/gujeuk-aws/stag/docker-compose.yml
+ops/gujeuk/prod.env.example       -> ~/gujeuk-aws/prod/.env
+ops/gujeuk/stag.env.example       -> ~/gujeuk-aws/stag/.env
+ops/gujeuk/docker-compose.proxy.yml -> ~/gujeuk-aws/proxy/docker-compose.yml
+ops/gujeuk/Caddyfile                -> ~/gujeuk-aws/proxy/Caddyfile
 ```
 
 Edit `.env` files and replace every `change-me-*` value.

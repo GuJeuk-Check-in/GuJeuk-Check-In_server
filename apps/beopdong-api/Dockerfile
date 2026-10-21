@@ -2,7 +2,8 @@ FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-COPY apps/beopdong-api/build/libs/beopdong-api.jar app.jar
+ARG JAR_FILE=apps/beopdong-api/build/libs/beopdong-api.jar
+COPY ${JAR_FILE} app.jar
 
 ENV JAVA_OPTS=""
 

@@ -6,11 +6,11 @@ on:
     paths-ignore:
       - "apps/beopdong-api/**"
       - "ops/beopdong/**"
-      - ".github/workflows/beopdong-ci.yml"
+      - ".github/workflows/beopdong-ci-cd.yml"
       - "docs/**"
       - "**/*.md"
       # 앱 배포와 무관한 경로. 여기만 바뀐 푸시는 앱을 재빌드·재배포하지 않는다.
-      # ops/aws 는 배포 job 이 docker-compose.aws.yml 을 EC2 로 복사하므로 제외하지 않는다.
+      # ops/gujeuk 는 배포 job 이 docker-compose.aws.yml 을 EC2 로 복사하므로 제외하지 않는다.
       - "monitor-bot/**"
       - "ops/monitoring/**"
       - ".github/ISSUE_TEMPLATE/**"
@@ -144,7 +144,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "ops/aws/docker-compose.aws.yml"
+          source: "ops/gujeuk/docker-compose.aws.yml"
           target: "/tmp/gujeuk-deploy-${{ needs.package-image.outputs.deploy_target }}"
           strip_components: 2
 
@@ -162,11 +162,14 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: IMAGE_REF,REMOTE_DIR,LOCAL_PORT,DEPLOY_TARGET,GHCR_ACTOR,GHCR_TOKEN
+          command_timeout: 14m
           script_stop: true
           script: |
             set -euo pipefail
 
             mkdir -p "$REMOTE_DIR"
+            exec 9>/home/ubuntu/gujeuk-aws/.deploy.lock
+            flock -w 300 9
             cp "/tmp/gujeuk-deploy-${DEPLOY_TARGET}/docker-compose.aws.yml" "$REMOTE_DIR/docker-compose.yml"
             rm -rf "/tmp/gujeuk-deploy-${DEPLOY_TARGET}"
 
@@ -178,8 +181,9 @@ jobs:
             export APP_IMAGE="$IMAGE_REF"
             export DD_ENV="$DEPLOY_TARGET"
             export COMPOSE_PROJECT_NAME="gujeuk-aws-${DEPLOY_TARGET}"
+            export COMPOSE_FILE="docker-compose.yml"
             docker compose --env-file .env pull app
-            docker compose --env-file .env up -d
+            docker compose --env-file .env up -d app
 
             # Flyway 마이그레이션과 JPA 초기화까지 포함해 기동에 70~80초가 걸린다.
             # 기존 30초(10회x3s)로는 앱이 정상인데도 실패로 판정됐다. 120초까지 기다린다.
