@@ -6,6 +6,8 @@ HELP.md
 !.env.example
 !.env.stag.example
 !*.env.example
+# 법동 로컬 환경변수의 공개 양식만 추적합니다. 실제 값은 ~/env/에 둡니다.
+!apps/beopdong-api/.env.local.example
 
 # DB 덤프/백업은 개인정보와 자격증명을 포함하므로 절대 커밋하지 않는다.
 backups/
