@@ -1,0 +1,77 @@
+package com.example.burserker.gujeuk.domain.log.service;
+
+import com.example.burserker.gujeuk.domain.log.domain.Log;
+import com.example.burserker.gujeuk.domain.log.domain.repository.LogRepository;
+import com.example.burserker.gujeuk.domain.log.facade.LogFacade;
+import com.example.burserker.gujeuk.domain.log.exception.InvalidLogDateException;
+import com.example.burserker.gujeuk.domain.log.presentation.dto.request.LogRequest;
+import com.example.burserker.gujeuk.domain.organ.domain.Organ;
+import com.example.burserker.gujeuk.domain.organ.facade.OrganFacade;
+import com.example.burserker.gujeuk.domain.purpose.domain.Purpose;
+import com.example.burserker.gujeuk.domain.purpose.facade.PurposeFacade;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class CreateLogService {
+
+    private final LogRepository logRepository;
+    private final LogFacade logFacade;
+    private final PurposeFacade purposeFacade;
+    private final OrganFacade organFacade;
+
+    @Transactional
+    public void execute(Long organId, LogRequest request) {
+        String name = request.name().trim();
+        String purposeName = request.purpose().trim();
+        String visitDate = request.visitDate();
+        String visitTime = request.visitTime();
+        int year = extractYear(visitDate);
+        Purpose purpose = purposeFacade.getPurpose(organId, purposeName);
+
+        logFacade.validateNotDuplicated(
+                organId, name, request.age(), purpose.getPurposeName(), visitDate, visitTime, null);
+
+        logRepository.save(createUseLog(
+                request, name, purpose, visitDate, visitTime, year, organFacade.getOrganReference(organId)));
+    }
+
+    private Log createUseLog(
+            LogRequest request,
+            String name,
+            Purpose purpose,
+            String date,
+            String time,
+            int year,
+            Organ organ
+    ) {
+        return Log.builder()
+                .name(name)
+                .age(request.age())
+                .phone(request.phone())
+                .maleCount(request.maleCount())
+                .femaleCount(request.femaleCount())
+                .purpose(purpose.getPurposeName())
+                .visitTime(time)
+                .visitDate(date)
+                .year(year)
+                .privacyAgreed(request.privacyAgreed())
+                .organ(organ)
+                .build();
+    }
+
+    private int extractYear(String visitDate) {
+        if (visitDate == null || visitDate.length() < 4) {
+            throw InvalidLogDateException.EXCEPTION;
+        }
+
+        try {
+            return Integer.parseInt(visitDate.substring(0, 4));
+        } catch (NumberFormatException e) {
+            throw InvalidLogDateException.EXCEPTION;
+        }
+    }
+}

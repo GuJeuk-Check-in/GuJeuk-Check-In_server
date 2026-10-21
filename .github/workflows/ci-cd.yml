@@ -4,6 +4,9 @@ on:
   push:
     branches: ["main", "develop"]
     paths-ignore:
+      - "apps/beopdong-api/**"
+      - "ops/beopdong/**"
+      - ".github/workflows/beopdong-ci.yml"
       - "docs/**"
       - "**/*.md"
       # 앱 배포와 무관한 경로. 여기만 바뀐 푸시는 앱을 재빌드·재배포하지 않는다.
@@ -44,18 +47,18 @@ jobs:
 
       - name: Compile source for PR verification
         if: github.event_name == 'pull_request'
-        run: ./gradlew compileJava
+        run: ./gradlew :apps:gujeuk-api:compileJava
 
       - name: Build bootJar for deployment flows
         if: github.event_name != 'pull_request'
-        run: ./gradlew bootJar -x test
+        run: ./gradlew :apps:gujeuk-api:bootJar -x test
 
       - name: Upload bootJar artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: gujeuk-bootjar-${{ github.sha }}
-          path: build/libs/*.jar
+          path: apps/gujeuk-api/build/libs/gujeuk-api.jar
           retention-days: 3
 
   package-image:
@@ -75,7 +78,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: gujeuk-bootjar-${{ github.sha }}
-          path: build/libs
+          path: apps/gujeuk-api/build/libs
 
       - name: Set deployment metadata
         id: meta
@@ -101,7 +104,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build deployment image
-        run: docker build -t "${{ steps.meta.outputs.image_ref }}" .
+        run: docker build -f apps/gujeuk-api/Dockerfile -t "${{ steps.meta.outputs.image_ref }}" .
 
       - name: Push deployment image
         run: docker push "${{ steps.meta.outputs.image_ref }}"

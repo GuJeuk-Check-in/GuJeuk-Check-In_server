@@ -1,0 +1,57 @@
+package com.example.burserker.gujeuk.domain.log.service;
+
+import com.example.burserker.gujeuk.domain.log.domain.repository.LogRepository;
+import com.example.burserker.gujeuk.domain.log.exception.InvalidLogDateException;
+import com.example.burserker.gujeuk.domain.log.presentation.dto.response.LogSliceWithTotalResponse;
+import com.example.burserker.gujeuk.domain.log.presentation.dto.response.QueryLogListResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+
+@Service
+@RequiredArgsConstructor
+public class QueryLogListByDateService {
+    private final LogRepository logRepository;
+
+    @Transactional(readOnly = true)
+    public LogSliceWithTotalResponse execute(Long organId, String yearMonth, Pageable p) {
+        Pageable pageable = PageRequest.of(
+                p.getPageNumber(),
+                p.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        String date = toYearMonthPrefix(yearMonth);
+
+        Slice<QueryLogListResponse> slice = logRepository.findAllByOrganIdAndVisitDateStartingWith(organId, date, pageable)
+                .map(QueryLogListResponse::from);
+
+        long total = logRepository.countByYearMonth(organId, date);
+
+        return LogSliceWithTotalResponse.of(total, slice);
+    }
+
+    private String toYearMonthPrefix(String yearMonth) {
+        if (!yearMonth.matches("\\d{4}-\\d{2}")) {
+            throw InvalidLogDateException.EXCEPTION;
+        }
+
+        String[] parts = yearMonth.split("-");
+        LocalDate now = LocalDate.now();
+
+        String year = parts[0];
+        String month = parts[1];
+
+        if (Integer.parseInt(month) > 12 || Integer.parseInt(month) < 1 || Integer.parseInt(year) > now.getYear()) {
+            throw InvalidLogDateException.EXCEPTION;
+        }
+
+        return year + "년" + month + "월";
+    }
+}

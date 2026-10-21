@@ -1,1 +1,3 @@
-rootProject.name = 'GuJeuck_server'
+rootProject.name = 'burserker-server'
+
+include 'apps:gujeuk-api', 'apps:beopdong-api', 'shared:common'

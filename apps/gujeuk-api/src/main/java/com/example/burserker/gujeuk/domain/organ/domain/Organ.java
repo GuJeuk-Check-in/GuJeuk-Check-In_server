@@ -1,0 +1,26 @@
+package com.example.burserker.gujeuk.domain.organ.domain;
+
+import com.example.burserker.gujeuk.global.entity.BaseIdEntity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@Builder
+@AllArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+public class Organ extends BaseIdEntity {
+
+    @Column(nullable = false, unique = true)
+    private String organName;
+
+    @Column(nullable = false, length = 300)
+    private String password;
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+}
