@@ -171,7 +171,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: IMAGE_REF,REMOTE_DIR,LOCAL_PORT,DEPLOY_TARGET,GHCR_ACTOR,GHCR_TOKEN
           command_timeout: 14m
-          script_stop: true
           script: |
             set -euo pipefail
             umask 077
