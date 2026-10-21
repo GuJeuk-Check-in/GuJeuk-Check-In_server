@@ -52,8 +52,8 @@ GuJeuk-Check-In Server는 시설 출입 관리를 위한 Spring Boot 백엔드�
 ./gradlew test
 
 # 특정 테스트 실행
-./gradlew test --tests "TestClassName"
-./gradlew test --tests "com.example.gujeuck_server.domain.user.service.LoginServiceTest"
+./gradlew :apps:gujeuk-api:test --tests "TestClassName"
+./gradlew :apps:gujeuk-api:test --tests "com.example.burserker.gujeuk.domain.user.service.LoginServiceTest"
 
 # QueryDSL Q-classes 생성 (컴파일 시 자동 생성됨)
 ./gradlew compileJava
@@ -88,7 +88,7 @@ TEST_URL=http://localhost:5173
 ### 도메인 주도 패키지 구조
 
 ```
-src/main/java/com/example/gujeuck_server/
+apps/gujeuk-api/src/main/java/com/example/burserker/gujeuk/
 ├── domain/
 │   ├── organ/          # 시설 운영자 계정, JWT 인증, Excel 내보내기
 │   ├── user/           # 사용자 등록, 프로필
@@ -124,7 +124,7 @@ src/main/java/com/example/gujeuck_server/
 
 ### QueryDSL
 
-Q-classes는 `src/main/generated/`에 생성됩니다. 커스텀 저장소 구현체는 복잡한 쿼리를 위해 QueryDSL을 사용합니다:
+Q-classes는 `apps/gujeuk-api/src/main/generated/`에 생성됩니다. 커스텀 저장소 구현체는 복잡한 쿼리를 위해 QueryDSL을 사용합니다:
 - `UserRepositoryCustom` / `UserRepositoryCustomImpl`
 - `LogRepositoryCustom` / `LogRepositoryCustomImpl`
 - `PurposeRepositoryCustom` / `PurposeRepositoryCustomImpl`
@@ -147,3 +147,21 @@ Q-classes는 `src/main/generated/`에 생성됩니다. 커스텀 저장소 구�
 - DTOs는 `presentation/dto/request/`와 `presentation/dto/response/`의 record 타입
 - 예외는 도메인별 기본 예외를 상속
 - BaseIdEntity는 `@MappedSuperclass`를 통해 공통 `@Id` 필드를 제공
+
+## 기관별 모듈 경계 (#135)
+
+- `apps/gujeuk-api`: 기존 구즉 앱. Java·SQL 내용은 유지하고 경로만 이동했습니다.
+- `apps/beopdong-api`: 법동 독립 실행 앱과 MySQL 연결 설정. 업무 API·JWT는 없고 Redis는 같은 환경의 기존 구즉 Redis DB 1을 공유합니다. 법동 스테이징 App·MySQL 배포는 구즉과 같은 `ops/beopdong/docker-compose.aws.yml`·`stag.env.example` 및 workflow 내부 SSH script 형식이며 실제 배포 여부는 별도로 확인합니다.
+- `shared/common`: 빈 공통 라이브러리. 기관별 앱을 의존하지 않으며 두 앱도 아직 연결하지 않았습니다.
+- 구즉 실행 클래스는 `apps/gujeuk-api/src/main/java/com/example/burserker/GuJeuckServerApplication.java`입니다. 두 앱은 서로의 런타임 클래스패스를 공유하지 않습니다.
+- 구즉 빌드: `./gradlew :apps:gujeuk-api:bootJar`; 산출물: `apps/gujeuk-api/build/libs/gujeuk-api.jar`.
+- Docker 빌드: 저장소 루트에서 `docker build -f apps/gujeuk-api/Dockerfile -t gujeuk-check-in-server:local .`.
+- 법동 PR은 컴파일, 수동은 빌드, develop/main push는 각각 스테이징/운영 이미지 게시와 배포를 수행합니다. 기관별 Compose 파일을 합쳐 기존 gujeuk-aws-prod/stag 프로젝트에 법동 App·MySQL만 추가합니다. 구즉 배포 대상·포트·볼륨은 유지합니다.
+
+### 법동 로컬 DB 검증
+
+- 개인 local env는 저장소 밖 `~/env/법동_local.env`이며 내용과 실제 자격증명을 출력·커밋하지 않습니다. 공개 양식은 `apps/beopdong-api/.env.local.example`입니다.
+- 대상은 로컬 `BeopDong` 스키마입니다. `ddl-auto: none`을 유지하며 구즉 마이그레이션을 연결하지 않습니다.
+- `BEOPDONG_LOCAL_DB_TEST=true`와 법동 local env를 함께 제공할 때만 실제 DB 테스트 2개를 실행합니다. 일반 CI는 이 테스트를 건너뜁니다.
+- Docker Desktop에서 호스트 MySQL을 테스트할 때만 DB_URL 호스트를 `host.docker.internal`로 덮어씁니다. IDE env의 localhost 값을 바꾸지 않습니다.
+- 법동 배포 범위는 운영·스테이징 각각 App·MySQL 2개이며 Redis는 각 환경의 구즉과 공유합니다. 최초 머지 전 서버 비공개 env와 여유 RAM을 준비합니다. Caddy/Cloudflare와 법동 APM은 별도 작업입니다. `ops/beopdong/README.md`를 우선 확인합니다.

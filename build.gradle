@@ -1,76 +1,61 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.5.6'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'base'
+    id 'org.springframework.boot' version '3.5.6' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
 }
 
-group = 'com.example'
-version = '0.0.1-SNAPSHOT'
-description = 'GuJeuck_server'
+def javaModules = [project(':apps:gujeuk-api'), project(':apps:beopdong-api'), project(':shared:common')]
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+configure(javaModules) {
+    apply plugin: 'java'
+
+    group = 'com.example'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+// Keep root-level convenience commands while each module remains independently buildable.
+tasks.named('clean') {
+    dependsOn javaModules.collect { "${it.path}:clean" }
 }
 
-repositories {
-    mavenCentral()
+tasks.named('build') {
+    dependsOn javaModules.collect { "${it.path}:build" }
 }
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    // security
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-
-    // redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'javax.xml.bind:jaxb-api:2.3.0'
-
-    // s3
-    implementation "software.amazon.awssdk:s3:2.20.40"
-    implementation 'commons-fileupload:commons-fileupload:1.5'
-
-    // apache poi
-    implementation 'org.apache.poi:poi-ooxml:5.2.5'
-
-    // querydsl 추가
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-
-    // flyway
-    implementation 'org.flywaydb:flyway-core'
-    implementation "org.flywaydb:flyway-mysql"
+tasks.register('test') {
+    group = 'verification'
+    description = 'Runs tests in all Java modules.'
+    dependsOn javaModules.collect { "${it.path}:test" }
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+tasks.register('compileJava') {
+    group = 'build'
+    description = 'Compiles all Java modules.'
+    dependsOn javaModules.collect { "${it.path}:compileJava" }
 }
 
-// Querydsl 설정
-def generated = 'src/main/generated'
-
-tasks.withType(JavaCompile) {
-    options.getGeneratedSourceOutputDirectory().set(file(generated))
+tasks.register('bootJar') {
+    group = 'build'
+    description = 'Builds the existing Gujeuk executable JAR.'
+    dependsOn ':apps:gujeuk-api:bootJar'
 }
 
-clean {
-    delete file(generated)
+tasks.register('bootRun') {
+    group = 'application'
+    description = 'Runs the existing Gujeuk application.'
+    dependsOn ':apps:gujeuk-api:bootRun'
 }

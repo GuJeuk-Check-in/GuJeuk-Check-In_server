@@ -1,0 +1,14 @@
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+ARG JAR_FILE=apps/gujeuk-api/build/libs/gujeuk-api.jar
+COPY ${JAR_FILE} app.jar
+
+ADD https://dtdg.co/latest-java-tracer /app/dd-java-agent.jar
+
+ENV JAVA_OPTS=""
+
+EXPOSE 8080
+
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -javaagent:/app/dd-java-agent.jar -jar app.jar"]

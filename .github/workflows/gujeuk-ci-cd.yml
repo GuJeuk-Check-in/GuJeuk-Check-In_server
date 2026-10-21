@@ -1,0 +1,217 @@
+name: Gujeuk CI/CD
+
+on:
+  push:
+    branches: ["main", "develop"]
+    paths-ignore:
+      - "apps/beopdong-api/**"
+      - "ops/beopdong/**"
+      - ".github/workflows/beopdong-ci-cd.yml"
+      - "docs/**"
+      - "**/*.md"
+      # 앱 배포와 무관한 경로. 여기만 바뀐 푸시는 앱을 재빌드·재배포하지 않는다.
+      # ops/gujeuk 는 배포 job 이 docker-compose.aws.yml 을 EC2 로 복사하므로 제외하지 않는다.
+      - "monitor-bot/**"
+      - "ops/monitoring/**"
+      - ".github/ISSUE_TEMPLATE/**"
+  pull_request:
+    branches: ["main", "develop"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: gujeuk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+          cache: gradle
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Compile source for PR verification
+        if: github.event_name == 'pull_request'
+        run: ./gradlew :apps:gujeuk-api:compileJava
+
+      - name: Build bootJar for deployment flows
+        if: github.event_name != 'pull_request'
+        run: ./gradlew :apps:gujeuk-api:bootJar -x test
+
+      - name: Upload bootJar artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gujeuk-bootjar-${{ github.sha }}
+          path: apps/gujeuk-api/build/libs/gujeuk-api.jar
+          retention-days: 3
+
+  package-image:
+    name: Package Deployment Image
+    needs: verify
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    outputs:
+      image_ref: ${{ steps.meta.outputs.image_ref }}
+      deploy_target: ${{ steps.meta.outputs.deploy_target }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download bootJar artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: gujeuk-bootjar-${{ github.sha }}
+          path: apps/gujeuk-api/build/libs
+
+      - name: Set deployment metadata
+        id: meta
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            DEPLOY_TARGET="prod"
+            IMAGE_REF="ghcr.io/gujeuk-check-in/gujeuk-check-in-server:prod-${GITHUB_SHA}"
+          else
+            DEPLOY_TARGET="stag"
+            IMAGE_REF="ghcr.io/gujeuk-check-in/gujeuk-check-in-server:stag-${GITHUB_SHA}"
+          fi
+
+          echo "deploy_target=${DEPLOY_TARGET}" >> "$GITHUB_OUTPUT"
+          echo "image_ref=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build deployment image
+        run: docker build -f apps/gujeuk-api/Dockerfile -t "${{ steps.meta.outputs.image_ref }}" .
+
+      - name: Push deployment image
+        run: docker push "${{ steps.meta.outputs.image_ref }}"
+
+  deploy:
+    name: Deploy to AWS EC2
+    needs: [verify, package-image]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: gujeuk-aws-deploy-${{ needs.package-image.outputs.deploy_target }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set deployment target
+        id: target
+        run: |
+          set -euo pipefail
+
+          if [ "${{ needs.package-image.outputs.deploy_target }}" = "prod" ]; then
+            echo "remote_dir=/home/ubuntu/gujeuk-aws/prod" >> "$GITHUB_OUTPUT"
+            echo "local_port=8080" >> "$GITHUB_OUTPUT"
+            echo "public_health_url=https://aws-api.oijwef098234.com/purpose/all" >> "$GITHUB_OUTPUT"
+          else
+            echo "remote_dir=/home/ubuntu/gujeuk-aws/stag" >> "$GITHUB_OUTPUT"
+            echo "local_port=8081" >> "$GITHUB_OUTPUT"
+            echo "public_health_url=https://aws-stag.oijwef098234.com/purpose/all" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Copy docker-compose file to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "ops/gujeuk/docker-compose.aws.yml"
+          target: "/tmp/gujeuk-deploy-${{ needs.package-image.outputs.deploy_target }}"
+          strip_components: 2
+
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          IMAGE_REF: ${{ needs.package-image.outputs.image_ref }}
+          REMOTE_DIR: ${{ steps.target.outputs.remote_dir }}
+          LOCAL_PORT: ${{ steps.target.outputs.local_port }}
+          DEPLOY_TARGET: ${{ needs.package-image.outputs.deploy_target }}
+          GHCR_ACTOR: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: IMAGE_REF,REMOTE_DIR,LOCAL_PORT,DEPLOY_TARGET,GHCR_ACTOR,GHCR_TOKEN
+          command_timeout: 14m
+          script_stop: true
+          script: |
+            set -euo pipefail
+
+            mkdir -p "$REMOTE_DIR"
+            exec 9>/home/ubuntu/gujeuk-aws/.deploy.lock
+            flock -w 300 9
+            cp "/tmp/gujeuk-deploy-${DEPLOY_TARGET}/docker-compose.aws.yml" "$REMOTE_DIR/docker-compose.yml"
+            rm -rf "/tmp/gujeuk-deploy-${DEPLOY_TARGET}"
+
+            cd "$REMOTE_DIR"
+            test -f .env
+
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_ACTOR" --password-stdin
+
+            export APP_IMAGE="$IMAGE_REF"
+            export DD_ENV="$DEPLOY_TARGET"
+            export COMPOSE_PROJECT_NAME="gujeuk-aws-${DEPLOY_TARGET}"
+            export COMPOSE_FILE="docker-compose.yml"
+            docker compose --env-file .env pull app
+            docker compose --env-file .env up -d app
+
+            # Flyway 마이그레이션과 JPA 초기화까지 포함해 기동에 70~80초가 걸린다.
+            # 기존 30초(10회x3s)로는 앱이 정상인데도 실패로 판정됐다. 120초까지 기다린다.
+            for i in $(seq 1 40); do
+              if curl -fs "http://localhost:${LOCAL_PORT}/purpose/all" >/dev/null; then
+                echo "local health check OK (${i}번째 시도, 약 $((i * 3))초)"
+                break
+              fi
+              if [ "$i" = "40" ]; then
+                echo "local health check FAILED (120초 대기 후에도 응답 없음)"
+                docker compose --env-file .env logs --tail 50 app || true
+                exit 1
+              fi
+              sleep 3
+            done
+
+            docker image prune -f
+
+      - name: Public health check
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 40); do
+            STATUS=$(curl -fs -o /dev/null -w "%{http_code}" "${{ steps.target.outputs.public_health_url }}" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "public health check OK (${i}번째 시도, 약 $((i * 3))초)"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "public health check FAILED (120초 대기 후 마지막 상태: $STATUS)"
+          exit 1

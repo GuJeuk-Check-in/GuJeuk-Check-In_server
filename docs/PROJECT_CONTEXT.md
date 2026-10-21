@@ -1,5 +1,65 @@
 # GuJeuk 프로젝트 현재 상황
 
+## 2026-10-21 #135 최종 환경별 Compose와 Redis 공유 (로컬 구성·미배포)
+
+- 최종 요구는 기존 gujeuk-aws-prod/stag 프로젝트에 각각 app/mysql/redis + beopdong-app/beopdong-mysql 다섯 서비스를 두는 것입니다. 기관별 ops 폴더는 유지하고 법동 파일을 기존 구즉 Compose에 합칩니다. 이전 독립 beopdong 프로젝트 및 스테이징만 배포한다는 설명은 더 이상 적용하지 않습니다.
+- 법동 workflow는 develop→stag(8082), main→prod(8083)에 배포합니다. 서버 디렉터리는 기존 `/home/ubuntu/gujeuk-aws/{stag,prod}`를 사용합니다. 기존 .env와 별도로 .env.beopdong을 준비하며 법동 변수는 BEOPDONG_ 접두어를 사용합니다. 법동 MySQL은 기관·환경별 전용 볼륨을 사용하고 구즉의 기존 세 서비스와 볼륨 설정은 보존합니다.
+- Redis는 환경별 기존 구즉 컨테이너를 공유합니다. 구즉 LettuceConnectionFactory는 기존 DB 0을 유지하고 법동은 Spring Data Redis 설정으로 DB 1을 사용합니다. 논리 DB는 보안·자원·장애 격리가 아니며 FLUSHALL을 사용하지 않습니다. 법동 Redis 업무 기능은 아직 없습니다.
+- 법동 배포는 서비스 이름을 지정해 두 서비스만 관리하고 기존 법동 MySQL은 --no-recreate로 유지합니다. 구즉 배포도 app과 기존 의존 서비스만 관리하며 법동 서비스는 건드리지 않습니다. 전체 down/--remove-orphans/볼륨 삭제는 자동 배포에 넣지 않습니다. 같은 호스트의 prod/stag 기동은 공용 flock으로 직렬화합니다.
+- 첫 법동 환경 기동은 가용 RAM 1536MiB 및 디스크 2GiB 기준입니다. 기존 약 4GiB EC2에 두 환경 추가 시 부족 가능성이 크므로 실제 자원 확인·증설을 먼저 진행해야 합니다. swap을 RAM으로 계산하지 않습니다. 실제 서버 SSH 조회는 시간 초과, AWS CLI 로그인은 만료되어 현 상태는 미확인입니다.
+- 검증: Java 17 `./gradlew --offline --no-daemon clean build` 통과(일반 실행에서 DB/Redis 외부 연결 테스트는 opt-in으로 건너뜀). 운영/스테이징 merged config가 각각 5개 서비스이며 기존 구즉 세 서비스와 볼륨의 렌더링 결과가 동일함을 확인했습니다.
+- 임시 컨테이너로 두 환경 각각 5개 서비스를 기동했습니다. 이 인프라 검증의 구즉 App은 경량 stand-in이며 구즉 업무 API 검증은 아닙니다. 법동 추가 전후 기존 구즉 서비스 ID와 Redis DB 0 테스트 키 유지, 법동 전용 MySQL SELECT·Hikari/Spring 기동·HTTP 404·앱→Redis PING·법동 MySQL 재생성 방지를 확인했습니다. 임시 자원만 정리했습니다.
+- 실제 법동 Spring RedisConnectionFactory의 PING 및 동일 키 DB 0/1 분리 테스트 2개를 통과했습니다. UUID 테스트 키만 사용하고 제거했습니다. 추출한 실제 SSH script에 대해 두 환경 배포 대상, env 누락, 자원 부족, 포트·볼륨 오설정, Redis 없음, 이미지 다운로드 실패, DB/앱/Redis 연결 실패를 검증하는 격리 테스트 7개를 통과했습니다.
+- 기존 ops/monitoring의 Prometheus/Grafana 설정 삭제도 별도 정리 대상입니다. 저장소 파일 삭제가 EC2의 기존 모니터링 컨테이너를 중지하는 작업은 아닙니다. Datadog 전환 이력과 분리해 해석합니다.
+- 실제 서버 배포·도메인·Caddy 변경·푸시·머지는 하지 않습니다. Caddy/Cloudflare 및 법동 APM은 별도 작업입니다. 아래 과거 설명보다 이 절과 ops/beopdong/README.md를 우선합니다.
+
+## 2026-10-21 #135 구즉 ops 디렉터리명 명시
+
+- 기존 AWS 배포 디렉터리를 `ops/gujeuk/`으로 이동했습니다. 구즉 workflow의 SCP source와 관련 실행 안내·문서 경로를 함께 갱신했습니다. 기존 Caddy·EC2 초기화 설정도 이 폴더 안에 함께 유지합니다.
+- 저장소 안의 경로만 변경했습니다. EC2의 `/home/ubuntu/gujeuk-aws/{prod,stag,proxy}` 경로, 컨테이너·네트워크·DB 볼륨 이름, 포트와 배포 명령은 그대로입니다. 서버 적용·푸시·머지는 하지 않았습니다.
+
+## 2026-10-21 #135 기관별 workflow 파일명 명시
+
+- 구즉은 `.github/workflows/gujeuk-ci-cd.yml`, 법동은 `.github/workflows/beopdong-ci-cd.yml`로 이름을 통일했습니다. 법동 workflow 자체 경로 필터와 구즉의 법동 workflow 제외 경로, 관련 문서를 함께 수정했습니다. job·명령·배포 조건은 변경하지 않았으며 푸시·배포는 하지 않았습니다.
+
+## 2026-10-21 #135 법동 배포 형식을 구즉과 통일 (미푸시·EC2 미적용)
+
+- 법동도 `ops/beopdong/docker-compose.aws.yml`, `stag.env.example`을 사용하고 서버에서는 `docker-compose.yml`로 복사합니다. 서비스명은 구즉과 같은 app/mysql, 변수는 APP_IMAGE·APP_CONTAINER_NAME·APP_PORT·DD_ENV·MYSQL_*·DB_URL·JAVA_OPTS로 통일했습니다. 이전 초안의 BEOPDONG_* 변수와 docker-compose.stag.yml은 더 이상 사용하지 않습니다.
+- 구즉 workflow의 verify → package-image → deploy job 및 step 이름·artifact 전달·SCP·SSH script 구조를 따릅니다. 별도 deploy-stag.sh와 그 전용 Python 테스트는 제거했습니다. PR은 법동 컴파일, main/수동은 JAR 빌드, develop push만 이미지 게시·EC2 배포를 수행합니다.
+- Dockerfile은 구즉처럼 ARG JAR_FILE과 COPY를 사용합니다. 법동 미사용 Redis·JWT·CORS·Datadog Java tracer는 추가하지 않습니다. 업무 Java·DB 마이그레이션 내용은 변경하지 않습니다.
+- 법동 스테이징 컨테이너·프로젝트·DB·볼륨·8082 포트 값은 이전 초안에서 유지합니다. 구즉의 실제 Compose·workflow와 개인 env는 변경하지 않습니다. 메모리 상한, 최초 가용 RAM 1536MiB/디스크 2GiB 검사, 구즉 env 오복사 방지, 기존 MySQL --no-recreate를 유지합니다.
+- MySQL healthcheck는 구즉과 동일한 mysqladmin 방식이며, 배포 script에서 앱 계정 SELECT 1을 별도 확인합니다. 앱은 API가 없어 Hikari/Spring 기동 로그와 루트 HTTP 404/200을 검사합니다. 구즉 stag와 같은 Actions concurrency 그룹을 사용합니다. Caddy·Cloudflare·법동 APM 연결은 별도입니다.
+- 변경된 Dockerfile 이미지 빌드, Compose의 필수 env 11개 누락 시 실패, 서비스 app/mysql·메모리 상한·DB 포트 비공개·법동 볼륨을 검증했습니다. workflow에서 추출한 SSH script에 대한 격리 검사 7개(최초/재배포, 자원·포트·볼륨 오설정, env 누락, 이미지 pull 실패, DB 실패, 앱 실패)를 통과했습니다.
+- 임시 이름·포트·볼륨으로 실제 App·MySQL을 기동하여 mysql 호스트명 DB 연결·앱 계정 SELECT·Hikari/Spring 기동·HTTP 404·DB 컨테이너 ID 유지를 확인했습니다. 테스트 자원만 정리했습니다. 구즉 실제 파일과 개인 env에는 diff가 없습니다.
+- 실제 서버 배포·푸시·PR 생성은 하지 않았습니다. 아래의 이전 초안 파일명·전용 스크립트·테스트 설명보다 이 절과 `ops/beopdong/README.md`를 우선합니다.
+
+## 2026-10-21 #135 법동 스테이징 자동 배포 설정 (미푸시·EC2 미적용)
+
+- 법동 workflow를 CI/CD로 확장했습니다. 대상 경로의 develop push에서만 JAR 검증 → 별도 GHCR `beopdong-api:stag-<SHA>` 게시 → EC2 배포를 수행합니다. main·PR·workflow_dispatch는 검증만 하며 법동 운영 배포는 없습니다.
+- `ops/beopdong/docker-compose.stag.yml`은 독립 프로젝트 `beopdong-aws-stag`로 App·MySQL 2개만 정의합니다. 호스트 8082, DB `beopdong_stag`, 전용 볼륨 `beopdong-stag-mysql-data`, 서버 디렉터리 `/home/ubuntu/beopdong-aws/stag`입니다. 기존 구즉 Compose·볼륨·네트워크는 수정하지 않습니다.
+- 서버 .env를 최초 머지 전에 권한 600으로 준비해야 합니다. 값은 저장소에서 복사하지 않습니다. 기존 `EC2_HOST`·`EC2_USER`·`EC2_SSH_KEY`와 GHCR 패키지 생성/pull 권한이 필요합니다.
+- App 메모리 상한 512MiB/JVM heap 256MiB, MySQL 상한 768MiB입니다. 배포 전 새로 기동할 서비스의 상한 + 256MiB 가용 RAM 및 디스크 2GiB를 요구합니다. 첫 기동은 MemAvailable 1536MiB 기준이며 swap은 제외합니다. 기준은 보수적인 시작값이고 부하에 대한 안전 보장은 아닙니다. 서버의 현재 자원은 이번 작업에서 확인하지 않았습니다.
+- 배포는 법동 전용 서비스만 지정합니다. 기존 MySQL은 `--no-recreate`로 보존하고 App만 교체합니다. 구즉 stag deploy와 같은 Actions concurrency 그룹을 사용합니다. 수동 구즉 배포는 이 직렬화 대상이 아닙니다.
+- DB healthcheck는 앱 계정의 SELECT 1입니다. 업무 API/헬스체크가 없어 앱 검사에는 Hikari 풀·Spring 기동 로그와 루트 HTTP 404/200을 사용합니다. 이는 업무 readiness 또는 외부 HTTPS 확인이 아닙니다. 앱 단일 교체로 짧은 중단이 있을 수 있고 자동 롤백은 없습니다.
+- 현재 라벨은 법동 service/env를 식별하지만 Java tracer는 추가하지 않아 법동 APM 수집이 자동 연결되지는 않습니다. Caddy·Cloudflare도 자동 변경하지 않습니다. 법동 도메인의 중첩 서브도메인 인증서 범위를 확인한 뒤 기존 경로를 보존하며 별도로 연결합니다.
+- 가짜 Docker 기반 배포 안전 조건 테스트 7개를 통과했습니다. 실제 Compose 렌더링에서 서비스 2개·메모리 제한·DB 포트 비공개·필수 env 누락 시 실패를 검증했습니다. 임의 이름/임시 포트/전용 테스트 볼륨으로 App·MySQL을 기동하여 앱 계정 SELECT·Hikari 풀·HTTP 404를 확인했고, DB 재배포 시 동일 컨테이너 ID 유지도 확인했습니다. 검증 자원만 정리했습니다.
+- EC2 읽기 조회를 시도했으나 SSH 22번 포트 연결이 시간 초과되어 현재 RAM·디스크·env 존재 여부는 확인하지 못했습니다. 실제 서버 env 작성·컨테이너 기동·도메인 연결·푸시·PR 생성은 하지 않았습니다. 아래의 이전 빌드 전용 설명보다 이 절과 `ops/beopdong/README.md`를 우선합니다.
+
+## 2026-10-21 #135 모노레포와 법동 로컬 DB 구성 (로컬 검증, 미배포)
+
+- 루트 Gradle은 `apps:gujeuk-api`, `apps:beopdong-api`, `shared:common`을 관리합니다. Java 17·Spring Boot 3.5.6을 유지합니다.
+- 기존 구즉 코드를 `apps/gujeuk-api/src/`로 이동하고 사용자가 진행한 `com.example.burserker.gujeuk` 패키지 리팩터링을 유지합니다. 구즉 업무 로직·application.yml·마이그레이션 내용은 이번 모듈/DB 구성 작업에서 수정하지 않았습니다. QueryDSL 생성 파일은 컴파일 결과입니다.
+- 법동은 `BeopdongApplication`으로 독립 실행하며 JPA·MySQL 드라이버·DataSource 설정을 추가했습니다. 업무 API·헬스체크·엔티티·마이그레이션·Redis·JWT는 없습니다. 공통 모듈도 빈 상태이고 앱 간 의존성은 없습니다.
+- 실제 로컬 설정은 저장소 밖 `~/env/법동_local.env`에 권한 600으로 보관합니다. 구즉 로컬 MySQL 계정을 사용하되 대상 스키마만 `BeopDong`으로 분리합니다. 비밀값은 추적하지 않고 공개 양식만 커밋합니다.
+- 법동 IntelliJ 비공개 실행 설정 `Beopdong - Local DB`를 추가했습니다. `.idea`와 개인 env는 Git 제외 대상입니다. 로컬 포트는 8082이며 검증용 실행은 별도 임시 포트로 기동 후 종료했습니다.
+- 법동 `ddl-auto: none`으로 자동 DDL을 막습니다. 구즉 Flyway SQL은 법동 모듈의 클래스패스에 포함하지 않습니다. 로컬 MySQL의 lower_case_table_names=2에서 접속 DB 이름은 소문자로 반환되지만 SCHEMA_NAME은 `BeopDong`이며 테스트는 이를 고려합니다.
+- 법동 실제 앱 DataSource를 사용하는 로컬 연결/SELECT 테스트 2개를 통과했습니다. 이 테스트는 `BEOPDONG_LOCAL_DB_TEST=true`일 때만 실행되어 일반 CI에는 개인 DB가 필요하지 않습니다. env 없는 CI 방식에서는 테스트 2개 SKIPPED와 빌드 성공을 확인했습니다.
+- Java 17 전체 clean build, 법동 실행 JAR의 DB 풀 기동/HTTP 404, Docker 이미지 빌드 및 임시 컨테이너의 호스트 DB 연결/HTTP 404를 확인했습니다. Docker 검증에서만 호스트를 `host.docker.internal`로 덮어썼으며 개인 env는 localhost로 유지했습니다. BeopDong 테이블 수는 검증 전후 0개로 동일합니다.
+- 구즉 JAR은 `apps/gujeuk-api/build/libs/gujeuk-api.jar`, 법동 JAR은 `apps/beopdong-api/build/libs/beopdong-api.jar`입니다. 각 앱 Dockerfile은 모듈 안에 있으며 저장소 루트 컨텍스트에서 빌드합니다.
+- 기존 구즉 workflow의 Gradle·artifact·Dockerfile 경로를 새 구조에 맞췄습니다. 법동 전용 경로만 바뀌면 구즉 push 배포를 제외합니다. 법동 workflow는 빌드 검증 전용이며 자동 배포는 없습니다.
+- 목표는 실제 EC2 스테이징에 법동 App·전용 MySQL 2개만 추가하는 것입니다. 운영 법동과 법동 Redis는 만들지 않습니다. `ops/gujeuk/`의 기존 Compose·서버 디렉터리·포트·볼륨·이미지 경로를 이번 작업에서 변경하지 않았습니다.
+- 아래 과거 기록의 루트 src/Dockerfile/산출물 경로보다 이 절의 경로를 우선합니다. 로컬 검증은 EC2 배포 완료를 의미하지 않으며 푸시·PR 생성은 하지 않습니다.
+
 ## 2026-10-07 develop → main 통합 검토 (PR 준비, 운영 상태 미확인)
 
 - 비교 기준은 main `e9250bb`와 develop `3d9cbe0`이다. 2026-09-07부터 2026-10-07까지 두 브랜치에 반영된 커밋 이력을 검토했다.
@@ -125,7 +185,7 @@ Compose 프로젝트/볼륨 이름을 임의로 변경하면 기존 DB 대신 �
 | `aws-stag.oijwef098234.com` | `host.docker.internal:8081` |
 | `game-api.oijwef098234.com` | `host.docker.internal:8095` |
 
-- 저장소: `ops/aws/Caddyfile`, `ops/aws/docker-compose.proxy.yml`.
+- 저장소: `ops/gujeuk/Caddyfile`, `ops/gujeuk/docker-compose.proxy.yml`.
 - 서버: `/home/ubuntu/gujeuk-aws/proxy/Caddyfile` → 컨테이너 `/etc/caddy/Caddyfile`에 마운트.
 - `host.docker.internal`은 Compose의 `host-gateway` 설정으로 EC2 호스트를 가리킨다.
 - Caddy가 원본 HTTPS를 처리한다. Cloudflare 관리 콘솔의 SSL 모드와 원본 연결 프로토콜은 이번에 확인하지 않았다.
@@ -136,14 +196,14 @@ Compose 프로젝트/볼륨 이름을 임의로 변경하면 기존 DB 대신 �
 
 ### 2026-10-06 저장소 Datadog 배포 설정 변경 (EC2 미배포·미확인)
 
-- 실제 배포 파일 `ops/aws/docker-compose.aws.yml`에 앱 APM 환경변수와 앱·MySQL·Redis의 Datadog service/env 라벨을 추가했다.
+- 실제 배포 파일 `ops/gujeuk/docker-compose.aws.yml`에 앱 APM 환경변수와 앱·MySQL·Redis의 Datadog service/env 라벨을 추가했다.
 - 배포 SSH 스크립트는 `DD_ENV="$DEPLOY_TARGET"`을 export한다. main은 prod, develop은 stag이며, Compose의 앱 환경변수와 세 서비스의 env 라벨이 같은 값을 사용한다.
-- 수동 Compose 실행 시에도 `DD_ENV`가 필수다. 환경별 `.env`에 `DD_ENV=prod` 또는 `DD_ENV=stag`를 지정하거나 셸에서 export한다. 예시는 `ops/aws/*.env.example`에 있다.
+- 수동 Compose 실행 시에도 `DD_ENV`가 필수다. 환경별 `.env`에 `DD_ENV=prod` 또는 `DD_ENV=stag`를 지정하거나 셸에서 export한다. 예시는 `ops/gujeuk/*.env.example`에 있다.
 - 앱의 trace 목적지는 `datadog-agent:8126`이다. 별도로 실행하는 Agent가 각 앱의 Docker 네트워크에 연결되어 해당 이름으로 접근 가능해야 한다. 이번 수정에서는 네트워크·서버 환경파일·컨테이너를 변경하지 않았다.
 - Dockerfile에는 Java Agent 로드 설정이 있다. 실제 EC2 네트워크 연결과 APM 수집 여부는 이번 작업에서 확인하지 않았다. 아래 런타임 및 모니터링 현황은 기존 2026-09-22 스냅샷이다.
 
 
-기준: `.github/workflows/ci-cd.yml`.
+기준: `.github/workflows/gujeuk-ci-cd.yml`.
 
 | 이벤트 | 수행 작업 |
 |---|---|
@@ -156,7 +216,7 @@ Compose 프로젝트/볼륨 이름을 임의로 변경하면 기존 DB 대신 �
 
 1. JDK 17로 `./gradlew bootJar -x test` 실행.
 2. Dockerfile로 이미지 생성, GHCR에 `prod-${GITHUB_SHA}` 또는 `stag-${GITHUB_SHA}` 태그로 push.
-3. SCP로 `ops/aws/docker-compose.aws.yml`을 EC2의 해당 환경 `docker-compose.yml`로 복사.
+3. SCP로 `ops/gujeuk/docker-compose.aws.yml`을 EC2의 해당 환경 `docker-compose.yml`로 복사.
 4. SSH로 배포 디렉터리에 접속. 기존 `.env`를 사용하고 `APP_IMAGE`는 이번 이미지 주소로 export.
 5. `COMPOSE_PROJECT_NAME=gujeuk-aws-prod` 또는 `gujeuk-aws-stag` 설정.
 6. `docker compose --env-file .env pull app`, 이어서 `docker compose --env-file .env up -d` 실행.
@@ -169,7 +229,7 @@ Compose 프로젝트/볼륨 이름을 임의로 변경하면 기존 DB 대신 �
 - `up -d`는 앱만 지정하지 않으므로 Compose 변경에 따라 다른 서비스도 영향을 받을 수 있다.
 - 단일 앱 컨테이너 교체 방식이며, 무중단 배포나 자동 롤백은 구성되어 있지 않다.
 - `.env`를 저장소에서 복사하는 단계는 없다. 서버 파일과 실행 컨테이너 환경변수를 구분한다.
-- Caddy·게임·모니터링은 이 앱 배포 workflow로 자동 배포되지 않는다. `ops/aws/docker-compose.aws.yml`만 복사한다.
+- Caddy·게임·모니터링은 이 앱 배포 workflow로 자동 배포되지 않는다. `ops/gujeuk/docker-compose.aws.yml`만 복사한다.
 - push에서 `docs/**`, `**/*.md`, `monitor-bot/**`, `ops/monitoring/**`, `.github/ISSUE_TEMPLATE/**`만 바뀐 경우 workflow가 제외된다. PR은 이 경로 제외 조건을 적용하지 않는다.
 - 현재 CI에 테스트 실행 단계와 Discord 배포 알림 단계는 없다. `src/test` 디렉터리도 현재 체크아웃에 없다.
 
@@ -206,7 +266,7 @@ TEST_URL=http://localhost:5173,http://localhost:5174
 - **실행 중인 prod 컨테이너에는 아직 예전 CORS 주소 목록과 `VERCEL_URL`이 남아 있다.** 이전 이미지로 기동한 컨테이너의 환경변수는 `.env` 수정만으로 바뀌지 않는다.
 - 현재 코드와 정리된 환경변수를 함께 적용해야 한다. 이전 이미지가 요구하는 변수를 없앤 상태로 이전 이미지만 재기동하지 않는다.
 
-앱 실행에는 DB 연결 정보, JWT secret, Redis 연결 정보가 필요하다. AWS Compose에는 이미지·컨테이너 이름·호스트 포트·볼륨 이름도 필요하다. `ops/aws/prod.env.example`, `stag.env.example`은 형식 참고용이며 실제 `.env`가 아니다.
+앱 실행에는 DB 연결 정보, JWT secret, Redis 연결 정보가 필요하다. AWS Compose에는 이미지·컨테이너 이름·호스트 포트·볼륨 이름도 필요하다. `ops/gujeuk/prod.env.example`, `stag.env.example`은 형식 참고용이며 실제 `.env`가 아니다.
 
 `${VAR:?message}`는 필수값이 없거나 비어 있으면 Compose 실행을 실패시키는 문법이다. `APP_IMAGE`는 배포 쉘에서 전달할 수 있으므로 서버 `.env`만으로 실행 설정을 판단하지 않는다.
 

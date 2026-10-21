@@ -1,0 +1,27 @@
+package com.example.burserker.gujeuk.domain.user.service;
+
+import com.example.burserker.gujeuk.domain.user.presentation.dto.request.HaDataLogRequest;
+import com.example.burserker.gujeuk.domain.user.presentation.dto.request.UserCheckInRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class UserLogHaService {
+    private final UserCheckInService userCheckInService;
+
+    @Transactional
+    public void execute(HaDataLogRequest request) {
+        UserCheckInRequest userCheckInRequest = UserCheckInRequest.create(
+            request.id(),
+            request.maleCount(),
+            request.femaleCount(),
+            request.purpose(),
+            request.visitTime(),
+            request.clientRecordId()
+        );
+
+        userCheckInService.execute(userCheckInRequest);
+    }
+}

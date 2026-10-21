@@ -1,0 +1,30 @@
+package com.example.burserker.gujeuk.domain.log.service;
+
+import com.example.burserker.gujeuk.domain.log.domain.repository.LogRepository;
+import com.example.burserker.gujeuk.domain.log.presentation.dto.response.QueryLogListResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class QueryLogListService {
+    private final LogRepository logRepository;
+
+    @Transactional(readOnly = true)
+    public Slice<QueryLogListResponse> execute(Long organId, Pageable p) {
+        Pageable pageable = PageRequest.of(
+                p.getPageNumber(),
+                p.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "visitDate")
+                        .and(Sort.by(Sort.Direction.DESC, "id"))
+        );
+
+        return logRepository.findAllByOrganId(pageable, organId)
+                .map(QueryLogListResponse::from);
+    }
+}

@@ -3,6 +3,42 @@
 
 > 방문 등록부터 월별 실적 정리까지, 청소년 문화의 집의 운영을 돕습니다.
 
+## 모노레포 개발 구조 (#135)
+
+이 저장소는 기관별 앱을 독립된 Gradle 모듈로 관리합니다. 아래 기존 기능·실행 설명은 구즉에 해당합니다.
+
+```text
+apps/
+├── gujeuk-api/     # 기존 구즉 코드·설정·마이그레이션·Dockerfile
+└── beopdong-api/   # 법동 독립 실행 앱·로컬 MySQL 연결 설정
+shared/common/     # 빈 공통 라이브러리, 앱 의존 연결 없음
+ops/gujeuk/        # 구즉 배포·기존 EC2/Caddy 설정
+ops/beopdong/      # 법동 운영·스테이징 App·MySQL 추가 설정
+```
+
+```bash
+# 전체 빌드
+./gradlew clean build
+
+# 구즉 개별 빌드·실행 (기존 환경변수 필요)
+./gradlew :apps:gujeuk-api:bootJar
+./gradlew :apps:gujeuk-api:bootRun
+
+# 법동 개별 빌드·실행 (법동 local env 필요)
+./gradlew :apps:beopdong-api:build
+./gradlew :apps:beopdong-api:bootRun
+
+# 구즉 이미지: 반드시 저장소 루트에서 실행
+# 실행 JAR만 Docker 컨텍스트에 포함
+docker build -f apps/gujeuk-api/Dockerfile -t gujeuk-check-in-server:local .
+```
+
+구즉 JAR은 `apps/gujeuk-api/build/libs/gujeuk-api.jar`에 생성됩니다. 루트의 `bootJar`·`bootRun`은 구즉 작업으로 연결됩니다. 두 앱은 서로 의존하지 않으며, 공통 코드는 실제 공유 필요가 생길 때만 추출합니다.
+
+법동 로컬 실행은 저장소 밖 `~/env/법동_local.env`를 사용합니다. 연결 대상은 `BeopDong`이고 기본 설정에서 스키마를 자동 변경하지 않습니다. 자세한 실행·테스트 방법은 [법동 모듈 안내](apps/beopdong-api/README.md)를 참고합니다.
+
+기존 구즉 CI/CD는 새 모듈 경로에서 구즉만 패키징·배포합니다. 법동 전용 경로만 변경한 push는 구즉 배포를 실행하지 않습니다. 법동도 develop/main push에서 각각 스테이징/운영 App·MySQL을 배포하도록 설정했습니다. 각 환경의 기존 구즉 Compose에 합치고 Redis를 공유하며, 최초 서버 env·메모리 확보는 별도로 필요합니다. 실제 운영 서버·DB 설정은 이번 초기 구성으로 변경하지 않습니다.
+
 ## 운영 문서
 
 - [현재 프로젝트 상황 및 Codex 작업 기준](docs/PROJECT_CONTEXT.md)
@@ -116,7 +152,7 @@ cp .env.example .env.local
 ## 프로젝트 구조
 
 ```text
-src/main/java/com/example/gujeuck_server/
+apps/gujeuk-api/src/main/java/com/example/burserker/gujeuk/
 ├── domain/
 │   ├── user/          # 회원 등록 및 체크인
 │   ├── log/           # 시설 이용기록
